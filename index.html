@@ -3,1236 +3,210 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Mini Mall 3D - Mobile First</title>
+  <title>Mini Mall 3D</title>
   <style>
-    :root{
-      --bg:#f5efe7;
-      --panel:#fffaf5;
-      --panel-2:#f2e4d5;
-      --accent:#ef7f53;
-      --accent-2:#4a9e86;
-      --text:#2b2b2b;
-      --muted:#6a6a6a;
-      --danger:#cc5646;
-      --shadow:0 12px 30px rgba(0,0,0,.15);
-      --radius:18px;
-    }
-
-    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    html,body{margin:0;height:100%;background:linear-gradient(180deg,#f9f4ed 0%,#efe3d4 100%);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);overflow:hidden}
-    button,input,select{font:inherit}
-
-    #app{
-      position:fixed; inset:0; overflow:hidden;
-    }
-
-    canvas{display:block; width:100%; height:100%}
-
-    .overlay{
-      position:fixed; inset:0; pointer-events:none;
-      display:flex; flex-direction:column; justify-content:space-between;
-      padding:10px;
-      z-index:20;
-    }
-
-    .topbar, .bottombar, .panel, .floating, .toast{
-      pointer-events:auto;
-    }
-
-    .topbar{
-      display:flex; gap:8px; align-items:stretch; justify-content:space-between;
-      background:rgba(255,250,245,.92); backdrop-filter:blur(12px);
-      padding:8px; border-radius:20px; box-shadow:var(--shadow);
-    }
-
-    .brand{display:flex; align-items:center; gap:10px; min-width:0}
-    .brand-badge{
-      width:42px; height:42px; border-radius:14px;
-      background:linear-gradient(135deg,var(--accent),#ffca7a);
-      display:grid; place-items:center; color:#fff; font-weight:900;
-      flex:0 0 auto;
-    }
-    .brand-text{min-width:0}
-    .brand-text h1{margin:0; font-size:15px; line-height:1.1}
-    .brand-text p{margin:2px 0 0; font-size:11px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-
-    .money-wrap{
-      display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end;
-    }
-    .pill{
-      display:flex; align-items:center; gap:6px;
-      background:var(--panel-2); border-radius:999px; padding:9px 12px; font-weight:700; font-size:13px;
-      white-space:nowrap;
-    }
-    .pill small{font-weight:600; color:var(--muted)}
-
-    .bottombar{
-      background:rgba(255,250,245,.94); backdrop-filter:blur(12px);
-      border-radius:22px; box-shadow:var(--shadow);
-      padding:8px;
-      display:grid; grid-template-columns:repeat(5,1fr); gap:8px;
-      margin-bottom:calc(env(safe-area-inset-bottom, 0px));
-    }
-
-    .nav-btn{
-      border:0; background:var(--panel-2); color:var(--text); border-radius:18px; padding:10px 6px;
-      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px;
-      min-height:62px; font-size:11px; font-weight:800; cursor:pointer;
-      transition:transform .15s ease, background .2s ease;
-    }
-    .nav-btn:active{transform:scale(.97)}
-    .nav-btn.active{background:linear-gradient(135deg,var(--accent),#ffb36f); color:white}
-    .icon{font-size:18px; line-height:1}
-
-    .panel{
-      position:fixed; left:10px; right:10px; bottom:98px;
-      max-height:50vh; overflow:auto;
-      background:rgba(255,250,245,.96); backdrop-filter:blur(10px);
-      border-radius:24px; box-shadow:var(--shadow); z-index:30;
-      padding:14px; display:none;
-    }
-    .panel.open{display:block; animation:rise .22s ease}
-    @keyframes rise{from{transform:translateY(14px); opacity:0} to{transform:none; opacity:1}}
-
-    .panel h2{margin:0 0 6px; font-size:18px}
-    .panel p.desc{margin:0 0 12px; color:var(--muted); font-size:13px}
-
-    .shop-cards, .grid-cards{display:grid; gap:10px}
-    .shop-cards{grid-template-columns:1fr}
-    .grid-cards{grid-template-columns:1fr 1fr}
-
-    .card{
-      background:var(--panel); border:1px solid rgba(0,0,0,.05); border-radius:20px; padding:12px; box-shadow:0 8px 20px rgba(0,0,0,.06);
-    }
-    .card h3{margin:0 0 4px; font-size:15px}
-    .card p{margin:0; font-size:12px; color:var(--muted)}
-    .card .row{display:flex; justify-content:space-between; gap:10px; align-items:center; margin-top:10px}
-    .card .meta{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px}
-    .tag{background:var(--panel-2); border-radius:999px; padding:6px 9px; font-size:11px; font-weight:700}
-
-    .btn{
-      border:0; background:var(--accent); color:white; border-radius:14px; padding:10px 12px; font-weight:800; cursor:pointer;
-      box-shadow:0 10px 18px rgba(239,127,83,.22);
-    }
-    .btn.secondary{background:var(--accent-2); box-shadow:0 10px 18px rgba(74,158,134,.2)}
-    .btn.ghost{background:var(--panel-2); color:var(--text); box-shadow:none}
-    .btn.danger{background:var(--danger)}
-    .btn:disabled{opacity:.45; cursor:not-allowed; box-shadow:none}
-
-    .floating{
-      position:fixed; right:10px; top:76px; z-index:25;
-      display:flex; flex-direction:column; gap:8px;
-    }
-    .fab{
-      width:52px; height:52px; border-radius:18px; border:0; cursor:pointer; box-shadow:var(--shadow);
-      background:rgba(255,250,245,.95); font-size:19px; font-weight:900;
-    }
-
-    .toast{
-      position:fixed; left:50%; transform:translateX(-50%); top:78px; z-index:50;
-      background:#222; color:#fff; padding:10px 14px; border-radius:999px; font-size:13px; opacity:0; pointer-events:none;
-      transition:opacity .2s ease, transform .2s ease;
-    }
-    .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
-
-    .splash{
-      position:fixed; inset:0; z-index:100;
-      background:linear-gradient(180deg,#fff7ef 0%,#f2dfc7 100%);
-      display:flex; flex-direction:column; align-items:center; justify-content:center;
-      padding:20px; text-align:center;
-    }
-    .splash.hidden{display:none}
-    .logo-hero{
-      width:96px; height:96px; border-radius:28px; background:linear-gradient(135deg,var(--accent),#ffcd77);
-      display:grid; place-items:center; color:#fff; font-size:46px; font-weight:900; box-shadow:var(--shadow);
-      margin-bottom:16px;
-    }
-    .splash h1{margin:0; font-size:28px}
-    .splash p{max-width:520px; color:var(--muted); font-size:14px; line-height:1.5}
-    .splash-grid{
-      width:min(100%,700px); display:grid; grid-template-columns:1fr; gap:12px; margin-top:16px;
-    }
-
-    .choice{
-      text-align:left; padding:14px; border-radius:24px; background:rgba(255,255,255,.75); border:1px solid rgba(0,0,0,.04); box-shadow:var(--shadow);
-    }
-    .choice .head{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px}
-    .choice .emoji{font-size:28px}
-    .choice h3{margin:0; font-size:18px}
-    .choice p{margin:0; font-size:13px; color:var(--muted)}
-    .choice .features{display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 14px}
-
-    .legend{
-      position:fixed; left:10px; top:76px; z-index:24; max-width:min(78vw,330px);
-      background:rgba(255,250,245,.92); backdrop-filter:blur(10px);
-      border-radius:18px; box-shadow:var(--shadow); padding:10px 12px; font-size:12px;
-    }
-    .legend strong{display:block; margin-bottom:5px}
-    .legend span{color:var(--muted)}
-
-    .mini-stats{display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-top:10px}
-    .mini-stats .stat{background:var(--panel-2); border-radius:14px; padding:8px}
-    .mini-stats .stat b{display:block; font-size:15px}
-    .mini-stats .stat span{font-size:11px; color:var(--muted)}
-
-    @media (min-width: 780px){
-      .overlay{padding:14px}
-      .topbar{padding:10px 12px}
-      .brand-text h1{font-size:18px}
-      .brand-text p{font-size:12px}
-      .panel{left:14px; right:auto; width:390px; bottom:14px; top:92px; max-height:none}
-      .bottombar{width:500px; margin:0 auto 14px}
-      .shop-cards{grid-template-columns:1fr 1fr 1fr}
-      .splash-grid{grid-template-columns:1fr 1fr 1fr}
-    }
+    :root{--bg:#f5efe7;--panel:#fffaf5;--panel2:#f2e4d5;--accent:#ef7f53;--accent2:#4a9e86;--txt:#2b2b2b;--muted:#6a6a6a;--shadow:0 12px 30px rgba(0,0,0,.15)}
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent} html,body{margin:0;height:100%;overflow:hidden;font-family:Inter,system-ui,Arial,sans-serif;background:linear-gradient(180deg,#f9f4ed,#efe3d4);color:var(--txt)}
+    #game{position:fixed;inset:0;display:block;width:100%;height:100%}
+    .ui{position:fixed;inset:0;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:10px;z-index:3}
+    .top,.bottom,.panel,.splash,.fabcol,.toast{pointer-events:auto}
+    .top{display:flex;justify-content:space-between;gap:8px;align-items:center;background:rgba(255,250,245,.95);backdrop-filter:blur(10px);padding:8px 10px;border-radius:18px;box-shadow:var(--shadow)}
+    .brand{display:flex;gap:10px;align-items:center;min-width:0}.logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--accent),#ffca7a);display:grid;place-items:center;color:#fff;font-weight:900}.brand h1{margin:0;font-size:15px}.brand p{margin:2px 0 0;color:var(--muted);font-size:11px}
+    .stats{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.pill{background:var(--panel2);border-radius:999px;padding:9px 12px;font-size:13px;font-weight:700}
+    .bottom{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;background:rgba(255,250,245,.95);backdrop-filter:blur(10px);padding:8px;border-radius:20px;box-shadow:var(--shadow);margin-bottom:env(safe-area-inset-bottom,0)}
+    .nav{border:0;border-radius:16px;background:var(--panel2);min-height:58px;font-weight:800;font-size:11px;cursor:pointer}.nav.active{background:linear-gradient(135deg,var(--accent),#ffb36f);color:#fff}
+    .panel{position:fixed;left:10px;right:10px;bottom:95px;max-height:48vh;overflow:auto;background:rgba(255,250,245,.97);border-radius:22px;box-shadow:var(--shadow);padding:14px;display:none;z-index:4}.panel.open{display:block}
+    .cards{display:grid;grid-template-columns:1fr;gap:10px}.card{background:var(--panel);padding:12px;border-radius:18px;border:1px solid rgba(0,0,0,.05)}.card h3{margin:0 0 6px;font-size:15px}.card p{margin:0;color:var(--muted);font-size:12px}.meta{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}.tag{background:var(--panel2);padding:6px 9px;border-radius:999px;font-size:11px;font-weight:700}.row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px}
+    .btn{border:0;border-radius:14px;padding:10px 12px;font-weight:800;cursor:pointer;background:var(--accent);color:#fff}.btn.secondary{background:var(--accent2)}.btn:disabled{opacity:.45;cursor:not-allowed}
+    .fabcol{position:fixed;right:10px;top:78px;display:flex;flex-direction:column;gap:8px;z-index:4}.fab{width:52px;height:52px;border:0;border-radius:18px;background:rgba(255,250,245,.95);box-shadow:var(--shadow);cursor:pointer}
+    .toast{position:fixed;left:50%;top:78px;transform:translateX(-50%);background:#222;color:#fff;border-radius:999px;padding:10px 14px;opacity:0;transition:.2s;z-index:10}.toast.show{opacity:1}
+    .legend{position:fixed;left:10px;top:78px;max-width:min(78vw,330px);background:rgba(255,250,245,.95);padding:10px 12px;border-radius:18px;box-shadow:var(--shadow);font-size:12px;z-index:4}.legend span{color:var(--muted)}
+    .splash{position:fixed;inset:0;background:linear-gradient(180deg,#fff7ef,#f2dfc7);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;z-index:20}.splash.hidden{display:none}.hero{width:96px;height:96px;border-radius:28px;background:linear-gradient(135deg,var(--accent),#ffcd77);display:grid;place-items:center;color:#fff;font-size:46px;font-weight:900;box-shadow:var(--shadow)}.splash h1{margin:14px 0 8px;font-size:28px}.splash p{max-width:600px;color:var(--muted);text-align:center}
+    .choices{width:min(100%,700px);display:grid;grid-template-columns:1fr;gap:12px;margin-top:16px}.choice{background:rgba(255,255,255,.8);padding:14px;border-radius:22px;box-shadow:var(--shadow)}.choice-head{display:flex;justify-content:space-between;align-items:center}.choice h3{margin:0}.emoji{font-size:28px}
+    @media (min-width:780px){.panel{left:14px;right:auto;top:92px;bottom:14px;width:390px;max-height:none}.bottom{width:500px;margin:0 auto 14px}.choices{grid-template-columns:repeat(3,1fr)}.cards{grid-template-columns:1fr 1fr}.brand h1{font-size:18px}}
   </style>
 </head>
 <body>
-  <div id="app"></div>
-
-  <div class="splash" id="splash">
-    <div class="logo-hero">🏬</div>
-    <h1>Mini Mall 3D</h1>
-    <p>
-      Ouvre ton magasin, recrute tes employés, ajoute des stands, vends à des clients PNJ et agrandis ton terrain.
-      L'esprit est inspiré des jeux de gestion en vue du dessus, pensé <strong>mobile first</strong> et jouable directement sur Vercel.
-    </p>
-    <div class="splash-grid" id="shopChoices"></div>
-  </div>
-
+  <canvas id="game"></canvas>
   <div class="toast" id="toast"></div>
-
-  <div class="overlay">
+  <div class="splash" id="splash">
+    <div class="hero">🏬</div>
+    <h1>Mini Mall 3D</h1>
+    <p>Choisis un magasin, ajoute des stands, recrute, vends à des clients PNJ et agrandis ton terrain. Cette version est autonome, sans dépendance externe, donc elle fonctionne bien sur Vercel.</p>
+    <div class="choices" id="choices"></div>
+  </div>
+  <div class="ui">
     <div>
-      <div class="topbar">
-        <div class="brand">
-          <div class="brand-badge">3D</div>
-          <div class="brand-text">
-            <h1 id="shopTitle">Mini Mall 3D</h1>
-            <p id="shopSubtitle">Choisis un magasin pour commencer</p>
-          </div>
-        </div>
-        <div class="money-wrap">
-          <div class="pill">💶 <span id="money">100 €</span></div>
-          <div class="pill">🧑‍💼 <small>Employés</small> <span id="employeeCount">1</span></div>
-          <div class="pill">🏪 <small>Stands</small> <span id="standCount">1</span></div>
-        </div>
+      <div class="top">
+        <div class="brand"><div class="logo">3D</div><div><h1 id="shopName">Mini Mall 3D</h1><p id="shopSub">Choisis un magasin pour commencer</p></div></div>
+        <div class="stats"><div class="pill">💶 <span id="money">100 €</span></div><div class="pill">👥 <span id="employees">1</span></div><div class="pill">🏪 <span id="stands">1</span></div></div>
       </div>
-
-      <div class="legend">
-        <strong>Commandes</strong>
-        <span>Fais glisser pour tourner. Pince pour zoomer. Touchez un terrain vide pour le sélectionner. Les clients entrent seuls et achètent automatiquement.</span>
-        <div class="mini-stats">
-          <div class="stat"><b id="level">1</b><span>Niveau</span></div>
-          <div class="stat"><b id="popularity">1.0x</b><span>Popularité</span></div>
-          <div class="stat"><b id="customersServed">0</b><span>Clients servis</span></div>
-          <div class="stat"><b id="incomePerMinute">0 €/m</b><span>Revenu estimé</span></div>
-        </div>
-      </div>
+      <div class="legend"><strong>Vue du dessus</strong><br><span>Appuie sur une case du magasin pour la sélectionner. Les clients arrivent automatiquement. Tu peux construire, débloquer des produits, recruter et agrandir.</span></div>
     </div>
-
-    <div class="bottombar">
-      <button class="nav-btn active" data-panel="build"><span class="icon">🧱</span><span>Construire</span></button>
-      <button class="nav-btn" data-panel="products"><span class="icon">📦</span><span>Produits</span></button>
-      <button class="nav-btn" data-panel="staff"><span class="icon">👥</span><span>Équipe</span></button>
-      <button class="nav-btn" data-panel="expand"><span class="icon">⬜</span><span>Terrain</span></button>
-      <button class="nav-btn" data-panel="stats"><span class="icon">📈</span><span>Stats</span></button>
+    <div class="bottom">
+      <button class="nav active" data-panel="build">🧱 Construire</button>
+      <button class="nav" data-panel="products">📦 Produits</button>
+      <button class="nav" data-panel="staff">👥 Équipe</button>
+      <button class="nav" data-panel="expand">⬜ Terrain</button>
+      <button class="nav" data-panel="stats">📈 Stats</button>
     </div>
   </div>
-
-  <div class="floating">
-    <button class="fab" id="speedBtn" title="Vitesse">⏩</button>
-    <button class="fab" id="saveBtn" title="Sauvegarder">💾</button>
-    <button class="fab" id="resetBtn" title="Réinitialiser">↺</button>
-  </div>
-
+  <div class="fabcol"><button class="fab" id="speed">⏩</button><button class="fab" id="save">💾</button><button class="fab" id="reset">↺</button></div>
   <div class="panel open" id="panel-build"></div>
   <div class="panel" id="panel-products"></div>
   <div class="panel" id="panel-staff"></div>
   <div class="panel" id="panel-expand"></div>
   <div class="panel" id="panel-stats"></div>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const $$ = s => Array.from(document.querySelectorAll(s));
+  const toastEl = $('#toast');
+  const key = 'mini-mall-standalone-v2';
 
-  <script type="module">
-    import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
-    import { OrbitControls } from 'https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+  const SHOPS = {
+    food:{name:'Magasin alimentaire',emoji:'🥬',sub:'Fruits, pains, produits premium',floor:'#e8d7b7',accent:'#8bbf67',stands:[
+      {id:'fruit',name:'Stand fruits',cost:0,income:5,service:5,premium:false},
+      {id:'bakery',name:'Boulangerie',cost:120,income:12,service:7,premium:false},
+      {id:'cheese',name:'Fromages fins',cost:240,income:22,service:9,premium:true},
+      {id:'organic',name:'Bio premium',cost:360,income:28,service:11,premium:true},
+      {id:'fine',name:'Épicerie fine',cost:520,income:38,service:12,premium:true}
+    ],products:[
+      {id:'apples',name:'Pommes premium',stand:'fruit',cost:40,bonus:.03,price:8},
+      {id:'bread',name:'Pains spéciaux',stand:'bakery',cost:85,bonus:.07,price:16},
+      {id:'truffle',name:'Truffes gourmet',stand:'organic',cost:210,bonus:.16,price:40},
+      {id:'gourmet',name:'Panier gourmet',stand:'fine',cost:360,bonus:.23,price:65}
+    ]},
+    decor:{name:'Magasin décoration',emoji:'🛋️',sub:'Objets design, plantes, luminaires',floor:'#d7e6ef',accent:'#7ca8c7',stands:[
+      {id:'frames',name:'Vases & cadres',cost:0,income:6,service:5,premium:false},
+      {id:'plants',name:'Coin plantes',cost:130,income:13,service:7,premium:false},
+      {id:'lights',name:'Luminaires',cost:260,income:23,service:9,premium:true},
+      {id:'furniture',name:'Mobilier design',cost:390,income:30,service:11,premium:true},
+      {id:'luxury',name:'Collection luxe',cost:560,income:42,service:13,premium:true}
+    ],products:[
+      {id:'mirror',name:'Miroirs déco',stand:'frames',cost:50,bonus:.04,price:10},
+      {id:'lamp',name:'Lampe tendance',stand:'lights',cost:105,bonus:.08,price:20},
+      {id:'sofa',name:'Mini canapé design',stand:'furniture',cost:230,bonus:.16,price:44},
+      {id:'luxbox',name:'Objet signature',stand:'luxury',cost:380,bonus:.24,price:70}
+    ]},
+    candy:{name:'Magasin de bonbons',emoji:'🍬',sub:'Bonbons colorés, chocolats, cadeaux',floor:'#f4d4e3',accent:'#e17aa8',stands:[
+      {id:'classic',name:'Bonbons classiques',cost:0,income:5,service:5,premium:false},
+      {id:'choco',name:'Chocolats',cost:125,income:12,service:7,premium:false},
+      {id:'gift',name:'Coffrets cadeaux',cost:250,income:23,service:9,premium:true},
+      {id:'jelly',name:'Bar à jelly',cost:375,income:29,service:11,premium:true},
+      {id:'dubai',name:'Chocolat prestige',cost:540,income:41,service:13,premium:true}
+    ],products:[
+      {id:'mix',name:'Sachet mix',stand:'classic',cost:40,bonus:.03,price:8},
+      {id:'tablet',name:'Tablette premium',stand:'choco',cost:90,bonus:.07,price:16},
+      {id:'giftbox',name:'Grand coffret',stand:'gift',cost:220,bonus:.17,price:42},
+      {id:'prestige',name:'Collection prestige',stand:'dubai',cost:355,bonus:.25,price:66}
+    ]}
+  };
 
-    const STORAGE_KEY = 'mini-mall-3d-save-v1';
+  let state = null;
+  let selectedTile = '0,0';
+  let activePanel = 'build';
+  let speed = 1;
+  let cameraOffsetY = 0;
+  let cameraOffsetX = 0;
+  const tileSize = 80;
+  const worldOrigin = {x: 0, y: 0};
+  const customers = [];
+  let last = performance.now();
 
-    const SHOP_DEFS = {
-      food: {
-        key: 'food',
-        name: 'Marché Alimentaire',
-        emoji: '🥬',
-        color: 0x8bbf67,
-        floor: 0xe7d6b5,
-        subtitle: 'Fruits, légumes, pains et produits premium.',
-        stands: [
-          { id:'fruit', name:'Stand fruits', cost:0, income:5, service:5, color:0xf58b47, tag:'Basique', premium:false },
-          { id:'bakery', name:'Boulangerie', cost:120, income:12, service:7, color:0xd69b52, tag:'Chaud', premium:false },
-          { id:'cheese', name:'Fromages fins', cost:240, income:22, service:9, color:0xf0d060, tag:'Premium', premium:true },
-          { id:'organic', name:'Bio premium', cost:360, income:28, service:11, color:0x7cab5d, tag:'Éco', premium:true },
-          { id:'wine', name:'Épicerie fine', cost:520, income:38, service:12, color:0x8b4d4d, tag:'Luxe', premium:true }
-        ],
-        products: [
-          { id:'apples', name:'Pommes', stand:'fruit', price:8, bonus:.03, cost:40 },
-          { id:'bread', name:'Pains spéciaux', stand:'bakery', price:16, bonus:.07, cost:85 },
-          { id:'truffle', name:'Truffes & coffrets', stand:'organic', price:40, bonus:.16, cost:210 },
-          { id:'gourmet', name:'Panier gourmet', stand:'wine', price:65, bonus:.23, cost:360 }
-        ]
-      },
-      decor: {
-        key: 'decor',
-        name: 'Boutique Déco',
-        emoji: '🛋️',
-        color: 0x7ca8c7,
-        floor: 0xd7e6ef,
-        subtitle: 'Objets design, plantes, luminaires et pièces chic.',
-        stands: [
-          { id:'vases', name:'Vases & cadres', cost:0, income:6, service:5, color:0x6ea5c2, tag:'Basique', premium:false },
-          { id:'plants', name:'Coin plantes', cost:130, income:13, service:7, color:0x6ca86c, tag:'Nature', premium:false },
-          { id:'lights', name:'Luminaires', cost:260, income:23, service:9, color:0xf7cb66, tag:'Style', premium:true },
-          { id:'furniture', name:'Mobilier design', cost:390, income:30, service:11, color:0xb58a5d, tag:'Premium', premium:true },
-          { id:'luxury', name:'Collection luxe', cost:560, income:42, service:13, color:0x8e6ac0, tag:'Signature', premium:true }
-        ],
-        products: [
-          { id:'mirror', name:'Miroirs déco', stand:'vases', price:10, bonus:.04, cost:50 },
-          { id:'lamp', name:'Lampe tendance', stand:'lights', price:20, bonus:.08, cost:105 },
-          { id:'sofa', name:'Mini canapé design', stand:'furniture', price:44, bonus:.16, cost:230 },
-          { id:'luxbox', name:'Objet signature', stand:'luxury', price:70, bonus:.24, cost:380 }
-        ]
-      },
-      candy: {
-        key: 'candy',
-        name: 'Magasin de Bonbons',
-        emoji: '🍬',
-        color: 0xe17aa8,
-        floor: 0xf4d4e3,
-        subtitle: 'Bonbons colorés, chocolats, cadeaux et exclusivités.',
-        stands: [
-          { id:'classic', name:'Bonbons classiques', cost:0, income:5, service:5, color:0xe485b1, tag:'Basique', premium:false },
-          { id:'choco', name:'Chocolats', cost:125, income:12, service:7, color:0x8e5a49, tag:'Gourmand', premium:false },
-          { id:'gift', name:'Coffrets cadeaux', cost:250, income:23, service:9, color:0xf1b94a, tag:'Premium', premium:true },
-          { id:'jelly', name:'Bar à jelly', cost:375, income:29, service:11, color:0x73c9dc, tag:'Fun', premium:true },
-          { id:'dubai', name:'Chocolat prestige', cost:540, income:41, service:13, color:0x4c8967, tag:'Luxe', premium:true }
-        ],
-        products: [
-          { id:'mix', name:'Sachet mix', stand:'classic', price:8, bonus:.03, cost:40 },
-          { id:'tablet', name:'Tablette premium', stand:'choco', price:16, bonus:.07, cost:90 },
-          { id:'giftbox', name:'Grand coffret', stand:'gift', price:42, bonus:.17, cost:220 },
-          { id:'prestige', name:'Collection prestige', stand:'dubai', price:66, bonus:.25, cost:355 }
-        ]
-      }
-    };
+  const canvas = $('#game');
+  const ctx = canvas.getContext('2d');
 
-    const TOAST = document.getElementById('toast');
-    const splash = document.getElementById('splash');
-    const shopChoices = document.getElementById('shopChoices');
-    const moneyEl = document.getElementById('money');
-    const employeeCountEl = document.getElementById('employeeCount');
-    const standCountEl = document.getElementById('standCount');
-    const titleEl = document.getElementById('shopTitle');
-    const subtitleEl = document.getElementById('shopSubtitle');
-    const levelEl = document.getElementById('level');
-    const popularityEl = document.getElementById('popularity');
-    const customersServedEl = document.getElementById('customersServed');
-    const incomePerMinuteEl = document.getElementById('incomePerMinute');
+  function resize(){
+    canvas.width = innerWidth * devicePixelRatio;
+    canvas.height = innerHeight * devicePixelRatio;
+    canvas.style.width = innerWidth + 'px';
+    canvas.style.height = innerHeight + 'px';
+    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  }
+  addEventListener('resize', resize);
+  resize();
 
-    let scene, camera, renderer, controls, raycaster, pointer;
-    let world = null;
-    let speedMultiplier = 1;
-    let lastTime = performance.now();
-    let hoverTile = null;
-    let hoveredMesh = null;
-
-    function showToast(message){
-      TOAST.textContent = message;
-      TOAST.classList.add('show');
-      clearTimeout(showToast._t);
-      showToast._t = setTimeout(()=>TOAST.classList.remove('show'), 1600);
+  function showToast(msg){ toastEl.textContent = msg; toastEl.classList.add('show'); clearTimeout(showToast.t); showToast.t = setTimeout(()=>toastEl.classList.remove('show'),1400); }
+  function money(v){ return Math.floor(v).toLocaleString('fr-FR') + ' €'; }
+  function uid(){ return Math.random().toString(36).slice(2)+Date.now().toString(36); }
+  function save(){ if(!state) return; const all = JSON.parse(localStorage.getItem(key)||'{}'); all[state.shopKey] = state; localStorage.setItem(key, JSON.stringify(all)); showToast('Sauvegardé'); }
+  function load(shopKey){ const all = JSON.parse(localStorage.getItem(key)||'{}'); return all[shopKey] || makeState(shopKey); }
+  function makeState(shopKey){ const def = SHOPS[shopKey]; return {shopKey,money:100,employees:1,popularity:1,level:1,customersServed:0,totalEarned:0,gridSize:4,ownedTiles:['0,0','1,0','0,1','1,1'],stands:[{uid:uid(),tile:'0,0',standId:def.stands[0].id,level:1}],unlockedProducts:[],expansionIndex:0,stats:{sales:0,minutesPlayed:0,sessions:0}}; }
+  function shop(){ return SHOPS[state.shopKey]; }
+  function standDef(id){ return shop().stands.find(s=>s.id===id); }
+  function unlockedBonus(standId){ return shop().products.filter(p=>p.stand===standId && state.unlockedProducts.includes(p.id)).reduce((a,b)=>a+b.bonus,0); }
+  function standPower(stand){ const d=standDef(stand.standId); return (d.income*stand.level)*(1+unlockedBonus(stand.standId))*state.popularity; }
+  function incomePerMin(){ return Math.floor(state.stands.reduce((a,s)=>a+standPower(s),0) * (0.8 + state.employees*0.18)); }
+  function updateProgress(){ state.level = 1 + Math.floor(state.totalEarned / 500); state.popularity = 1 + state.stands.length*0.05 + state.unlockedProducts.length*0.04 + Math.min(1.6, state.level*0.03); }
+  function tileCenter(x,z){
+    const baseX = innerWidth/2 + cameraOffsetX;
+    const baseY = innerHeight/2 - 90 + cameraOffsetY;
+    return {x: baseX + (x-z)*tileSize*0.7, y: baseY + (x+z)*tileSize*0.35};
+  }
+  function drawDiamond(cx,cy,w,h,fill,stroke){ ctx.beginPath(); ctx.moveTo(cx,cy-h/2); ctx.lineTo(cx+w/2,cy); ctx.lineTo(cx,cy+h/2); ctx.lineTo(cx-w/2,cy); ctx.closePath(); ctx.fillStyle=fill; ctx.fill(); ctx.strokeStyle=stroke; ctx.lineWidth=2; ctx.stroke(); }
+  function drawStand(stand,x,z){ const d=standDef(stand.standId); const c=tileCenter(x,z); drawDiamond(c.x,c.y-14,64,34,'#fff6ea','#d2b79b'); ctx.fillStyle=d.accent||shop().accent; ctx.fillRect(c.x-22,c.y-38,44,18); ctx.fillStyle=colorForStand(d); ctx.fillRect(c.x-26,c.y-32,52,28); ctx.fillStyle='#fff'; ctx.fillRect(c.x-30,c.y-36,60,6); ctx.fillStyle=d.premium ? '#ffd54a' : '#ffe0a8'; ctx.fillRect(c.x-18,c.y-55,12,12); if(d.premium){ctx.beginPath();ctx.arc(c.x+18,c.y-50,7,0,Math.PI*2);ctx.fillStyle='#ffd54a';ctx.fill();} }
+  function colorForStand(d){ return ({food:'#8bbf67',decor:'#7ca8c7',candy:'#e17aa8'})[state.shopKey] || '#ef7f53'; }
+  function drawEmployee(i){ const pos = i < state.stands.length ? state.stands[i] : state.stands[state.stands.length-1]; const t = pos ? tileCenter(...pos.tile.split(',').map(Number)) : tileCenter(0,0); const ox = i%2===0 ? -24 : 24; const oy = i%2===0 ? 4 : -4; drawPerson(t.x+ox,t.y+oy,'#4a9e86'); }
+  function drawPerson(x,y,color){ ctx.fillStyle=color; ctx.fillRect(x-6,y-22,12,16); ctx.beginPath(); ctx.arc(x,y-28,7,0,Math.PI*2); ctx.fillStyle='#ffd9be'; ctx.fill(); ctx.fillStyle=color; ctx.fillRect(x-4,y-6,3,10); ctx.fillRect(x+1,y-6,3,10); }
+  function spawnCustomer(){ if(state.stands.length===0) return; const target = state.stands[Math.floor(Math.random()*state.stands.length)]; customers.push({x:-60,y:innerHeight*0.56,phase:'enter',wait:2+Math.random()*4,target:target.uid,color:Math.random()>.5?'#5f7fe2':'#df7e69'}); }
+  function updateCustomers(dt){ const max = Math.min(18,4+Math.floor(state.ownedTiles.length/2)+state.employees); if(Math.random() < dt*(0.4 + state.popularity*0.1) && customers.length < max) spawnCustomer();
+    for(let i=customers.length-1;i>=0;i--){ const c=customers[i]; const s = state.stands.find(v=>v.uid===c.target); if(!s){ customers.splice(i,1); continue; } const tc = tileCenter(...s.tile.split(',').map(Number)); if(c.phase==='enter'){ const dx = tc.x - c.x, dy=(tc.y+18)-c.y; const len=Math.hypot(dx,dy)||1; c.x += dx/len*80*dt*speed; c.y += dy/len*80*dt*speed; if(len<10) c.phase='wait'; }
+      else if(c.phase==='wait'){ c.wait -= dt*(0.7 + state.employees*0.2)*speed; if(c.wait<=0){ const amount = standPower(s)*(0.75+Math.random()*0.55); state.money += amount; state.totalEarned += amount; state.customersServed += 1; state.stats.sales += 1; updateProgress(); c.phase='exit'; } }
+      else { c.x -= 90*dt*speed; c.y += 20*dt*speed; if(c.x < -100) customers.splice(i,1); }
     }
-
-    function formatMoney(v){
-      return `${Math.floor(v).toLocaleString('fr-FR')} €`;
-    }
-
-    function deepClone(obj){ return JSON.parse(JSON.stringify(obj)); }
-
-    function makeDefaultState(shopKey){
-      const def = SHOP_DEFS[shopKey];
-      return {
-        version:1,
-        shopKey,
-        money:100,
-        employees:1,
-        popularity:1,
-        level:1,
-        customersServed:0,
-        totalEarned:0,
-        speed:1,
-        gridSize:4,
-        ownedTiles:["0,0","1,0","0,1","1,1"],
-        stands:[
-          { uid: crypto.randomUUID(), tile:'0,0', standId:def.stands[0].id, level:1 }
-        ],
-        unlockedProducts:[],
-        employeeAssignments:[{ id: crypto.randomUUID(), targetStandUid:null, progress:0 }],
-        expansionIndex:0,
-        stats:{ sessions:0, minutesPlayed:0, sales:0 }
-      };
-    }
-
-    function saveState(){
-      if(!world) return;
-      const all = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-      all[world.state.shopKey] = world.state;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-      showToast('Partie sauvegardée');
-    }
-
-    function loadState(shopKey){
-      const all = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-      return all[shopKey] || makeDefaultState(shopKey);
-    }
-
-    function resetState(){
-      if(!world) return;
-      if(!confirm('Réinitialiser ce magasin ?')) return;
-      world.dispose();
-      startGame(world.state.shopKey, true);
-      showToast('Magasin réinitialisé');
-    }
-
-    function createRenderer(){
-      const app = document.getElementById('app');
-      renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      renderer.setSize(innerWidth, innerHeight);
-      renderer.shadowMap.enabled = true;
-      app.innerHTML = '';
-      app.appendChild(renderer.domElement);
-    }
-
-    function createScene(){
-      scene = new THREE.Scene();
-      scene.fog = new THREE.Fog(0xf2e4d5, 20, 46);
-
-      camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 200);
-      camera.position.set(7.2, 9.5, 7.2);
-
-      controls = new OrbitControls(camera, renderer.domElement);
-      controls.enableDamping = true;
-      controls.target.set(2.2, 0, 2.2);
-      controls.maxPolarAngle = Math.PI/2.2;
-      controls.minDistance = 5;
-      controls.maxDistance = 18;
-      controls.enablePan = false;
-
-      const hemi = new THREE.HemisphereLight(0xfff5df, 0xb38f72, 1.2);
-      scene.add(hemi);
-
-      const dir = new THREE.DirectionalLight(0xffffff, 1.4);
-      dir.position.set(7, 10, 5);
-      dir.castShadow = true;
-      dir.shadow.mapSize.set(1024,1024);
-      dir.shadow.camera.left = -20;
-      dir.shadow.camera.right = 20;
-      dir.shadow.camera.top = 20;
-      dir.shadow.camera.bottom = -20;
-      scene.add(dir);
-
-      raycaster = new THREE.Raycaster();
-      pointer = new THREE.Vector2();
-
-      const ground = new THREE.Mesh(
-        new THREE.PlaneGeometry(60,60),
-        new THREE.MeshStandardMaterial({ color:0xdcc3ab, roughness:1 })
-      );
-      ground.rotation.x = -Math.PI/2;
-      ground.position.y = -0.02;
-      ground.receiveShadow = true;
-      scene.add(ground);
-
-      for(let i=0;i<30;i++){
-        const x = (Math.random()-.5)*42;
-        const z = (Math.random()-.5)*42;
-        if(Math.abs(x)<8 && Math.abs(z)<8) continue;
-        scene.add(makeTree(x,z));
-      }
-    }
-
-    function makeTree(x,z){
-      const g = new THREE.Group();
-      const trunk = new THREE.Mesh(
-        new THREE.CylinderGeometry(.08,.12,.8,8),
-        new THREE.MeshStandardMaterial({ color:0x8d6546, roughness:1 })
-      );
-      trunk.position.y=.4;
-      trunk.castShadow=true;
-      g.add(trunk);
-      const top = new THREE.Mesh(
-        new THREE.SphereGeometry(.45,16,12),
-        new THREE.MeshStandardMaterial({ color:0x78af64, roughness:1 })
-      );
-      top.position.y=1.05;
-      top.castShadow=true;
-      g.add(top);
-      g.position.set(x,0,z);
-      return g;
-    }
-
-    function createWorld(state){
-      const def = SHOP_DEFS[state.shopKey];
-      const group = new THREE.Group();
-      scene.add(group);
-
-      const tileMap = new Map();
-      const standMeshes = new Map();
-      const customers = [];
-      const employees = [];
-      let spawnTimer = 0;
-      let selectedTile = null;
-      let sparkleTimer = 0;
-
-      const worldObj = {
-        state,
-        def,
-        group,
-        tileMap,
-        standMeshes,
-        customers,
-        employees,
-        get selectedTile(){ return selectedTile; },
-        set selectedTile(v){ selectedTile = v; repaintTiles(); renderPanels(); },
-        dispose(){ scene.remove(group); },
-        update,
-        buyStand,
-        expandLand,
-        hireEmployee,
-        unlockProduct,
-        repaintTiles,
-        getStandData,
-        incomePerMinuteEstimate,
-        removeAllVisuals,
-      };
-
-      buildBase();
-      rebuildEmployees();
-      rebuildStands();
-      repaintTiles();
-
-      function removeAllVisuals(){
-        while(group.children.length) group.remove(group.children[0]);
-      }
-
-      function buildBase(){
-        const border = new THREE.Mesh(
-          new THREE.BoxGeometry(state.gridSize+0.5, .18, state.gridSize+0.5),
-          new THREE.MeshStandardMaterial({ color:0xb28b6a, roughness:.95 })
-        );
-        border.position.set((state.gridSize-1)/2,.05,(state.gridSize-1)/2);
-        border.receiveShadow=true;
-        group.add(border);
-
-        const path = new THREE.Mesh(
-          new THREE.BoxGeometry(1.2,.08,2.4),
-          new THREE.MeshStandardMaterial({ color:0xc6b5a0, roughness:1 })
-        );
-        path.position.set(-0.75,.15,.5);
-        path.receiveShadow = true;
-        group.add(path);
-
-        const gate = new THREE.Group();
-        const g1 = new THREE.Mesh(new THREE.BoxGeometry(.15,1.1,.15), new THREE.MeshStandardMaterial({ color:0x73594d }));
-        const g2 = g1.clone();
-        g1.position.set(-1.25,.55,-.1); g2.position.set(-1.25,.55,1.1);
-        const arch = new THREE.Mesh(new THREE.BoxGeometry(.15,.18,1.35), new THREE.MeshStandardMaterial({ color:def.color }));
-        arch.position.set(-1.25,1.05,.5);
-        gate.add(g1,g2,arch);
-        group.add(gate);
-
-        const sign = makeSign(def.emoji + ' ' + def.name, def.color);
-        sign.position.set(.9,.2,-.75);
-        group.add(sign);
-
-        for(let x=0;x<state.gridSize;x++){
-          for(let z=0;z<state.gridSize;z++){
-            const tile = makeTile(x,z,state.ownedTiles.includes(`${x},${z}`));
-            group.add(tile);
-            tileMap.set(`${x},${z}`, tile);
-          }
-        }
-      }
-
-      function makeSign(text,color){
-        const g = new THREE.Group();
-        const board = new THREE.Mesh(
-          new THREE.BoxGeometry(2.4,.2,.7),
-          new THREE.MeshStandardMaterial({ color, roughness:.8 })
-        );
-        board.position.y=1.5;
-        board.castShadow = true;
-        const pole1 = new THREE.Mesh(new THREE.BoxGeometry(.12,1.5,.12), new THREE.MeshStandardMaterial({ color:0x7a5b46 }));
-        const pole2 = pole1.clone();
-        pole1.position.set(-.85,.75,0);
-        pole2.position.set(.85,.75,0);
-        g.add(board,pole1,pole2);
-        return g;
-      }
-
-      function makeTile(x,z,owned){
-        const mesh = new THREE.Mesh(
-          new THREE.BoxGeometry(.92,.14,.92),
-          new THREE.MeshStandardMaterial({ color: owned ? def.floor : 0xcab6a1, roughness:1 })
-        );
-        mesh.receiveShadow = true;
-        mesh.castShadow = false;
-        mesh.position.set(x,.15,z);
-        mesh.userData = { type:'tile', tile:`${x},${z}` };
-        return mesh;
-      }
-
-      function repaintTiles(){
-        tileMap.forEach((mesh,key)=>{
-          const isOwned = state.ownedTiles.includes(key);
-          const isSelected = selectedTile === key;
-          const hasStand = state.stands.some(s=>s.tile===key);
-          mesh.material.color.setHex(
-            isSelected ? 0xffd46f : hasStand ? 0xead29f : isOwned ? def.floor : 0xcab6a1
-          );
-          mesh.scale.y = isSelected ? 1.12 : 1;
-        });
-      }
-
-      function rebuildStands(){
-        for(const [uid,mesh] of standMeshes.entries()) group.remove(mesh);
-        standMeshes.clear();
-
-        for(const stand of state.stands){
-          const data = getStandData(stand.standId);
-          const [x,z] = stand.tile.split(',').map(Number);
-          const mesh = makeStandMesh(data, stand.level, x, z);
-          mesh.userData = { type:'stand', uid:stand.uid, tile:stand.tile };
-          group.add(mesh);
-          standMeshes.set(stand.uid, mesh);
-        }
-      }
-
-      function makeStandMesh(data, level, x, z){
-        const g = new THREE.Group();
-        g.position.set(x,.23,z);
-
-        const base = new THREE.Mesh(
-          new THREE.BoxGeometry(.82,.2,.82),
-          new THREE.MeshStandardMaterial({ color:0xf7f2ea, roughness:.9 })
-        );
-        base.receiveShadow = true;
-        g.add(base);
-
-        const top = new THREE.Mesh(
-          new THREE.BoxGeometry(.72,.48,.72),
-          new THREE.MeshStandardMaterial({ color:data.color, roughness:.75 })
-        );
-        top.position.y=.33;
-        top.castShadow = true;
-        g.add(top);
-
-        const awning = new THREE.Mesh(
-          new THREE.BoxGeometry(.86,.1,.86),
-          new THREE.MeshStandardMaterial({ color:0xffffff, roughness:.8 })
-        );
-        awning.position.y=.64;
-        awning.castShadow=true;
-        g.add(awning);
-
-        for(let i=0;i<level;i++){
-          const crate = new THREE.Mesh(
-            new THREE.BoxGeometry(.15,.15,.15),
-            new THREE.MeshStandardMaterial({ color:0xffe0a8, roughness:.8 })
-          );
-          crate.position.set(-.18 + i*.18,.78,.18);
-          crate.castShadow=true;
-          g.add(crate);
-        }
-
-        if(data.premium){
-          const premium = new THREE.Mesh(
-            new THREE.CylinderGeometry(.12,.12,.07,16),
-            new THREE.MeshStandardMaterial({ color:0xffd54a, metalness:.3, roughness:.35 })
-          );
-          premium.position.set(.24,.78,-.22);
-          premium.castShadow = true;
-          g.add(premium);
-        }
-
-        return g;
-      }
-
-      function rebuildEmployees(){
-        employees.forEach(e=>group.remove(e.mesh));
-        employees.length = 0;
-        while(state.employeeAssignments.length < state.employees){
-          state.employeeAssignments.push({ id: crypto.randomUUID(), targetStandUid:null, progress:0 });
-        }
-        state.employeeAssignments = state.employeeAssignments.slice(0, state.employees);
-
-        state.employeeAssignments.forEach((emp, i)=>{
-          const mesh = makeHuman(0x4a9e86, 0xffe0c5);
-          mesh.position.set(-0.55,.2, 0.4 + i*0.28);
-          group.add(mesh);
-          employees.push({ ...emp, mesh, busy:false, targetPos:new THREE.Vector3(mesh.position.x, mesh.position.y, mesh.position.z), servedCustomers:0 });
-        });
-      }
-
-      function makeHuman(bodyColor, headColor){
-        const g = new THREE.Group();
-        const body = new THREE.Mesh(new THREE.CapsuleGeometry(.12,.38,4,8), new THREE.MeshStandardMaterial({ color:bodyColor, roughness:.9 }));
-        body.position.y=.4;
-        body.castShadow = true;
-        const head = new THREE.Mesh(new THREE.SphereGeometry(.12,16,12), new THREE.MeshStandardMaterial({ color:headColor, roughness:.9 }));
-        head.position.y=.75;
-        head.castShadow = true;
-        g.add(body, head);
-        return g;
-      }
-
-      function makeCustomer(color=0x4d6ccf){
-        const mesh = makeHuman(color, 0xffdfc8);
-        mesh.position.set(-1.2,.2,.45 + (Math.random()-.5)*.6);
-        group.add(mesh);
-        return mesh;
-      }
-
-      function getStandData(id){
-        return def.stands.find(s=>s.id===id);
-      }
-
-      function getUnlockedBonus(standId){
-        return def.products
-          .filter(p=>p.stand===standId && state.unlockedProducts.includes(p.id))
-          .reduce((acc,p)=>acc+p.bonus, 0);
-      }
-
-      function getStandPower(stand){
-        const data = getStandData(stand.standId);
-        const productBonus = getUnlockedBonus(stand.standId);
-        return (data.income * stand.level) * (1 + productBonus) * state.popularity;
-      }
-
-      function getStandService(stand){
-        const data = getStandData(stand.standId);
-        return data.service + stand.level * .8;
-      }
-
-      function hireEmployee(){
-        const cost = 90 + (state.employees - 1) * 70;
-        if(state.money < cost) return showToast('Pas assez d’argent');
-        state.money -= cost;
-        state.employees += 1;
-        rebuildEmployees();
-        updateHUD();
-        renderPanels();
-        showToast('Nouvel employé recruté');
-      }
-
-      function buyStand(standId){
-        if(!selectedTile) return showToast('Sélectionne une case vide');
-        if(state.stands.some(s=>s.tile===selectedTile)) return showToast('Une structure est déjà ici');
-        const defStand = getStandData(standId);
-        if(!defStand) return;
-        if(!state.ownedTiles.includes(selectedTile)) return showToast('Terrain non acheté');
-        const cost = defStand.cost;
-        if(state.money < cost) return showToast('Pas assez d’argent');
-        state.money -= cost;
-        state.stands.push({ uid:crypto.randomUUID(), tile:selectedTile, standId, level:1 });
-        rebuildStands();
-        repaintTiles();
-        updateProgression();
-        updateHUD();
-        renderPanels();
-        showToast(`${defStand.name} ajouté`);
-      }
-
-      function unlockProduct(productId){
-        if(state.unlockedProducts.includes(productId)) return;
-        const product = def.products.find(p=>p.id===productId);
-        if(!product) return;
-        if(!state.stands.some(s=>s.standId===product.stand)) return showToast('Il faut d’abord le stand correspondant');
-        if(state.money < product.cost) return showToast('Pas assez d’argent');
-        state.money -= product.cost;
-        state.unlockedProducts.push(productId);
-        state.popularity += product.bonus * 0.35;
-        updateProgression();
-        updateHUD();
-        renderPanels();
-        showToast(`${product.name} débloqué`);
-      }
-
-      function expandLand(){
-        const nextTiles = getExpandableTiles();
-        if(!nextTiles.length) return showToast('Aucun terrain adjacent disponible');
-        const cost = 140 + state.expansionIndex * 90;
-        if(state.money < cost) return showToast('Pas assez d’argent');
-        state.money -= cost;
-        const tile = nextTiles[0];
-        state.ownedTiles.push(tile);
-        state.expansionIndex += 1;
-
-        const [x,z] = tile.split(',').map(Number);
-        if(!tileMap.has(tile)){
-          const mesh = makeTile(x,z,true);
-          group.add(mesh);
-          tileMap.set(tile, mesh);
-        }
-        const existing = tileMap.get(tile);
-        existing.material.color.setHex(def.floor);
-
-        const maxCoord = Math.max(...state.ownedTiles.map(k=>Math.max(...k.split(',').map(Number))));
-        if(maxCoord >= state.gridSize-1){
-          state.gridSize = Math.max(state.gridSize, maxCoord+2);
-          extendVisualGrid();
-        }
-        repaintTiles();
-        updateHUD();
-        renderPanels();
-        showToast(`Terrain agrandi : ${tile}`);
-      }
-
-      function extendVisualGrid(){
-        for(let x=0;x<state.gridSize;x++){
-          for(let z=0;z<state.gridSize;z++){
-            const key = `${x},${z}`;
-            if(!tileMap.has(key)){
-              const mesh = makeTile(x,z,state.ownedTiles.includes(key));
-              group.add(mesh);
-              tileMap.set(key, mesh);
-            }
-          }
-        }
-      }
-
-      function getExpandableTiles(){
-        const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
-        const set = new Set(state.ownedTiles);
-        const candidates = [];
-        for(const tile of state.ownedTiles){
-          const [x,z] = tile.split(',').map(Number);
-          for(const [dx,dz] of dirs){
-            const nx = Math.max(0, x+dx);
-            const nz = Math.max(0, z+dz);
-            const key = `${nx},${nz}`;
-            if(!set.has(key) && !candidates.includes(key)) candidates.push(key);
-          }
-        }
-        return candidates.sort((a,b)=>{
-          const [ax,az]=a.split(',').map(Number);
-          const [bx,bz]=b.split(',').map(Number);
-          return (ax+az) - (bx+bz);
-        });
-      }
-
-      function chooseTargetStand(){
-        if(!state.stands.length) return null;
-        const weights = state.stands.map(s=>Math.max(1, getStandPower(s)));
-        const total = weights.reduce((a,b)=>a+b,0);
-        let r = Math.random()*total;
-        for(let i=0;i<state.stands.length;i++){
-          r -= weights[i];
-          if(r<=0) return state.stands[i];
-        }
-        return state.stands[0];
-      }
-
-      function update(delta){
-        state.stats.minutesPlayed += delta / 60;
-
-        spawnTimer -= delta;
-        const maxCustomers = Math.min(18, 4 + Math.floor(state.ownedTiles.length/2) + state.employees);
-        const spawnRate = Math.max(0.7, 3.2 - state.popularity*.4 - state.stands.length*.08);
-        if(spawnTimer <= 0 && customers.length < maxCustomers && state.stands.length > 0){
-          spawnTimer = spawnRate / speedMultiplier;
-          const stand = chooseTargetStand();
-          if(stand){
-            const target = standMeshes.get(stand.uid);
-            const customer = {
-              mesh: makeCustomer(Math.random() > .5 ? 0x5f7fe2 : 0xdf7e69),
-              phase:'enter',
-              standUid: stand.uid,
-              patience: 8 + Math.random()*10,
-              exit: new THREE.Vector3(-1.4,.2,.5)
-            };
-            customer.targetPos = new THREE.Vector3(target.position.x, .2, target.position.z + .34);
-            customers.push(customer);
-          }
-        }
-
-        // Employees assignment
-        employees.forEach((emp, index)=>{
-          if(!emp.targetStandUid || !state.stands.some(s=>s.uid===emp.targetStandUid)){
-            const available = state.stands[index % Math.max(1,state.stands.length)];
-            emp.targetStandUid = available?.uid || null;
-          }
-          const standMesh = emp.targetStandUid ? standMeshes.get(emp.targetStandUid) : null;
-          if(standMesh){
-            emp.targetPos.set(standMesh.position.x - .28, .2, standMesh.position.z - .18);
-          }
-          moveTowards(emp.mesh.position, emp.targetPos, delta * 1.6);
-          bobCharacter(emp.mesh, performance.now()*0.003 + index);
-        });
-
-        for(let i=customers.length-1;i>=0;i--){
-          const c = customers[i];
-          const stand = state.stands.find(s=>s.uid===c.standUid);
-          const standMesh = stand ? standMeshes.get(stand.uid) : null;
-          if(!stand || !standMesh){
-            c.phase = 'exit';
-          }
-
-          if(c.phase === 'enter'){
-            moveTowards(c.mesh.position, c.targetPos, delta * 1.3);
-            if(c.mesh.position.distanceTo(c.targetPos) < 0.08){
-              c.phase = 'wait';
-            }
-          } else if(c.phase === 'wait'){
-            c.patience -= delta;
-            const assigned = employees.find(e=>e.targetStandUid===c.standUid);
-            const serviceSpeed = stand ? getStandService(stand) / 10 : 1;
-            if(assigned && assigned.mesh.position.distanceTo(new THREE.Vector3(standMesh.position.x - .28,.2,standMesh.position.z - .18)) < 0.25){
-              c.patience -= delta * serviceSpeed;
-            }
-            if(c.patience <= 0){
-              if(stand){
-                const amount = getStandPower(stand) * (0.75 + Math.random()*0.55);
-                state.money += amount;
-                state.totalEarned += amount;
-                state.stats.sales += 1;
-                state.customersServed += 1;
-                sparkleSale(standMesh.position.clone());
-                updateProgression();
-                updateHUD();
-              }
-              c.phase = 'exit';
-            }
-          } else if(c.phase === 'exit'){
-            moveTowards(c.mesh.position, c.exit, delta * 1.55);
-            if(c.mesh.position.distanceTo(c.exit) < 0.1){
-              group.remove(c.mesh);
-              customers.splice(i,1);
-            }
-          }
-          bobCharacter(c.mesh, performance.now()*0.004 + i);
-        }
-
-        sparkleTimer -= delta;
-      }
-
-      function sparkleSale(pos){
-        const spark = new THREE.Mesh(
-          new THREE.CylinderGeometry(.12,.12,.05,18),
-          new THREE.MeshStandardMaterial({ color:0xffdb57, emissive:0x7c6210, emissiveIntensity:1.2 })
-        );
-        spark.position.copy(pos).add(new THREE.Vector3(0,1.05,0));
-        group.add(spark);
-        const start = performance.now();
-        const animateSpark = ()=>{
-          const t = (performance.now() - start) / 700;
-          if(t>=1){ group.remove(spark); return; }
-          spark.position.y = pos.y + 1.05 + t*.8;
-          spark.material.opacity = 1-t;
-          spark.material.transparent = true;
-          requestAnimationFrame(animateSpark);
-        };
-        animateSpark();
-      }
-
-      function bobCharacter(mesh, seed){
-        mesh.position.y = 0.2 + Math.sin(seed*3) * 0.02;
-      }
-
-      function moveTowards(position, target, speed){
-        const dir = new THREE.Vector3().subVectors(target, position);
-        const len = dir.length();
-        if(len <= 0.0001) return;
-        dir.normalize();
-        const step = Math.min(len, speed * 0.016 * speedMultiplier * 60);
-        position.addScaledVector(dir, step);
-      }
-
-      function updateProgression(){
-        state.level = 1 + Math.floor(state.totalEarned / 500);
-        state.popularity = 1 + state.stands.length*0.05 + state.unlockedProducts.length*0.04 + Math.min(1.6, state.level*0.03);
-      }
-
-      function incomePerMinuteEstimate(){
-        if(!state.stands.length) return 0;
-        const sum = state.stands.reduce((acc,s)=>acc + getStandPower(s), 0);
-        return sum * (0.8 + state.employees*0.18);
-      }
-
-      return worldObj;
-    }
-
-    function updateHUD(){
-      if(!world) return;
-      const s = world.state;
-      moneyEl.textContent = formatMoney(s.money);
-      employeeCountEl.textContent = s.employees;
-      standCountEl.textContent = s.stands.length;
-      titleEl.textContent = SHOP_DEFS[s.shopKey].name;
-      subtitleEl.textContent = SHOP_DEFS[s.shopKey].subtitle;
-      levelEl.textContent = s.level;
-      popularityEl.textContent = `${s.popularity.toFixed(1)}x`;
-      customersServedEl.textContent = s.customersServed;
-      incomePerMinuteEl.textContent = `${Math.floor(world.incomePerMinuteEstimate())} €/m`;
-    }
-
-    function renderPanels(){
-      if(!world) return;
-      const { state, def } = world;
-      const selected = world.selectedTile;
-      const selectedOwned = selected && state.ownedTiles.includes(selected);
-      const selectedHasStand = selected && state.stands.some(s=>s.tile===selected);
-      const nextExpandCost = 140 + state.expansionIndex * 90;
-      const nextHireCost = 90 + (state.employees - 1) * 70;
-
-      document.getElementById('panel-build').innerHTML = `
-        <h2>Construire</h2>
-        <p class="desc">Choisis une case vide puis ajoute un stand. ${selected ? `Case sélectionnée : <strong>${selected}</strong>.` : 'Touchez une case pour la sélectionner.'}</p>
-        <div class="shop-cards">
-          ${def.stands.map(stand => `
-            <div class="card">
-              <h3>${stand.name}</h3>
-              <p>${stand.premium ? 'Structure premium qui rapporte beaucoup.' : 'Structure de base pour développer la boutique.'}</p>
-              <div class="meta">
-                <span class="tag">Coût ${formatMoney(stand.cost)}</span>
-                <span class="tag">+${stand.income} €/vente</span>
-                <span class="tag">Service ${stand.service}</span>
-              </div>
-              <div class="row">
-                <span>${stand.tag}</span>
-                <button class="btn buy-stand" data-stand="${stand.id}" ${(!selectedOwned || selectedHasStand || state.money < stand.cost) ? 'disabled' : ''}>Ajouter</button>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      `;
-
-      document.getElementById('panel-products').innerHTML = `
-        <h2>Produits premium</h2>
-        <p class="desc">Débloque des produits plus chers qui augmentent la rentabilité et la popularité du magasin.</p>
-        <div class="shop-cards">
-          ${def.products.map(prod => {
-            const unlocked = state.unlockedProducts.includes(prod.id);
-            const standReady = state.stands.some(s=>s.standId===prod.stand);
-            return `
-              <div class="card">
-                <h3>${prod.name}</h3>
-                <p>${standReady ? 'Le stand associé existe déjà.' : 'Nécessite d’abord le stand correspondant.'}</p>
-                <div class="meta">
-                  <span class="tag">Coût ${formatMoney(prod.cost)}</span>
-                  <span class="tag">Prix +${prod.price} €</span>
-                  <span class="tag">Bonus +${Math.round(prod.bonus*100)}%</span>
-                </div>
-                <div class="row">
-                  <span>${unlocked ? 'Déjà débloqué' : 'Amélioration'}</span>
-                  <button class="btn secondary unlock-product" data-product="${prod.id}" ${(unlocked || !standReady || state.money < prod.cost) ? 'disabled' : ''}>Débloquer</button>
-                </div>
-              </div>
-            `;
-          }).join('')}
-        </div>
-      `;
-
-      document.getElementById('panel-staff').innerHTML = `
-        <h2>Équipe</h2>
-        <p class="desc">Chaque magasin démarre avec 1 employé. Recrute pour servir plus vite et absorber plus de clients.</p>
-        <div class="card">
-          <h3>Recruter un employé</h3>
-          <p>Les employés se répartissent automatiquement entre les stands.</p>
-          <div class="meta">
-            <span class="tag">Effectif ${state.employees}</span>
-            <span class="tag">Coût ${formatMoney(nextHireCost)}</span>
-          </div>
-          <div class="row">
-            <span>Rendement amélioré</span>
-            <button class="btn secondary" id="hireEmployeeBtn" ${state.money < nextHireCost ? 'disabled' : ''}>Recruter</button>
-          </div>
-        </div>
-        <div class="grid-cards" style="margin-top:10px;">
-          ${Array.from({length: state.employees}).map((_,i)=>`
-            <div class="card">
-              <h3>Employé ${i+1}</h3>
-              <p>Service, rangement, encaissement automatique.</p>
-            </div>
-          `).join('')}
-        </div>
-      `;
-
-      document.getElementById('panel-expand').innerHTML = `
-        <h2>Agrandir le terrain</h2>
-        <p class="desc">Achète la prochaine case adjacente pour poser plus de stands et accueillir plus de clients.</p>
-        <div class="card">
-          <h3>Extension suivante</h3>
-          <p>Chaque extension augmente le potentiel du magasin et la place disponible.</p>
-          <div class="meta">
-            <span class="tag">Terrains possédés ${state.ownedTiles.length}</span>
-            <span class="tag">Coût ${formatMoney(nextExpandCost)}</span>
-            <span class="tag">Grille ${state.gridSize}x${state.gridSize}</span>
-          </div>
-          <div class="row">
-            <span>Case adjacente auto</span>
-            <button class="btn" id="expandLandBtn" ${state.money < nextExpandCost ? 'disabled' : ''}>Acheter</button>
-          </div>
-        </div>
-      `;
-
-      document.getElementById('panel-stats').innerHTML = `
-        <h2>Statistiques</h2>
-        <p class="desc">Vue rapide sur la performance du magasin.</p>
-        <div class="grid-cards">
-          <div class="card"><h3>Argent</h3><p>${formatMoney(state.money)}</p></div>
-          <div class="card"><h3>Total gagné</h3><p>${formatMoney(state.totalEarned)}</p></div>
-          <div class="card"><h3>Clients servis</h3><p>${state.customersServed}</p></div>
-          <div class="card"><h3>Ventes</h3><p>${state.stats.sales}</p></div>
-          <div class="card"><h3>Popularité</h3><p>${state.popularity.toFixed(2)}x</p></div>
-          <div class="card"><h3>Revenu/min</h3><p>${Math.floor(world.incomePerMinuteEstimate())} €</p></div>
-        </div>
-      `;
-
-      bindPanelActions();
-    }
-
-    function bindPanelActions(){
-      document.querySelectorAll('.buy-stand').forEach(btn=>{
-        btn.onclick = ()=> world.buyStand(btn.dataset.stand);
-      });
-      document.querySelectorAll('.unlock-product').forEach(btn=>{
-        btn.onclick = ()=> world.unlockProduct(btn.dataset.product);
-      });
-      const hireBtn = document.getElementById('hireEmployeeBtn');
-      if(hireBtn) hireBtn.onclick = ()=> world.hireEmployee();
-      const expandBtn = document.getElementById('expandLandBtn');
-      if(expandBtn) expandBtn.onclick = ()=> world.expandLand();
-    }
-
-    function buildSplashChoices(){
-      shopChoices.innerHTML = Object.values(SHOP_DEFS).map(shop => `
-        <div class="choice">
-          <div class="head">
-            <div>
-              <h3>${shop.name}</h3>
-              <p>${shop.subtitle}</p>
-            </div>
-            <div class="emoji">${shop.emoji}</div>
-          </div>
-          <div class="features">
-            <span class="tag">100 € de départ</span>
-            <span class="tag">1 employé</span>
-            <span class="tag">Agrandissement</span>
-          </div>
-          <button class="btn start-shop" data-shop="${shop.key}">Jouer</button>
-        </div>
-      `).join('');
-      document.querySelectorAll('.start-shop').forEach(btn=>{
-        btn.addEventListener('click', ()=>startGame(btn.dataset.shop));
-      });
-    }
-
-    function startGame(shopKey, forceNew=false){
-      splash.classList.add('hidden');
-      if(!renderer) createRenderer();
-      createScene();
-      const state = forceNew ? makeDefaultState(shopKey) : loadState(shopKey);
-      state.stats.sessions += 1;
-      speedMultiplier = state.speed || 1;
-      world = createWorld(state);
-      updateHUD();
-      renderPanels();
-      lastTime = performance.now();
-      animate();
-    }
-
-    let animationRunning = false;
-    function animate(){
-      if(animationRunning) return;
-      animationRunning = true;
-      function loop(now){
-        if(!world){ animationRunning=false; return; }
-        const delta = Math.min(.05, (now - lastTime) / 1000);
-        lastTime = now;
-        controls.update();
-        world.update(delta * speedMultiplier);
-        renderer.render(scene, camera);
-        requestAnimationFrame(loop);
-      }
-      requestAnimationFrame(loop);
-    }
-
-    function openPanel(panelName){
-      document.querySelectorAll('.panel').forEach(el=>el.classList.remove('open'));
-      document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('active'));
-      document.getElementById(`panel-${panelName}`)?.classList.add('open');
-      document.querySelector(`.nav-btn[data-panel="${panelName}"]`)?.classList.add('active');
-    }
-
-    document.querySelectorAll('.nav-btn').forEach(btn=>{
-      btn.addEventListener('click', ()=>openPanel(btn.dataset.panel));
-    });
-
-    document.getElementById('speedBtn').addEventListener('click', ()=>{
-      speedMultiplier = speedMultiplier === 1 ? 2 : speedMultiplier === 2 ? 3 : 1;
-      if(world) world.state.speed = speedMultiplier;
-      showToast(`Vitesse x${speedMultiplier}`);
-    });
-    document.getElementById('saveBtn').addEventListener('click', saveState);
-    document.getElementById('resetBtn').addEventListener('click', resetState);
-
-    function handlePointerMove(event){
-      if(!world || !camera || !renderer) return;
-      const rect = renderer.domElement.getBoundingClientRect();
-      pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-      raycaster.setFromCamera(pointer, camera);
-      const meshes = Array.from(world.tileMap.values());
-      const hits = raycaster.intersectObjects(meshes, false);
-      hoverTile = hits[0]?.object?.userData?.tile || null;
-    }
-
-    function handlePointerDown(event){
-      if(!world || !camera || !renderer) return;
-      const rect = renderer.domElement.getBoundingClientRect();
-      pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-      raycaster.setFromCamera(pointer, camera);
-      const objects = [...Array.from(world.tileMap.values()), ...Array.from(world.standMeshes.values())];
-      const hits = raycaster.intersectObjects(objects, true);
-      if(!hits.length) return;
-      let obj = hits[0].object;
-      while(obj && !obj.userData?.type && obj.parent) obj = obj.parent;
-      if(obj?.userData?.type === 'tile'){
-        if(!world.state.ownedTiles.includes(obj.userData.tile)){
-          showToast('Terrain non acheté');
-        }
-        world.selectedTile = obj.userData.tile;
-      }
-      if(obj?.userData?.type === 'stand'){
-        world.selectedTile = obj.userData.tile;
-      }
-      updateHUD();
-    }
-
-    window.addEventListener('resize', ()=>{
-      if(!renderer || !camera) return;
-      camera.aspect = innerWidth / innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(innerWidth, innerHeight);
-    });
-
-    window.addEventListener('pointermove', handlePointerMove, { passive:true });
-    window.addEventListener('pointerdown', handlePointerDown);
-    window.addEventListener('beforeunload', saveState);
-
-    buildSplashChoices();
-    openPanel('build');
-  </script>
+  }
+  function drawCustomers(){ customers.forEach(c=>drawPerson(c.x,c.y,c.color)); }
+
+  function draw(){ if(!state) return; ctx.clearRect(0,0,innerWidth,innerHeight); ctx.fillStyle='#dcc3ab'; ctx.fillRect(0,0,innerWidth,innerHeight);
+    // outside ground decorations
+    for(let i=0;i<14;i++){ const x = 90 + (i*137)%innerWidth; const y = 120 + ((i*211)%Math.max(200,innerHeight-180)); ctx.beginPath(); ctx.arc((x+cameraOffsetX*0.15)%innerWidth,y,18,0,Math.PI*2); ctx.fillStyle='#7aae66'; ctx.fill(); ctx.fillStyle='#8d6546'; ctx.fillRect(((x+cameraOffsetX*0.15)%innerWidth)-3,y+14,6,18); }
+    // tiles by depth
+    const def = shop();
+    const coords=[]; for(let x=0;x<state.gridSize;x++) for(let z=0;z<state.gridSize;z++) coords.push([x,z]); coords.sort((a,b)=>(a[0]+a[1])-(b[0]+b[1]));
+    coords.forEach(([x,z])=>{ const key=x+','+z; const c=tileCenter(x,z); const owned=state.ownedTiles.includes(key); const hasStand=state.stands.some(s=>s.tile===key); let fill=owned?def.floor:'#cab6a1'; if(selectedTile===key) fill='#ffd46f'; if(hasStand && selectedTile!==key) fill='#ead29f'; drawDiamond(c.x,c.y,100,52,fill,'#b79c82'); if(owned){ ctx.fillStyle='rgba(255,255,255,.18)'; ctx.fillRect(c.x-40,c.y-8,80,3); } });
+    // entrance path
+    const ent = tileCenter(0,0); ctx.fillStyle='#c6b5a0'; ctx.fillRect(ent.x-160,ent.y+5,120,16); ctx.fillStyle=def.accent; ctx.fillRect(ent.x-120,ent.y-80,96,18); ctx.fillStyle='#73594d'; ctx.fillRect(ent.x-110,ent.y-62,8,62); ctx.fillRect(ent.x-40,ent.y-62,8,62);
+    // stands
+    state.stands.slice().sort((a,b)=>{const [ax,az]=a.tile.split(',').map(Number); const [bx,bz]=b.tile.split(',').map(Number); return (ax+az)-(bx+bz)}).forEach(s=>{ const [x,z]=s.tile.split(',').map(Number); drawStand(s,x,z); });
+    // employees / customers
+    for(let i=0;i<state.employees;i++) drawEmployee(i); drawCustomers();
+  }
+
+  function updateHUD(){ $('#shopName').textContent = shop().name; $('#shopSub').textContent = shop().sub; $('#money').textContent = money(state.money); $('#employees').textContent = state.employees; $('#stands').textContent = state.stands.length; }
+  function openPanel(name){ activePanel=name; $$('.nav').forEach(b=>b.classList.toggle('active',b.dataset.panel===name)); $$('.panel').forEach(p=>p.classList.remove('open')); $('#panel-'+name).classList.add('open'); renderPanels(); }
+  function nextExpandCost(){ return 140 + state.expansionIndex*90; }
+  function nextHireCost(){ return 90 + (state.employees-1)*70; }
+  function getExpandable(){ const dirs=[[1,0],[-1,0],[0,1],[0,-1]], set=new Set(state.ownedTiles), out=[]; state.ownedTiles.forEach(t=>{ const [x,z]=t.split(',').map(Number); dirs.forEach(([dx,dz])=>{ const nx=Math.max(0,x+dx), nz=Math.max(0,z+dz), k=nx+','+nz; if(!set.has(k) && !out.includes(k)) out.push(k); });}); return out.sort(); }
+  function renderPanels(){
+    $('#panel-build').innerHTML = `<h2>Construire</h2><p>Case sélectionnée : <strong>${selectedTile||'aucune'}</strong></p><div class="cards">${shop().stands.map(st=>`<div class="card"><h3>${st.name}</h3><p>${st.premium?'Stand premium très rentable.':'Stand de base pour démarrer.'}</p><div class="meta"><span class="tag">Coût ${money(st.cost)}</span><span class="tag">+${st.income} €/vente</span><span class="tag">Service ${st.service}</span></div><div class="row"><span>${st.premium?'Premium':'Standard'}</span><button class="btn build-btn" data-id="${st.id}" ${canBuild(st)?'':'disabled'}>Ajouter</button></div></div>`).join('')}</div>`;
+    $('#panel-products').innerHTML = `<h2>Produits premium</h2><p>Débloque des produits plus chers.</p><div class="cards">${shop().products.map(p=>{ const unlocked=state.unlockedProducts.includes(p.id), ready=state.stands.some(s=>s.standId===p.stand); return `<div class="card"><h3>${p.name}</h3><p>${ready?'Le stand associé existe déjà.':'Nécessite le stand correspondant.'}</p><div class="meta"><span class="tag">Coût ${money(p.cost)}</span><span class="tag">+${p.price} €</span><span class="tag">Bonus +${Math.round(p.bonus*100)}%</span></div><div class="row"><span>${unlocked?'Déjà débloqué':'Amélioration'}</span><button class="btn secondary prod-btn" data-id="${p.id}" ${(unlocked||!ready||state.money<p.cost)?'disabled':''}>Débloquer</button></div></div>`; }).join('')}</div>`;
+    $('#panel-staff').innerHTML = `<h2>Équipe</h2><div class="card"><h3>Recruter un employé</h3><p>Chaque employé améliore le flux du magasin.</p><div class="meta"><span class="tag">Effectif ${state.employees}</span><span class="tag">Coût ${money(nextHireCost())}</span></div><div class="row"><span>Service amélioré</span><button class="btn secondary" id="hireBtn" ${state.money<nextHireCost()?'disabled':''}>Recruter</button></div></div>`;
+    $('#panel-expand').innerHTML = `<h2>Agrandir le terrain</h2><div class="card"><h3>Extension suivante</h3><p>Ajoute une case adjacente pour poser plus de stands.</p><div class="meta"><span class="tag">Terrains ${state.ownedTiles.length}</span><span class="tag">Coût ${money(nextExpandCost())}</span><span class="tag">Grille ${state.gridSize}x${state.gridSize}</span></div><div class="row"><span>Ajout auto</span><button class="btn" id="expandBtn" ${(state.money<nextExpandCost()||getExpandable().length===0)?'disabled':''}>Acheter</button></div></div>`;
+    $('#panel-stats').innerHTML = `<h2>Stats</h2><div class="cards"><div class="card"><h3>Argent</h3><p>${money(state.money)}</p></div><div class="card"><h3>Total gagné</h3><p>${money(state.totalEarned)}</p></div><div class="card"><h3>Clients servis</h3><p>${state.customersServed}</p></div><div class="card"><h3>Ventes</h3><p>${state.stats.sales}</p></div><div class="card"><h3>Popularité</h3><p>${state.popularity.toFixed(2)}x</p></div><div class="card"><h3>Revenu/min</h3><p>${incomePerMin()} €</p></div></div>`;
+    $$('.build-btn').forEach(b=>b.onclick=()=>buyStand(b.dataset.id)); $$('.prod-btn').forEach(b=>b.onclick=()=>unlockProduct(b.dataset.id)); const h=$('#hireBtn'); if(h) h.onclick=hire; const e=$('#expandBtn'); if(e) e.onclick=expand;
+  }
+  function canBuild(st){ return selectedTile && state.ownedTiles.includes(selectedTile) && !state.stands.some(s=>s.tile===selectedTile) && state.money>=st.cost; }
+  function buyStand(id){ const st=standDef(id); if(!canBuild(st)) return showToast('Impossible ici'); state.money-=st.cost; state.stands.push({uid:uid(),tile:selectedTile,standId:id,level:1}); updateProgress(); updateHUD(); renderPanels(); showToast(st.name+' ajouté'); }
+  function unlockProduct(id){ const p=shop().products.find(v=>v.id===id); if(!p) return; if(state.unlockedProducts.includes(id)) return; if(!state.stands.some(s=>s.standId===p.stand)) return showToast('Stand requis'); if(state.money<p.cost) return showToast('Pas assez d’argent'); state.money-=p.cost; state.unlockedProducts.push(id); updateProgress(); updateHUD(); renderPanels(); showToast(p.name+' débloqué'); }
+  function hire(){ const cost=nextHireCost(); if(state.money<cost) return; state.money-=cost; state.employees++; updateHUD(); renderPanels(); showToast('Nouvel employé recruté'); }
+  function expand(){ const list=getExpandable(); const cost=nextExpandCost(); if(!list.length||state.money<cost) return; state.money-=cost; const k=list[0]; state.ownedTiles.push(k); state.expansionIndex++; const [x,z]=k.split(',').map(Number); state.gridSize=Math.max(state.gridSize,x+2,z+2); updateHUD(); renderPanels(); showToast('Terrain agrandi : '+k); }
+
+  function buildChoices(){ $('#choices').innerHTML = Object.entries(SHOPS).map(([k,s])=>`<div class="choice"><div class="choice-head"><div><h3>${s.name}</h3><p>${s.sub}</p></div><div class="emoji">${s.emoji}</div></div><div class="meta"><span class="tag">100 € départ</span><span class="tag">1 employé</span><span class="tag">Terrain évolutif</span></div><button class="btn start-btn" data-shop="${k}">Jouer</button></div>`).join(''); $$('.start-btn').forEach(b=>b.onclick=()=>startGame(b.dataset.shop)); }
+  function startGame(shopKey, fresh=false){ state = fresh ? makeState(shopKey) : load(shopKey); state.stats.sessions++; speed=1; selectedTile='0,0'; $('#splash').classList.add('hidden'); updateHUD(); openPanel('build'); }
+
+  $$('.nav').forEach(b=>b.onclick=()=>openPanel(b.dataset.panel));
+  $('#speed').onclick=()=>{ speed = speed===1?2:speed===2?3:1; showToast('Vitesse x'+speed); };
+  $('#save').onclick=save;
+  $('#reset').onclick=()=>{ if(state && confirm('Réinitialiser ce magasin ?')) startGame(state.shopKey,true); };
+
+  function screenToTile(mx,my){ let best=null,bestDist=1e9; for(let x=0;x<state.gridSize;x++) for(let z=0;z<state.gridSize;z++){ const c=tileCenter(x,z); const d=Math.hypot(mx-c.x,(my-c.y)*1.3); if(d<bestDist){bestDist=d; best=x+','+z;} } return bestDist<60?best:null; }
+  canvas.addEventListener('click', e => { if(!state || !$('#splash').classList.contains('hidden')) return; const t = screenToTile(e.clientX,e.clientY); if(t){ selectedTile=t; renderPanels(); } });
+  let dragging=false,startX=0,startY=0; canvas.addEventListener('pointerdown',e=>{ dragging=true; startX=e.clientX; startY=e.clientY; }); addEventListener('pointerup',()=>dragging=false); addEventListener('pointermove',e=>{ if(!dragging||!state) return; cameraOffsetX += e.clientX-startX; cameraOffsetY += e.clientY-startY; startX=e.clientX; startY=e.clientY; });
+
+  function loop(now){ const dt=Math.min(.05,(now-last)/1000); last=now; if(state){ state.stats.minutesPlayed += dt/60; updateCustomers(dt); updateHUD(); draw(); } requestAnimationFrame(loop); }
+  buildChoices(); requestAnimationFrame(loop);
+})();
+</script>
 </body>
 </html>
