@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Mini Mall V6</title>
+  <title>Mini Mall V7</title>
   <style>
     :root{
       --bg1:#f6eee4; --bg2:#e6d2bb; --panel:#fff9f2; --panel2:#f1e2d1; --panel3:#ead7c1;
@@ -104,10 +104,9 @@
 
 <div class="shop-select" id="shopSelect">
   <div class="hero-badge">🏬</div>
-  <h1>Mini Mall V6</h1>
+  <h1>Mini Mall V7</h1>
   <p>
-    Cette version ajoute un jeu plus complexe : déblocage des stands par niveau, progression par clients servis,
-    nouveaux stands, satisfaction client, missions et rendu plus réaliste dans l’esprit d’un vrai magasin.
+    Cette version pousse encore plus loin le réalisme visuel, ajoute des niveaux plus difficiles à débloquer, et introduit encore de nouveaux stands dans chaque type de magasin.
   </p>
 
   <div class="profile-box">
@@ -121,16 +120,16 @@
 
   <div class="hero-preview">
     <div class="preview-card">
-      <h4>Déblocage par niveau</h4>
-      <p>Les stands avancés demandent désormais un niveau minimum. Le niveau augmente surtout avec les clients servis.</p>
+      <h4>Niveaux plus difficiles</h4>
+      <p>Les niveaux demandent désormais à la fois plus de clients servis et davantage de chiffre d’affaires cumulé.</p>
     </div>
     <div class="preview-card">
-      <h4>Jeu plus compliqué</h4>
-      <p>Tu gères la satisfaction, les temps d’attente, les employés, le terrain, les produits premium et les missions.</p>
+      <h4>Encore plus de contenu</h4>
+      <p>Deux nouveaux stands supplémentaires par univers, davantage d’objectifs, et une progression plus exigeante.</p>
     </div>
     <div class="preview-card">
-      <h4>Rendu plus vivant</h4>
-      <p>Stands enrichis, objets visibles, caisse, file d’attente légère, zones clients et effets visuels plus travaillés.</p>
+      <h4>Graphisme plus réaliste</h4>
+      <p>Personnages plus proches de vraies silhouettes humaines, ombres plus marquées, tenue plus détaillée et ambiance boutique plus crédible.</p>
     </div>
   </div>
 
@@ -158,9 +157,9 @@
   <div>
     <div class="topbar">
       <div class="brand">
-        <div class="brand-badge">V6</div>
+        <div class="brand-badge">V7</div>
         <div class="brand-text">
-          <h1 id="shopTitle">Mini Mall V6</h1>
+          <h1 id="shopTitle">Mini Mall V7</h1>
           <p id="shopSubtitle">Choisis un magasin pour commencer</p>
         </div>
       </div>
@@ -196,8 +195,8 @@
 
 <script>
 (() => {
-  const PROFILE_KEY = 'mini-mall-v6-profile';
-  const SAVE_KEY = 'mini-mall-v6-saves';
+  const PROFILE_KEY = 'mini-mall-v7-profile';
+  const SAVE_KEY = 'mini-mall-v7-saves';
   const MISSIONS = [
     {id:'serve10', text:'servir 10 clients', target:10, reward:60, field:'customersServed'},
     {id:'earn500', text:'gagner 500 € au total', target:500, reward:90, field:'totalEarned'},
@@ -213,7 +212,9 @@
         {id:'cheese', name:'Fromages fins', cost:240, income:24, service:1.08, tier:'Premium', premium:true, color:'#ecc95a', productType:'cheese', refund:120, levelReq:3},
         {id:'bio', name:'Rayon bio premium', cost:360, income:31, service:1.1, tier:'Bio', premium:true, color:'#85b56d', productType:'crate', refund:180, levelReq:4},
         {id:'fine', name:'Épicerie de luxe', cost:520, income:43, service:1.15, tier:'Luxe', premium:true, color:'#80555a', productType:'gift', refund:260, levelReq:5},
-        {id:'seafood', name:'Poissonnerie', cost:700, income:56, service:1.18, tier:'Expert', premium:true, color:'#6aaec7', productType:'fish', refund:350, levelReq:7}
+        {id:'seafood', name:'Poissonnerie', cost:700, income:56, service:1.18, tier:'Expert', premium:true, color:'#6aaec7', productType:'fish', refund:350, levelReq:7},
+        {id:'butcher', name:'Boucherie premium', cost:940, income:72, service:1.23, tier:'Maître', premium:true, color:'#b86158', productType:'meat', refund:470, levelReq:9},
+        {id:'coffee', name:'Coffee corner', cost:1180, income:88, service:1.28, tier:'Signature', premium:true, color:'#8c684d', productType:'coffee', refund:590, levelReq:10}
       ],
       products:[
         {id:'apples', name:'Pommes sélection', stand:'fruit', cost:45, bonus:0.04, price:8},
@@ -230,7 +231,9 @@
         {id:'lights', name:'Luminaires', cost:260, income:25, service:1.08, tier:'Style', premium:true, color:'#ebcb68', productType:'lamp', refund:130, levelReq:3},
         {id:'furniture', name:'Mobilier design', cost:390, income:32, service:1.1, tier:'Premium', premium:true, color:'#b89163', productType:'chair', refund:195, levelReq:4},
         {id:'luxury', name:'Collection signature', cost:560, income:45, service:1.15, tier:'Signature', premium:true, color:'#9170bc', productType:'gift', refund:280, levelReq:5},
-        {id:'art', name:'Galerie d’art', cost:760, income:60, service:1.2, tier:'Prestige', premium:true, color:'#b36d5e', productType:'art', refund:380, levelReq:7}
+        {id:'art', name:'Galerie d’art', cost:760, income:60, service:1.2, tier:'Prestige', premium:true, color:'#b36d5e', productType:'art', refund:380, levelReq:7},
+        {id:'textile', name:'Linge de maison', cost:920, income:74, service:1.23, tier:'Maison', premium:true, color:'#9fa8c8', productType:'textile', refund:460, levelReq:9},
+        {id:'ceramic', name:'Studio céramique', cost:1210, income:91, service:1.28, tier:'Atelier', premium:true, color:'#b8957a', productType:'ceramic', refund:605, levelReq:10}
       ],
       products:[
         {id:'mirror', name:'Miroirs déco', stand:'vases', cost:50, bonus:0.04, price:10},
@@ -247,7 +250,9 @@
         {id:'gift', name:'Coffrets cadeaux', cost:250, income:24, service:1.08, tier:'Premium', premium:true, color:'#f1bb4e', productType:'gift', refund:125, levelReq:3},
         {id:'jelly', name:'Bar à jelly', cost:375, income:31, service:1.1, tier:'Fun', premium:true, color:'#79c8dc', productType:'jelly', refund:187, levelReq:4},
         {id:'prestige', name:'Chocolat prestige', cost:540, income:44, service:1.15, tier:'Luxe', premium:true, color:'#5e9571', productType:'gift', refund:270, levelReq:5},
-        {id:'ice', name:'Glaces artisanales', cost:720, income:58, service:1.2, tier:'Attraction', premium:true, color:'#8bc3ef', productType:'ice', refund:360, levelReq:7}
+        {id:'ice', name:'Glaces artisanales', cost:720, income:58, service:1.2, tier:'Attraction', premium:true, color:'#8bc3ef', productType:'ice', refund:360, levelReq:7},
+        {id:'macaron', name:'Bar à macarons', cost:930, income:75, service:1.24, tier:'Pâtisserie', premium:true, color:'#f2a3b7', productType:'macaron', refund:465, levelReq:9},
+        {id:'party', name:'Corner fête', cost:1190, income:92, service:1.29, tier:'Événement', premium:true, color:'#9c7cff', productType:'party', refund:595, levelReq:10}
       ],
       products:[
         {id:'mix', name:'Sachet mix', stand:'classic', cost:42, bonus:0.04, price:8},
@@ -318,10 +323,30 @@
   function standPower(stand){ const def = getStandDef(stand.standId); const satMultiplier = 0.75 + (game.satisfaction / 100) * 0.45; return def.income * stand.level * (1 + standBonus(stand.standId)) * game.popularity * satMultiplier; }
   function standService(stand){ const def = getStandDef(stand.standId); return def.service + (game.employees - 1) * 0.07 + (stand.level - 1) * 0.08; }
   function incomePerMinute(){ return !game || !game.stands.length ? 0 : game.stands.reduce((a,s)=>a+standPower(s),0) * (0.72 + game.employees * 0.2); }
-  function levelFromCustomersServed(count){ return 1 + Math.floor(count / 8); }
+  function levelFromCustomersServed(count, totalEarned=0){
+    const thresholds = [
+      {served:0, earned:0},
+      {served:8, earned:150},
+      {served:20, earned:500},
+      {served:38, earned:1200},
+      {served:62, earned:2400},
+      {served:95, earned:4200},
+      {served:140, earned:6500},
+      {served:200, earned:9500},
+      {served:280, earned:13500},
+      {served:380, earned:19000},
+      {served:500, earned:26000}
+    ];
+    let lvl = 1;
+    for(let i=1;i<thresholds.length;i++){
+      if(count >= thresholds[i].served && totalEarned >= thresholds[i].earned) lvl = i+0;
+      else break;
+    }
+    return lvl;
+  }
   function updateMissionChip(){ if(!game) return; const m = game.mission; if(!m){ missionChip.textContent = 'Mission : aucune'; return; } const current = Math.min(game[m.field] || 0, m.target); missionChip.textContent = `Mission : ${m.text} (${current}/${m.target}) · récompense ${m.reward} €`; }
   function maybeCompleteMission(){ const m = game.mission; if(!m || m.claimed) return; const current = game[m.field] || 0; if(current >= m.target){ m.claimed = true; game.money += m.reward; showToast(`Mission accomplie : +${m.reward} €`); setTimeout(() => { game.mission = pickNewMission(); updateMissionChip(); renderPanels(); updateHud(); saveCurrentStateSilent(); }, 50); } }
-  function updateProgression(){ game.level = levelFromCustomersServed(game.customersServed); game.popularity = 1 + game.stands.length * 0.05 + game.unlockedProducts.length * 0.05 + Math.min(2, game.level * 0.04); game.satisfaction = clamp(game.satisfaction, 45, 100); maybeCompleteMission(); }
+  function updateProgression(){ game.level = levelFromCustomersServed(game.customersServed, game.totalEarned); game.popularity = 1 + game.stands.length * 0.05 + game.unlockedProducts.length * 0.05 + Math.min(2, game.level * 0.04); game.satisfaction = clamp(game.satisfaction, 45, 100); maybeCompleteMission(); }
   function updateHud(){
     if(!game) return;
     const shop = getShop();
@@ -358,8 +383,23 @@
     document.getElementById('panel-products').innerHTML = `<h2>Produits premium</h2><p class="desc">Débloque des références plus chères qui augmentent les revenus. Certains produits deviennent surtout utiles quand tu montes de niveau.</p><div class="cards">${shop.products.map(prod => { const unlocked = game.unlockedProducts.includes(prod.id), standReady = game.stands.some(s => s.standId === prod.stand); return `<div class="card"><h3>${prod.name}</h3><p>${standReady ? 'Le stand associé est déjà présent.' : 'Nécessite le stand correspondant.'}</p><div class="meta"><span class="tag">Coût ${formatMoney(prod.cost)}</span><span class="tag">Bonus +${Math.round(prod.bonus*100)}%</span><span class="tag">Prix ${prod.price} €</span></div><div class="row"><span>${unlocked ? 'Déjà débloqué' : 'Amélioration'}</span><button class="btn secondary unlock-product" data-id="${prod.id}" ${(unlocked || !standReady || game.money < prod.cost) ? 'disabled' : ''}>Débloquer</button></div></div>` }).join('')}</div>`;
     document.getElementById('panel-staff').innerHTML = `<h2>Équipe</h2><p class="desc">Chaque magasin démarre avec 1 employé. Plus tu recrutes, plus l’attente baisse et la satisfaction monte.</p><div class="card"><h3>Recruter un employé</h3><p>Les employés se répartissent automatiquement entre les stands et accélèrent le service client.</p><div class="meta"><span class="tag">Effectif ${game.employees}</span><span class="tag">Coût ${formatMoney(nextHireCost)}</span></div><div class="row"><span>Service amélioré</span><button class="btn blue" id="hireBtn" ${game.money < nextHireCost ? 'disabled' : ''}>Recruter</button></div></div><div class="grid2" style="margin-top:10px;">${Array.from({length: game.employees}).map((_, i) => `<div class="card"><h3>Employé ${i+1}</h3><p>Vente, rangement, assistance et fluidité du magasin.</p></div>`).join('')}</div>`;
     document.getElementById('panel-expand').innerHTML = `<h2>Agrandir le terrain</h2><p class="desc">Achète une nouvelle case adjacente pour ajouter davantage de stands et réduire l’effet de foule.</p><div class="card"><h3>Extension suivante</h3><p>Le terrain s’ouvre progressivement autour du magasin de départ.</p><div class="meta"><span class="tag">Terrains ${game.ownedTiles.length}</span><span class="tag">Coût ${formatMoney(nextExpandCost)}</span><span class="tag">Grille ${game.gridW}x${game.gridH}</span></div><div class="row"><span>Expansion auto</span><button class="btn gold" id="expandBtn" ${game.money < nextExpandCost ? 'disabled' : ''}>Acheter</button></div></div>`;
-    const xpToNext = 8 - (game.customersServed % 8 || 8);
-    document.getElementById('panel-stats').innerHTML = `<h2>Statistiques</h2><p class="desc">Vue rapide sur la performance, la satisfaction et la progression de niveau.</p><div class="grid2"><div class="card"><h3>Argent</h3><p>${formatMoney(game.money)}</p></div><div class="card"><h3>Total gagné</h3><p>${formatMoney(game.totalEarned)}</p></div><div class="card"><h3>Clients servis</h3><p>${game.customersServed}</p></div><div class="card"><h3>Ventes</h3><p>${game.sales}</p></div><div class="card"><h3>Satisfaction</h3><p>${Math.round(game.satisfaction)}%</p></div><div class="card"><h3>Prochain niveau</h3><p>${xpToNext} client(s)</p></div><div class="card"><h3>Popularité</h3><p>${game.popularity.toFixed(2)}x</p></div><div class="card"><h3>Revenu/min</h3><p>${Math.floor(incomePerMinute())} €</p></div></div>`;
+    const LEVEL_STEPS = [
+      {served:0, earned:0},
+      {served:8, earned:150},
+      {served:20, earned:500},
+      {served:38, earned:1200},
+      {served:62, earned:2400},
+      {served:95, earned:4200},
+      {served:140, earned:6500},
+      {served:200, earned:9500},
+      {served:280, earned:13500},
+      {served:380, earned:19000},
+      {served:500, earned:26000}
+    ];
+    const nextStep = LEVEL_STEPS[Math.min(game.level, LEVEL_STEPS.length-1)];
+    const needClients = Math.max(0, nextStep.served - game.customersServed);
+    const needMoney = Math.max(0, nextStep.earned - game.totalEarned);
+    document.getElementById('panel-stats').innerHTML = `<h2>Statistiques</h2><p class="desc">Vue rapide sur la performance, la satisfaction et la progression de niveau.</p><div class="grid2"><div class="card"><h3>Argent</h3><p>${formatMoney(game.money)}</p></div><div class="card"><h3>Total gagné</h3><p>${formatMoney(game.totalEarned)}</p></div><div class="card"><h3>Clients servis</h3><p>${game.customersServed}</p></div><div class="card"><h3>Ventes</h3><p>${game.sales}</p></div><div class="card"><h3>Satisfaction</h3><p>${Math.round(game.satisfaction)}%</p></div><div class="card"><h3>Prochain niveau</h3><p>${needClients} client(s) + ${Math.floor(needMoney)} €</p></div><div class="card"><h3>Popularité</h3><p>${game.popularity.toFixed(2)}x</p></div><div class="card"><h3>Revenu/min</h3><p>${Math.floor(incomePerMinute())} €</p></div></div>`;
     document.querySelectorAll('.buy-stand').forEach(btn => btn.onclick = () => buyStand(btn.dataset.id));
     document.querySelectorAll('.unlock-product').forEach(btn => btn.onclick = () => unlockProduct(btn.dataset.id));
     const hireBtn = document.getElementById('hireBtn'); if(hireBtn) hireBtn.onclick = hireEmployee;
@@ -397,7 +437,7 @@
           const earn = standPower(stand) * (0.75 + Math.random()*0.55);
           game.money += earn; game.totalEarned += earn; game.sales += 1; game.customersServed += 1; game.satisfaction = clamp(game.satisfaction + 0.8, 45, 100); updateProgression();
           floatingTexts.push({x:c.x, y:c.y-0.15, value:'+' + Math.floor(earn) + '€', life:1});
-          if(game.customersServed % 8 === 0){ showToast(`Niveau ${game.level} atteint`); }
+          const newLevel = levelFromCustomersServed(game.customersServed, game.totalEarned); if(newLevel > game.level){ game.level = newLevel; showToast(`Niveau ${game.level} atteint`); }
           c.phase = 'exit'; c.tx = -0.9; c.ty = 0.9 + (Math.random()-0.5)*0.3;
           updateHud(); renderPanels(); saveCurrentStateSilent();
         }
@@ -440,13 +480,65 @@
     else if(type === 'candy'){ ['#ff6fa5','#6fd8ff','#ffd25a','#9c7cff','#ff8b6a'].forEach((c,i)=>{ ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x + i*7*z, y + 1*z, 3.2*z, 0, Math.PI*2); ctx.fill(); }); }
     else if(type === 'choco'){ for(let i=0;i<3;i++){ ctx.fillStyle = '#6f4737'; roundRect(x + i*9*z, y, 7*z, 5*z, 2*z); ctx.fill(); } }
     else if(type === 'jelly'){ ['#7ed1e7','#ff9cc8','#b1e677'].forEach((c,i)=>{ ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x + i*9*z, y + 2*z, 3.5*z, 0, Math.PI*2); ctx.fill(); }); }
+    else if(type === 'meat'){ for(let i=0;i<3;i++){ ctx.fillStyle = '#b86158'; roundRect(x + i*9*z, y, 7*z, 4.5*z, 2*z); ctx.fill(); ctx.fillStyle = '#f5d1c8'; ctx.fillRect(x + 1*z + i*9*z, y + 1*z, 2*z, 1.4*z); } }
+    else if(type === 'coffee'){ for(let i=0;i<2;i++){ ctx.fillStyle = '#fff'; roundRect(x + i*11*z, y, 6*z, 7*z, 2*z); ctx.fill(); ctx.fillStyle = '#8c684d'; ctx.fillRect(x + 1*z + i*11*z, y + 1*z, 4*z, 3*z); } }
+    else if(type === 'textile'){ for(let i=0;i<2;i++){ ctx.fillStyle = i%2===0 ? '#d7dcee' : '#efe7d5'; roundRect(x + i*12*z, y, 10*z, 6*z, 2*z); ctx.fill(); } }
+    else if(type === 'ceramic'){ for(let i=0;i<3;i++){ ctx.fillStyle = ['#d8c3b2','#b8d5d0','#d9c0c7'][i%3]; ctx.beginPath(); ctx.ellipse(x + i*9*z, y + 2*z, 3.5*z, 4.5*z, 0, 0, Math.PI*2); ctx.fill(); } }
+    else if(type === 'macaron'){ ['#f3b6c5','#c8e7b1','#d7c4ff','#ffe1a4'].forEach((c,i)=>{ ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x + i*7*z, y + 2*z, 3*z, 0, Math.PI*2); ctx.fill(); }); }
+    else if(type === 'party'){ for(let i=0;i<3;i++){ ctx.fillStyle = ['#9c7cff','#ff8bb3','#6fd8ff'][i%3]; ctx.beginPath(); ctx.moveTo(x + i*8*z, y + 5*z); ctx.lineTo(x + 4*z + i*8*z, y - 1*z); ctx.lineTo(x + 8*z + i*8*z, y + 5*z); ctx.closePath(); ctx.fill(); } }
     else if(type === 'fish'){ for(let i=0;i<2;i++){ ctx.fillStyle = '#7fb9d1'; ctx.beginPath(); ctx.ellipse(x + i*13*z, y + 1*z, 5*z, 2.7*z, 0, 0, Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.moveTo(x + 6*z + i*13*z, y + 1*z); ctx.lineTo(x + 10*z + i*13*z, y - 2*z); ctx.lineTo(x + 10*z + i*13*z, y + 4*z); ctx.closePath(); ctx.fill(); } }
     else if(type === 'art'){ ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5*z; ctx.strokeRect(x, y-4*z, 9*z, 9*z); ctx.strokeRect(x+12*z, y-2*z, 8*z, 7*z); }
     else if(type === 'ice'){ ['#c8e9ff','#ffd7ef','#fff1a9'].forEach((c,i)=>{ ctx.fillStyle = '#d49b65'; ctx.beginPath(); ctx.moveTo(x + i*9*z, y + 5*z); ctx.lineTo(x + 5*z + i*9*z, y + 5*z); ctx.lineTo(x + 2.5*z + i*9*z, y + 10*z); ctx.closePath(); ctx.fill(); ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x + 2.5*z + i*9*z, y + 1*z, 3.6*z, 0, Math.PI*2); ctx.fill(); }); }
   }
   function drawEmployees(){ const stands = game.stands; for(let i=0;i<game.employees;i++){ const anchor = stands[i % Math.max(1, stands.length)], tile = parseTile(anchor.tile), offset = i % 2 === 0 ? -0.12 : 0.14; drawCharacter(tile.x + 0.25 + offset, tile.y + 0.52, { outfit:'#4f9b87', shirt:'#e9f8f2', skin:'#ffd7c0', hair:i%2===0 ? '#64493b' : '#2c2a29' }, true); } }
   function drawCustomers(){ for(const c of game.customers) drawCharacter(c.x, c.y, { outfit:c.outfit, shirt:c.color, skin:'#ffe2cf', hair:c.hair }, false); }
-  function drawCharacter(x,y,colors,isEmployee){ const p = isoToScreen(x,y), z = camera.zoom; ctx.fillStyle = 'rgba(0,0,0,.14)'; ctx.beginPath(); ctx.ellipse(p.x, p.y + 12*z, 10*z, 5*z, 0, 0, Math.PI*2); ctx.fill(); ctx.fillStyle = colors.outfit; roundRect(p.x - 9*z, p.y - 16*z, 18*z, 20*z, 7*z); ctx.fill(); ctx.fillStyle = colors.shirt; roundRect(p.x - 6*z, p.y - 13*z, 12*z, 8*z, 4*z); ctx.fill(); ctx.fillStyle = colors.skin; ctx.beginPath(); ctx.arc(p.x, p.y - 23*z, 8*z, 0, Math.PI*2); ctx.fill(); ctx.fillStyle = colors.hair; ctx.beginPath(); ctx.arc(p.x, p.y - 25*z, 8*z, Math.PI, Math.PI*2); ctx.lineTo(p.x + 8*z, p.y - 23*z); ctx.lineTo(p.x - 8*z, p.y - 23*z); ctx.closePath(); ctx.fill(); ctx.fillStyle = '#2a2a2a'; ctx.fillRect(p.x - 4*z, p.y + 4*z, 2*z, 7*z); ctx.fillRect(p.x + 2*z, p.y + 4*z, 2*z, 7*z); ctx.strokeStyle = '#2a2a2a'; ctx.lineWidth = 1.5*z; ctx.beginPath(); ctx.moveTo(p.x - 7*z, p.y - 8*z); ctx.lineTo(p.x - 11*z, p.y - 1*z); ctx.moveTo(p.x + 7*z, p.y - 8*z); ctx.lineTo(p.x + 11*z, p.y - 1*z); ctx.stroke(); if(isEmployee){ ctx.fillStyle = '#f0c85a'; ctx.beginPath(); ctx.arc(p.x + 8*z, p.y - 28*z, 3.5*z, 0, Math.PI*2); ctx.fill(); } }
+  function drawCharacter(x,y,colors,isEmployee){
+    const p = isoToScreen(x,y), z = camera.zoom;
+    ctx.fillStyle = 'rgba(0,0,0,.16)';
+    ctx.beginPath(); ctx.ellipse(p.x, p.y + 13*z, 10*z, 4.5*z, 0, 0, Math.PI*2); ctx.fill();
+
+    ctx.fillStyle = colors.outfit;
+    roundRect(p.x - 8.5*z, p.y - 15*z, 17*z, 21*z, 6*z); ctx.fill();
+
+    ctx.fillStyle = colors.shirt;
+    roundRect(p.x - 5.5*z, p.y - 12.5*z, 11*z, 8*z, 3*z); ctx.fill();
+
+    ctx.fillStyle = colors.skin;
+    ctx.beginPath(); ctx.arc(p.x, p.y - 23*z, 8*z, 0, Math.PI*2); ctx.fill();
+
+    ctx.fillStyle = colors.hair;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y - 25*z, 8*z, Math.PI*1.02, Math.PI*2);
+    ctx.lineTo(p.x + 8*z, p.y - 23*z);
+    ctx.lineTo(p.x - 8*z, p.y - 23*z);
+    ctx.closePath(); ctx.fill();
+
+    ctx.fillStyle = 'rgba(255,255,255,.16)';
+    roundRect(p.x - 5*z, p.y - 10.5*z, 10*z, 2.5*z, 2*z); ctx.fill();
+
+    ctx.fillStyle = '#2a2a2a';
+    ctx.fillRect(p.x - 3.8*z, p.y + 5*z, 2*z, 7*z);
+    ctx.fillRect(p.x + 1.8*z, p.y + 5*z, 2*z, 7*z);
+
+    ctx.strokeStyle = colors.skin;
+    ctx.lineWidth = 2*z;
+    ctx.beginPath();
+    ctx.moveTo(p.x - 7*z, p.y - 8*z); ctx.lineTo(p.x - 11*z, p.y - 1*z);
+    ctx.moveTo(p.x + 7*z, p.y - 8*z); ctx.lineTo(p.x + 11*z, p.y - 1*z);
+    ctx.stroke();
+
+    ctx.fillStyle = '#231f20';
+    ctx.beginPath(); ctx.arc(p.x - 2.3*z, p.y - 23*z, .7*z, 0, Math.PI*2); ctx.arc(p.x + 2.3*z, p.y - 23*z, .7*z, 0, Math.PI*2); ctx.fill();
+
+    ctx.strokeStyle = '#8b5a48';
+    ctx.lineWidth = .9*z;
+    ctx.beginPath(); ctx.arc(p.x, p.y - 20.5*z, 2.5*z, 0.15, Math.PI-0.15); ctx.stroke();
+
+    if(isEmployee){
+      ctx.fillStyle = '#f0c85a';
+      ctx.beginPath(); ctx.arc(p.x + 8*z, p.y - 28*z, 3.3*z, 0, Math.PI*2); ctx.fill();
+    }
+  }
   function drawFloatingTexts(){ ctx.textAlign = 'center'; for(const f of floatingTexts){ const p = isoToScreen(f.x,f.y); ctx.globalAlpha = Math.max(0, f.life); ctx.fillStyle = '#2d8e57'; ctx.font = `900 ${14*camera.zoom}px Inter, sans-serif`; ctx.fillText(f.value, p.x, p.y - 20*camera.zoom); ctx.globalAlpha = 1; } }
   function drawSelection(){ if(!selectedTile) return; const [x,y] = selectedTile.split(',').map(Number), p = tilePolygon(x,y); ctx.beginPath(); ctx.moveTo(p[0].x,p[0].y); for(let i=1;i<p.length;i++) ctx.lineTo(p[i].x,p[i].y); ctx.closePath(); ctx.strokeStyle = moveStandUid ? 'rgba(95,214,95,.98)' : 'rgba(255,255,255,.95)'; ctx.lineWidth = 3; ctx.stroke(); }
   function shade(hex, percent){ const c = hex.replace('#',''), num = parseInt(c,16); let r = (num>>16) + percent, g = ((num>>8)&255) + percent, b = (num&255) + percent; r = Math.max(0, Math.min(255, r)); g = Math.max(0, Math.min(255, g)); b = Math.max(0, Math.min(255, b)); return '#' + ((r<<16)|(g<<8)|b).toString(16).padStart(6,'0'); }
