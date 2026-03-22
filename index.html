@@ -3,31 +3,42 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Mini Mall V3</title>
+  <title>Mini Mall V4</title>
   <style>
     :root{
       --bg1:#f8efe5;
       --bg2:#e7d5bf;
       --panel:#fff9f2;
       --panel2:#f1e2d1;
-      --panel3:#e8d4bf;
       --accent:#ef8758;
       --accent2:#4f9b87;
       --accent3:#6e86d6;
       --gold:#f0c85a;
-      --danger:#c75b4c;
       --text:#2c2b2a;
       --muted:#6d6761;
       --shadow:0 14px 28px rgba(0,0,0,.14);
     }
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    html,body{margin:0;height:100%;overflow:hidden;background:linear-gradient(180deg,var(--bg1),var(--bg2));font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text)}
+    html,body{
+      margin:0;
+      min-height:100%;
+      background:linear-gradient(180deg,var(--bg1),var(--bg2));
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      overflow-x:hidden;
+    }
+    body.game-active{
+      height:100%;
+      overflow:hidden;
+    }
     button{font:inherit}
-    #app{position:fixed;inset:0}
+    #app{position:fixed;inset:0;display:none}
+    body.game-active #app{display:block}
     canvas{display:block;width:100%;height:100%}
 
-    .overlay{position:fixed;inset:0;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:10px;z-index:20}
-    .topbar,.bottombar,.panel,.floating,.toast,.shop-select,.legend-toggle,.legend-drawer{pointer-events:auto}
+    .overlay{position:fixed;inset:0;pointer-events:none;display:none;flex-direction:column;justify-content:space-between;padding:10px;z-index:20}
+    body.game-active .overlay{display:flex}
+    .topbar,.bottombar,.panel,.floating,.toast,.legend-toggle,.legend-drawer{pointer-events:auto}
 
     .topbar{
       display:flex;gap:8px;justify-content:space-between;align-items:center;
@@ -50,13 +61,14 @@
 
     .legend-toggle{
       position:fixed;left:10px;top:76px;z-index:22;border:0;border-radius:16px;background:rgba(255,249,242,.94);
-      box-shadow:var(--shadow);padding:10px 12px;font-weight:900;color:var(--text)
+      box-shadow:var(--shadow);padding:10px 12px;font-weight:900;color:var(--text);display:none
     }
     .legend-drawer{
       position:fixed;left:10px;top:122px;z-index:22;max-width:min(86vw,340px);
       background:rgba(255,249,242,.94);backdrop-filter:blur(10px);border-radius:18px;box-shadow:var(--shadow);
       padding:10px 12px;font-size:12px;line-height:1.4;display:none
     }
+    body.game-active .legend-toggle{display:block}
     .legend-drawer.open{display:block}
     .legend-drawer strong{display:block;margin-bottom:4px}
     .legend-drawer span{color:var(--muted)}
@@ -109,7 +121,8 @@
     .btn.gold{background:var(--gold);color:#5d4313;box-shadow:0 10px 18px rgba(240,200,90,.22)}
     .btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
 
-    .floating{position:fixed;right:10px;top:76px;display:flex;flex-direction:column;gap:8px;z-index:22}
+    .floating{position:fixed;right:10px;top:76px;display:none;flex-direction:column;gap:8px;z-index:22}
+    body.game-active .floating{display:flex}
     .fab{
       width:52px;height:52px;border-radius:18px;border:0;background:rgba(255,249,242,.96);box-shadow:var(--shadow);
       font-size:19px;font-weight:900;cursor:pointer
@@ -122,19 +135,20 @@
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
     .shop-select{
-      position:fixed;inset:0;z-index:100;background:linear-gradient(180deg,#fff7ef,#efdeca);display:flex;
-      flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center
+      position:relative; z-index:100; min-height:100vh; background:linear-gradient(180deg,#fff7ef,#efdeca);
+      display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding:20px; text-align:center;
+      overflow-y:auto; -webkit-overflow-scrolling:touch;
     }
-    .shop-select.hidden{display:none}
+    body.game-active .shop-select{display:none}
     .hero-badge{
       width:92px;height:92px;border-radius:28px;background:linear-gradient(135deg,var(--accent),#ffca7f);display:grid;place-items:center;
-      color:#fff;font-size:46px;font-weight:900;box-shadow:var(--shadow);margin-bottom:16px
+      color:#fff;font-size:46px;font-weight:900;box-shadow:var(--shadow);margin:18px 0 16px
     }
     .shop-select h1{margin:0;font-size:28px}
-    .shop-select p{max-width:700px;color:var(--muted);font-size:14px;line-height:1.5}
-    .choices{width:min(100%,850px);display:grid;gap:12px;grid-template-columns:1fr;margin-top:18px}
+    .shop-select p{max-width:760px;color:var(--muted);font-size:14px;line-height:1.55}
+    .choices{width:min(100%,900px);display:grid;gap:12px;grid-template-columns:1fr;margin:18px 0 24px}
     .choice{
-      text-align:left;background:rgba(255,255,255,.8);border-radius:24px;padding:14px;border:1px solid rgba(0,0,0,.04);
+      text-align:left;background:rgba(255,255,255,.82);border-radius:24px;padding:14px;border:1px solid rgba(0,0,0,.04);
       box-shadow:var(--shadow)
     }
     .choice-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
@@ -142,16 +156,24 @@
     .choice p{margin:0;font-size:13px}
     .emoji{font-size:30px}
     .features{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 14px}
+    .hero-preview{
+      width:min(100%,900px); display:grid; gap:12px; grid-template-columns:1fr; margin-top:8px;
+    }
+    .preview-card{
+      background:rgba(255,255,255,.7); border-radius:22px; padding:14px; box-shadow:var(--shadow); text-align:left;
+    }
+    .preview-card h4{margin:0 0 8px; font-size:16px}
+    .preview-card p{margin:0; font-size:13px}
 
     @media (min-width:780px){
-      .overlay{padding:14px}
       .topbar{padding:10px 12px}
       .brand-text h1{font-size:18px}
       .brand-text p{font-size:12px}
-      .panel{left:14px;top:92px;right:auto;bottom:14px;width:420px;max-height:none}
+      .panel{left:14px;top:92px;right:auto;bottom:14px;width:430px;max-height:none}
       .bottombar{width:540px;margin:0 auto 14px}
       .cards{grid-template-columns:1fr 1fr}
       .choices{grid-template-columns:1fr 1fr 1fr}
+      .hero-preview{grid-template-columns:1fr 1fr 1fr}
       .legend-toggle{left:14px;top:92px}
       .legend-drawer{left:14px;top:140px}
     }
@@ -162,11 +184,27 @@
 
 <div class="shop-select" id="shopSelect">
   <div class="hero-badge">🏬</div>
-  <h1>Mini Mall V3</h1>
+  <h1>Mini Mall V4</h1>
   <p>
-    Version plus confortable sur téléphone avec panneau d’aide repliable, panneaux scrollables
-    et personnages améliorés. Choisis ton magasin, agrandis le terrain, recrute et développe ton commerce.
+    Version enrichie avec une page d’accueil qui scrolle correctement sur téléphone, des stands plus détaillés,
+    et des produits visibles directement dans le magasin. Le rendu reste stylisé, mais plus proche d’une boutique réelle.
   </p>
+
+  <div class="hero-preview">
+    <div class="preview-card">
+      <h4>Produits visibles</h4>
+      <p>Fruits, pains, lampes, vases, chocolats, bonbons et coffrets apparaissent directement sur les stands.</p>
+    </div>
+    <div class="preview-card">
+      <h4>Accueil mobile corrigé</h4>
+      <p>La page d’entrée peut maintenant défiler naturellement sur téléphone avant le lancement du jeu.</p>
+    </div>
+    <div class="preview-card">
+      <h4>Qualité renforcée</h4>
+      <p>Personnages plus détaillés, stands plus travaillés, ombres, caisse visuelle et rendu boutique plus crédible.</p>
+    </div>
+  </div>
+
   <div class="choices" id="choices"></div>
 </div>
 
@@ -188,9 +226,9 @@
   <div>
     <div class="topbar">
       <div class="brand">
-        <div class="brand-badge">V3</div>
+        <div class="brand-badge">V4</div>
         <div class="brand-text">
-          <h1 id="shopTitle">Mini Mall V3</h1>
+          <h1 id="shopTitle">Mini Mall V4</h1>
           <p id="shopSubtitle">Choisis un magasin pour commencer</p>
         </div>
       </div>
@@ -225,7 +263,7 @@
 
 <script>
 (() => {
-  const SAVE_KEY = 'mini-mall-v3-save';
+  const SAVE_KEY = 'mini-mall-v4-save';
   const SHOPS = {
     food: {
       key:'food',
@@ -234,11 +272,11 @@
       emoji:'🥬',
       theme:{ floor:'#ead6b7', accent:'#7fa95e', roof:'#f1e7d5', wall:'#cfb08b' },
       stands:[
-        {id:'fruit', name:'Stand fruits', cost:0, income:6, service:1.0, tier:'Basique', premium:false, color:'#f09a4f'},
-        {id:'bakery', name:'Boulangerie', cost:120, income:13, service:1.05, tier:'Chaud', premium:false, color:'#b78056'},
-        {id:'cheese', name:'Fromages fins', cost:240, income:24, service:1.08, tier:'Premium', premium:true, color:'#ecc95a'},
-        {id:'bio', name:'Rayon bio premium', cost:360, income:31, service:1.1, tier:'Bio', premium:true, color:'#85b56d'},
-        {id:'fine', name:'Épicerie de luxe', cost:520, income:43, service:1.15, tier:'Luxe', premium:true, color:'#80555a'}
+        {id:'fruit', name:'Stand fruits', cost:0, income:6, service:1.0, tier:'Basique', premium:false, color:'#f09a4f', productType:'fruit'},
+        {id:'bakery', name:'Boulangerie', cost:120, income:13, service:1.05, tier:'Chaud', premium:false, color:'#b78056', productType:'bread'},
+        {id:'cheese', name:'Fromages fins', cost:240, income:24, service:1.08, tier:'Premium', premium:true, color:'#ecc95a', productType:'cheese'},
+        {id:'bio', name:'Rayon bio premium', cost:360, income:31, service:1.1, tier:'Bio', premium:true, color:'#85b56d', productType:'crate'},
+        {id:'fine', name:'Épicerie de luxe', cost:520, income:43, service:1.15, tier:'Luxe', premium:true, color:'#80555a', productType:'gift'}
       ],
       products:[
         {id:'apples', name:'Pommes sélection', stand:'fruit', cost:45, bonus:0.04, price:8},
@@ -254,11 +292,11 @@
       emoji:'🛋️',
       theme:{ floor:'#d8e6ee', accent:'#658ea7', roof:'#eef4f7', wall:'#9eb9c7' },
       stands:[
-        {id:'vases', name:'Vases & cadres', cost:0, income:6, service:1.0, tier:'Basique', premium:false, color:'#83b4ca'},
-        {id:'plants', name:'Coin plantes', cost:130, income:14, service:1.05, tier:'Nature', premium:false, color:'#6da46e'},
-        {id:'lights', name:'Luminaires', cost:260, income:25, service:1.08, tier:'Style', premium:true, color:'#ebcb68'},
-        {id:'furniture', name:'Mobilier design', cost:390, income:32, service:1.1, tier:'Premium', premium:true, color:'#b89163'},
-        {id:'luxury', name:'Collection signature', cost:560, income:45, service:1.15, tier:'Signature', premium:true, color:'#9170bc'}
+        {id:'vases', name:'Vases & cadres', cost:0, income:6, service:1.0, tier:'Basique', premium:false, color:'#83b4ca', productType:'vase'},
+        {id:'plants', name:'Coin plantes', cost:130, income:14, service:1.05, tier:'Nature', premium:false, color:'#6da46e', productType:'plant'},
+        {id:'lights', name:'Luminaires', cost:260, income:25, service:1.08, tier:'Style', premium:true, color:'#ebcb68', productType:'lamp'},
+        {id:'furniture', name:'Mobilier design', cost:390, income:32, service:1.1, tier:'Premium', premium:true, color:'#b89163', productType:'chair'},
+        {id:'luxury', name:'Collection signature', cost:560, income:45, service:1.15, tier:'Signature', premium:true, color:'#9170bc', productType:'gift'}
       ],
       products:[
         {id:'mirror', name:'Miroirs déco', stand:'vases', cost:50, bonus:0.04, price:10},
@@ -274,11 +312,11 @@
       emoji:'🍬',
       theme:{ floor:'#f1d8e5', accent:'#d66b97', roof:'#fff2f8', wall:'#d99ab4' },
       stands:[
-        {id:'classic', name:'Bonbons classiques', cost:0, income:6, service:1.0, tier:'Basique', premium:false, color:'#e58cb7'},
-        {id:'choco', name:'Chocolats', cost:125, income:13, service:1.05, tier:'Gourmand', premium:false, color:'#8d6452'},
-        {id:'gift', name:'Coffrets cadeaux', cost:250, income:24, service:1.08, tier:'Premium', premium:true, color:'#f1bb4e'},
-        {id:'jelly', name:'Bar à jelly', cost:375, income:31, service:1.1, tier:'Fun', premium:true, color:'#79c8dc'},
-        {id:'prestige', name:'Chocolat prestige', cost:540, income:44, service:1.15, tier:'Luxe', premium:true, color:'#5e9571'}
+        {id:'classic', name:'Bonbons classiques', cost:0, income:6, service:1.0, tier:'Basique', premium:false, color:'#e58cb7', productType:'candy'},
+        {id:'choco', name:'Chocolats', cost:125, income:13, service:1.05, tier:'Gourmand', premium:false, color:'#8d6452', productType:'choco'},
+        {id:'gift', name:'Coffrets cadeaux', cost:250, income:24, service:1.08, tier:'Premium', premium:true, color:'#f1bb4e', productType:'gift'},
+        {id:'jelly', name:'Bar à jelly', cost:375, income:31, service:1.1, tier:'Fun', premium:true, color:'#79c8dc', productType:'jelly'},
+        {id:'prestige', name:'Chocolat prestige', cost:540, income:44, service:1.15, tier:'Luxe', premium:true, color:'#5e9571', productType:'gift'}
       ],
       products:[
         {id:'mix', name:'Sachet mix', stand:'classic', cost:42, bonus:0.04, price:8},
@@ -348,7 +386,7 @@
 
   function defaultState(shopKey){
     return {
-      version:3,
+      version:4,
       shopKey,
       money:100,
       employees:1,
@@ -458,7 +496,7 @@
         <div class="features">
           <span class="tag">100 € de départ</span>
           <span class="tag">1 employé</span>
-          <span class="tag">Mobile confort</span>
+          <span class="tag">Produits visibles</span>
         </div>
         <button class="btn start-shop" data-shop="${shop.key}">Jouer</button>
       </div>
@@ -469,6 +507,7 @@
   }
 
   function startGame(shopKey, fresh=false){
+    document.body.classList.add('game-active');
     game = fresh ? defaultState(shopKey) : loadState(shopKey);
     game.sessions += 1;
     speed = game.speed || 1;
@@ -478,9 +517,9 @@
     selectedTile = null;
     floatingTexts = [];
     lastTs = performance.now();
-    shopSelect.classList.add('hidden');
     renderPanels();
     updateHud();
+    resize();
     if(!animationId) loop(lastTs);
   }
 
@@ -717,8 +756,7 @@
     const entrance = {x:-0.8 + Math.random()*0.2, y:0.9 + (Math.random()-0.5)*0.4};
     const target = customerTargetFromStand(stand);
     game.customers.push({
-      id:uid(),
-      x:entrance.x, y:entrance.y, tx:target.x, ty:target.y,
+      id:uid(), x:entrance.x, y:entrance.y, tx:target.x, ty:target.y,
       standUid:stand.uid, phase:'enter', patience:5 + Math.random()*5,
       color: Math.random() > .5 ? '#6787da' : '#dc826d',
       outfit: Math.random() > .5 ? '#415ea8' : '#b65e4e',
@@ -785,7 +823,7 @@
 
   function loop(ts){
     animationId = requestAnimationFrame(loop);
-    if(!game){ drawBackdrop(); return; }
+    if(!game){ return; }
     const dt = Math.min(0.05, (ts-lastTs)/1000);
     lastTs = ts;
     game.minutesPlayed += dt/60;
@@ -794,14 +832,6 @@
     updateCustomers(dt);
     updateFloatingTexts(dt);
     draw();
-  }
-
-  function drawBackdrop(){
-    const g = ctx.createLinearGradient(0,0,0,height);
-    g.addColorStop(0,'#f8efe4');
-    g.addColorStop(1,'#e8d5be');
-    ctx.fillStyle = g;
-    ctx.fillRect(0,0,width,height);
   }
 
   function tileW(){ return 92 * camera.zoom; }
@@ -867,6 +897,7 @@
   }
 
   function draw(){
+    ctx.clearRect(0,0,width,height);
     drawBackdrop();
     const shop = getShop();
     const isMobile = width < 780;
@@ -881,6 +912,14 @@
     drawCustomers();
     drawFloatingTexts();
     drawSelection();
+  }
+
+  function drawBackdrop(){
+    const g = ctx.createLinearGradient(0,0,0,height);
+    g.addColorStop(0,'#f8efe4');
+    g.addColorStop(1,'#e8d5be');
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,width,height);
   }
 
   function drawDecor(shop){
@@ -923,7 +962,6 @@
   function drawPathAndEntrance(shop){
     drawIsoTile(-1,0,'#d4c4b2','#b7a592','#c8b6a2',null);
     drawIsoTile(-1,1,'#d4c4b2','#b7a592','#c8b6a2',null);
-
     const e = isoToScreen(-1.05, .45);
     ctx.fillStyle = shop.theme.accent;
     roundRect(e.x - 18*camera.zoom, e.y - 65*camera.zoom, 36*camera.zoom, 60*camera.zoom, 8*camera.zoom);
@@ -944,8 +982,12 @@
       const t = parseTile(stand.tile);
       const base = isoToScreen(t.x,t.y);
       const def = getStandDef(stand.standId);
-      const w = 52*camera.zoom, h = 42*camera.zoom;
-      const bx = base.x - w/2, by = base.y - 48*camera.zoom;
+      const w = 56*camera.zoom, h = 46*camera.zoom;
+      const bx = base.x - w/2, by = base.y - 52*camera.zoom;
+
+      ctx.fillStyle = 'rgba(0,0,0,.12)';
+      roundRect(bx + 3*camera.zoom, by + 38*camera.zoom, w, 10*camera.zoom, 7*camera.zoom);
+      ctx.fill();
 
       ctx.fillStyle = shop.theme.wall;
       roundRect(bx, by+14*camera.zoom, w, h, 10*camera.zoom);
@@ -959,12 +1001,22 @@
       roundRect(bx-3*camera.zoom, by+4*camera.zoom, w+6*camera.zoom, 12*camera.zoom, 8*camera.zoom);
       ctx.fill();
 
-      ctx.fillStyle = 'rgba(0,0,0,.12)';
-      ctx.fillRect(bx + 6*camera.zoom, by + 26*camera.zoom, w - 12*camera.zoom, 3*camera.zoom);
+      // front counter
+      ctx.fillStyle = '#f6f0e6';
+      roundRect(bx + 8*camera.zoom, by + 26*camera.zoom, w - 16*camera.zoom, 10*camera.zoom, 5*camera.zoom);
+      ctx.fill();
+
+      // cash register
+      ctx.fillStyle = '#3b3b3b';
+      roundRect(bx + w - 18*camera.zoom, by + 18*camera.zoom, 8*camera.zoom, 7*camera.zoom, 2*camera.zoom);
+      ctx.fill();
+
+      // products visible
+      drawStandProducts(def.productType, bx + 10*camera.zoom, by + 16*camera.zoom, w - 24*camera.zoom);
 
       for(let i=0;i<stand.level;i++){
         ctx.fillStyle = '#ffd98e';
-        ctx.fillRect(bx + 8*camera.zoom + i*8*camera.zoom, by + 16*camera.zoom, 6*camera.zoom, 6*camera.zoom);
+        ctx.fillRect(bx + 8*camera.zoom + i*8*camera.zoom, by + 8*camera.zoom, 6*camera.zoom, 6*camera.zoom);
       }
       if(def.premium){
         ctx.fillStyle = '#f0c85a';
@@ -977,6 +1029,116 @@
       ctx.font = `800 ${9*camera.zoom}px Inter, sans-serif`;
       ctx.textAlign = 'center';
       ctx.fillText(def.name, base.x, by - 3*camera.zoom);
+    }
+  }
+
+  function drawStandProducts(type, x, y, availableWidth){
+    const z = camera.zoom;
+    if(type === 'fruit'){
+      const colors = ['#d94e3d','#74b85a','#f0c84f','#f08a42'];
+      colors.forEach((c,i)=>{
+        ctx.fillStyle = c;
+        ctx.beginPath();
+        ctx.arc(x + i*8*z, y + (i%2)*2*z, 3.6*z, 0, Math.PI*2);
+        ctx.fill();
+      });
+    } else if(type === 'bread'){
+      for(let i=0;i<3;i++){
+        ctx.fillStyle = '#c88c4f';
+        roundRect(x + i*11*z, y - 2*z, 9*z, 5*z, 3*z);
+        ctx.fill();
+        ctx.strokeStyle = '#a26b34';
+        ctx.lineWidth = 1*z;
+        ctx.beginPath();
+        ctx.moveTo(x + 2*z + i*11*z, y);
+        ctx.lineTo(x + 7*z + i*11*z, y);
+        ctx.stroke();
+      }
+    } else if(type === 'cheese'){
+      for(let i=0;i<3;i++){
+        ctx.fillStyle = '#f1d05a';
+        ctx.beginPath();
+        ctx.moveTo(x + i*10*z, y + 4*z);
+        ctx.lineTo(x + 8*z + i*10*z, y + 4*z);
+        ctx.lineTo(x + 2*z + i*10*z, y - 2*z);
+        ctx.closePath();
+        ctx.fill();
+      }
+    } else if(type === 'crate'){
+      for(let i=0;i<2;i++){
+        ctx.fillStyle = '#9a6e46';
+        roundRect(x + i*12*z, y - 1*z, 10*z, 7*z, 2*z);
+        ctx.fill();
+        ctx.fillStyle = '#7fb35f';
+        ctx.fillRect(x + 2*z + i*12*z, y + 1*z, 6*z, 3*z);
+      }
+    } else if(type === 'gift'){
+      for(let i=0;i<2;i++){
+        ctx.fillStyle = '#e7d0a2';
+        roundRect(x + i*12*z, y - 1*z, 10*z, 8*z, 2*z);
+        ctx.fill();
+        ctx.fillStyle = '#c95f6a';
+        ctx.fillRect(x + 4*z + i*12*z, y - 1*z, 2*z, 8*z);
+        ctx.fillRect(x + i*12*z, y + 2.5*z, 10*z, 2*z);
+      }
+    } else if(type === 'vase'){
+      for(let i=0;i<3;i++){
+        ctx.fillStyle = ['#aac8da','#d6c8af','#b8d5d0'][i%3];
+        ctx.beginPath();
+        ctx.ellipse(x + i*10*z, y + 2*z, 3*z, 5*z, 0, 0, Math.PI*2);
+        ctx.fill();
+      }
+    } else if(type === 'plant'){
+      for(let i=0;i<2;i++){
+        ctx.fillStyle = '#8d6546';
+        roundRect(x + i*13*z, y + 2*z, 7*z, 4*z, 2*z);
+        ctx.fill();
+        ctx.fillStyle = '#6ca86c';
+        ctx.beginPath();
+        ctx.arc(x + 3.5*z + i*13*z, y, 5*z, 0, Math.PI*2);
+        ctx.fill();
+      }
+    } else if(type === 'lamp'){
+      for(let i=0;i<2;i++){
+        ctx.fillStyle = '#6a5d4d';
+        ctx.fillRect(x + 4*z + i*14*z, y + 1*z, 1.5*z, 6*z);
+        ctx.fillStyle = '#f0d479';
+        ctx.beginPath();
+        ctx.moveTo(x + i*14*z, y + 1*z);
+        ctx.lineTo(x + 10*z + i*14*z, y + 1*z);
+        ctx.lineTo(x + 7*z + i*14*z, y - 4*z);
+        ctx.lineTo(x + 3*z + i*14*z, y - 4*z);
+        ctx.closePath();
+        ctx.fill();
+      }
+    } else if(type === 'chair'){
+      ctx.fillStyle = '#b89163';
+      roundRect(x + 6*z, y + 1*z, 10*z, 5*z, 2*z);
+      ctx.fill();
+      ctx.fillRect(x + 6*z, y - 5*z, 3*z, 6*z);
+      ctx.fillRect(x + 13*z, y - 5*z, 3*z, 6*z);
+    } else if(type === 'candy'){
+      const colors = ['#ff6fa5','#6fd8ff','#ffd25a','#9c7cff'];
+      colors.forEach((c,i)=>{
+        ctx.fillStyle = c;
+        ctx.beginPath();
+        ctx.arc(x + i*8*z, y + 1*z, 3.2*z, 0, Math.PI*2);
+        ctx.fill();
+      });
+    } else if(type === 'choco'){
+      for(let i=0;i<3;i++){
+        ctx.fillStyle = '#6f4737';
+        roundRect(x + i*9*z, y, 7*z, 5*z, 2*z);
+        ctx.fill();
+      }
+    } else if(type === 'jelly'){
+      const colors = ['#7ed1e7','#ff9cc8','#b1e677'];
+      colors.forEach((c,i)=>{
+        ctx.fillStyle = c;
+        ctx.beginPath();
+        ctx.arc(x + i*9*z, y + 2*z, 3.5*z, 0, Math.PI*2);
+        ctx.fill();
+      });
     }
   }
 
@@ -1210,7 +1372,6 @@
 
   resize();
   buildShopChoices();
-  drawBackdrop();
 })();
 </script>
 </body>
