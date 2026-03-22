@@ -349,7 +349,16 @@
   }
   function updateMissionChip(){ if(!game) return; const m = game.mission; if(!m){ missionChip.textContent = 'Mission : aucune'; return; } const current = Math.min(game[m.field] || 0, m.target); missionChip.textContent = `Mission : ${m.text} (${current}/${m.target}) · récompense ${m.reward} €`; }
   function maybeCompleteMission(){ const m = game.mission; if(!m || m.claimed) return; const current = game[m.field] || 0; if(current >= m.target){ m.claimed = true; game.money += m.reward; showToast(`Mission accomplie : +${m.reward} €`); setTimeout(() => { game.mission = pickNewMission(); updateMissionChip(); renderPanels(); updateHud(); saveCurrentStateSilent(); }, 50); } }
-  function updateProgression(){ game.level = levelFromCustomersServed(game.customersServed, game.totalEarned); game.popularity = 1 + game.stands.length * 0.05 + game.unlockedProducts.length * 0.05 + Math.min(2, game.level * 0.04); game.satisfaction = clamp(game.satisfaction, 45, 100); maybeCompleteMission(); }
+  function updateProgression(){
+    const previousLevel = game.level || 1;
+    game.level = levelFromProgress(game.customersServed, game.totalEarned);
+    game.popularity = 1 + game.stands.length * 0.05 + game.unlockedProducts.length * 0.05 + Math.min(2, game.level * 0.04);
+    game.satisfaction = clamp(game.satisfaction, 45, 100);
+    if(game.level > previousLevel){
+      showToast(`Niveau ${game.level} atteint`);
+    }
+    maybeCompleteMission();
+  }
 
   function getLevelThresholds(){
     return [
@@ -442,23 +451,10 @@
     document.getElementById('panel-products').innerHTML = `<h2>Produits premium</h2><p class="desc">Débloque des références plus chères qui augmentent les revenus. Certains produits deviennent surtout utiles quand tu montes de niveau.</p><div class="cards">${shop.products.map(prod => { const unlocked = game.unlockedProducts.includes(prod.id), standReady = game.stands.some(s => s.standId === prod.stand); return `<div class="card"><h3>${prod.name}</h3><p>${standReady ? 'Le stand associé est déjà présent.' : 'Nécessite le stand correspondant.'}</p><div class="meta"><span class="tag">Coût ${formatMoney(prod.cost)}</span><span class="tag">Bonus +${Math.round(prod.bonus*100)}%</span><span class="tag">Prix ${prod.price} €</span></div><div class="row"><span>${unlocked ? 'Déjà débloqué' : 'Amélioration'}</span><button class="btn secondary unlock-product" data-id="${prod.id}" ${(unlocked || !standReady || game.money < prod.cost) ? 'disabled' : ''}>Débloquer</button></div></div>` }).join('')}</div>`;
     document.getElementById('panel-staff').innerHTML = `<h2>Équipe</h2><p class="desc">Chaque magasin démarre avec 1 employé. Plus tu recrutes, plus l’attente baisse et la satisfaction monte.</p><div class="card"><h3>Recruter un employé</h3><p>Les employés se répartissent automatiquement entre les stands et accélèrent le service client.</p><div class="meta"><span class="tag">Effectif ${game.employees}</span><span class="tag">Coût ${formatMoney(nextHireCost)}</span></div><div class="row"><span>Service amélioré</span><button class="btn blue" id="hireBtn" ${game.money < nextHireCost ? 'disabled' : ''}>Recruter</button></div></div><div class="grid2" style="margin-top:10px;">${Array.from({length: game.employees}).map((_, i) => `<div class="card"><h3>Employé ${i+1}</h3><p>Vente, rangement, assistance et fluidité du magasin.</p></div>`).join('')}</div>`;
     document.getElementById('panel-expand').innerHTML = `<h2>Agrandir le terrain</h2><p class="desc">Achète une nouvelle case adjacente pour ajouter davantage de stands et réduire l’effet de foule.</p><div class="card"><h3>Extension suivante</h3><p>Le terrain s’ouvre progressivement autour du magasin de départ.</p><div class="meta"><span class="tag">Terrains ${game.ownedTiles.length}</span><span class="tag">Coût ${formatMoney(nextExpandCost)}</span><span class="tag">Grille ${game.gridW}x${game.gridH}</span></div><div class="row"><span>Expansion auto</span><button class="btn gold" id="expandBtn" ${game.money < nextExpandCost ? 'disabled' : ''}>Acheter</button></div></div>`;
-    const LEVEL_STEPS = [
-      {served:0, earned:0},
-      {served:8, earned:150},
-      {served:20, earned:500},
-      {served:38, earned:1200},
-      {served:62, earned:2400},
-      {served:95, earned:4200},
-      {served:140, earned:6500},
-      {served:200, earned:9500},
-      {served:280, earned:13500},
-      {served:380, earned:19000},
-      {served:500, earned:26000}
-    ];
-    const nextStep = LEVEL_STEPS[Math.min(game.level, LEVEL_STEPS.length-1)];
-    const needClients = Math.max(0, nextStep.served - game.customersServed);
-    const needMoney = Math.max(0, nextStep.earned - game.totalEarned);
-    document.getElementById('panel-stats').innerHTML = `<h2>Statistiques</h2><p class="desc">Vue rapide sur la performance, la satisfaction et la progression de niveau.</p><div class="grid2"><div class="card"><h3>Argent</h3><p>${formatMoney(game.money)}</p></div><div class="card"><h3>Total gagné</h3><p>${formatMoney(game.totalEarned)}</p></div><div class="card"><h3>Clients servis</h3><p>${game.customersServed}</p></div><div class="card"><h3>Ventes</h3><p>${game.sales}</p></div><div class="card"><h3>Satisfaction</h3><p>${Math.round(game.satisfaction)}%</p></div><div class="card"><h3>Prochain niveau</h3><p>${needClients} client(s) + ${Math.floor(needMoney)} €</p><div style="margin-top:8px;background:#eadfce;border-radius:999px;height:10px;overflow:hidden;"><div style="height:100%;width:${getLevelProgressInfo().percent}%;background:linear-gradient(90deg,#ef8758,#f0c85a);border-radius:999px;"></div></div><p style="margin-top:6px;">Progression : ${getLevelProgressInfo().percent}%</p></div><div class="card"><h3>Popularité</h3><p>${game.popularity.toFixed(2)}x</p></div><div class="card"><h3>Revenu/min</h3><p>${Math.floor(incomePerMinute())} €</p></div></div>`;
+    const levelProgress = getLevelProgressInfo();
+    const needClients = levelProgress.clientsNeed;
+    const needMoney = levelProgress.moneyNeed;
+    document.getElementById('panel-stats').innerHTML = `<h2>Statistiques</h2><p class="desc">Vue rapide sur la performance, la satisfaction et la progression de niveau.</p><div class="grid2"><div class="card"><h3>Argent</h3><p>${formatMoney(game.money)}</p></div><div class="card"><h3>Total gagné</h3><p>${formatMoney(game.totalEarned)}</p></div><div class="card"><h3>Clients servis</h3><p>${game.customersServed}</p></div><div class="card"><h3>Ventes</h3><p>${game.sales}</p></div><div class="card"><h3>Satisfaction</h3><p>${Math.round(game.satisfaction)}%</p></div><div class="card"><h3>Prochain niveau</h3><p>${needClients} client(s) + ${Math.floor(needMoney)} €</p><div style="margin-top:8px;background:#eadfce;border-radius:999px;height:10px;overflow:hidden;"><div style="height:100%;width:${levelProgress.percent}%;background:linear-gradient(90deg,#ef8758,#f0c85a);border-radius:999px;"></div></div><p style="margin-top:6px;">Progression : ${levelProgress.percent}%</p></div><div class="card"><h3>Popularité</h3><p>${game.popularity.toFixed(2)}x</p></div><div class="card"><h3>Revenu/min</h3><p>${Math.floor(incomePerMinute())} €</p></div></div>`;
     document.querySelectorAll('.buy-stand').forEach(btn => btn.onclick = () => buyStand(btn.dataset.id));
     document.querySelectorAll('.unlock-product').forEach(btn => btn.onclick = () => unlockProduct(btn.dataset.id));
     const hireBtn = document.getElementById('hireBtn'); if(hireBtn) hireBtn.onclick = hireEmployee;
@@ -496,7 +492,7 @@
           const earn = standPower(stand) * (0.75 + Math.random()*0.55);
           game.money += earn; game.totalEarned += earn; game.sales += 1; game.customersServed += 1; game.satisfaction = clamp(game.satisfaction + 0.8, 45, 100); updateProgression();
           floatingTexts.push({x:c.x, y:c.y-0.15, value:'+' + Math.floor(earn) + '€', life:1});
-          const newLevel = levelFromCustomersServed(game.customersServed, game.totalEarned); if(newLevel > game.level){ game.level = newLevel; showToast(`Niveau ${game.level} atteint`); }
+          
           c.phase = 'exit'; c.tx = -0.9; c.ty = 0.9 + (Math.random()-0.5)*0.3;
           updateHud(); renderPanels(); saveCurrentStateSilent();
         }
