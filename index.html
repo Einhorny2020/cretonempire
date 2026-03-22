@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Mini Mall V8</title>
+  <title>Mini Mall V8.1</title>
   <style>
     :root{
       --bg1:#f6eee4; --bg2:#e6d2bb; --panel:#fff9f2; --panel2:#f1e2d1; --panel3:#ead7c1;
@@ -91,6 +91,23 @@
     .preview-card p{margin:0;font-size:13px}
     .profile-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
     .profile-input{width:100%;border:1px solid rgba(0,0,0,.08);border-radius:14px;padding:12px;background:#fff}
+    
+    .level-modal{
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:120;
+      background:rgba(0,0,0,.32); padding:20px;
+    }
+    .level-modal.show{display:flex}
+    .level-card{
+      width:min(92vw,460px); background:rgba(255,249,242,.98); border-radius:26px; box-shadow:var(--shadow);
+      padding:20px; text-align:left;
+    }
+    .level-card h3{margin:0 0 8px; font-size:24px}
+    .level-card p{margin:0 0 12px; color:var(--muted)}
+    .unlock-list{display:grid; gap:8px; margin:12px 0}
+    .unlock-item{
+      background:var(--panel2); border-radius:16px; padding:10px 12px; font-size:13px; font-weight:700;
+    }
+
     @media (min-width:780px){
       .topbar{padding:10px 12px}.brand-text h1{font-size:18px}.brand-text p{font-size:12px}
       .panel{left:14px;top:92px;right:auto;bottom:14px;width:450px;max-height:none}
@@ -105,7 +122,7 @@
 
 <div class="shop-select" id="shopSelect">
   <div class="hero-badge">🏬</div>
-  <h1>Mini Mall V8</h1>
+  <h1>Mini Mall V8.1</h1>
   <p>
     Cette version pousse encore plus loin le réalisme visuel, ajoute des niveaux plus difficiles à débloquer, et introduit encore de nouveaux stands dans chaque type de magasin.
   </p>
@@ -138,6 +155,14 @@
 </div>
 
 <div class="toast" id="toast"></div>
+<div class="level-modal" id="levelModal">
+  <div class="level-card">
+    <h3 id="levelModalTitle">Niveau débloqué</h3>
+    <p id="levelModalText">Tu as débloqué de nouveaux stands.</p>
+    <div class="unlock-list" id="levelUnlockList"></div>
+    <div class="row"><span></span><button class="btn" id="closeLevelModalBtn">Continuer</button></div>
+  </div>
+</div>
 
 <button class="legend-toggle" id="legendToggle">ℹ️ Aide</button>
 <div class="legend-drawer" id="legendDrawer">
@@ -159,9 +184,9 @@
   <div>
     <div class="topbar">
       <div class="brand">
-        <div class="brand-badge">V8</div>
+        <div class="brand-badge">V8.1</div>
         <div class="brand-text">
-          <h1 id="shopTitle">Mini Mall V8</h1>
+          <h1 id="shopTitle">Mini Mall V8.1</h1>
           <p id="shopSubtitle">Choisis un magasin pour commencer</p>
         </div>
       </div>
@@ -270,6 +295,11 @@
   const shopSelect = document.getElementById('shopSelect');
   const choices = document.getElementById('choices');
   const toast = document.getElementById('toast');
+  const levelModal = document.getElementById('levelModal');
+  const levelModalTitle = document.getElementById('levelModalTitle');
+  const levelModalText = document.getElementById('levelModalText');
+  const levelUnlockList = document.getElementById('levelUnlockList');
+  const closeLevelModalBtn = document.getElementById('closeLevelModalBtn');
   const legendToggle = document.getElementById('legendToggle');
   const legendDrawer = document.getElementById('legendDrawer');
   const profileNameInput = document.getElementById('profileName');
@@ -321,6 +351,24 @@
   function getShop(){ return SHOPS[game.shopKey]; }
   function getStandDef(id){ return getShop().stands.find(s => s.id === id); }
   function getProductDef(id){ return getShop().products.find(p => p.id === id); }
+
+  function getNewUnlockedStandsForLevel(level){
+    return getShop().stands.filter(s => s.levelReq === level);
+  }
+
+  function showLevelModal(level){
+    const unlocked = getNewUnlockedStandsForLevel(level);
+    levelModalTitle.textContent = `Niveau ${level} atteint`;
+    if(unlocked.length){
+      levelModalText.textContent = `Tu viens de débloquer ${unlocked.length} nouveau(x) stand(s).`;
+      levelUnlockList.innerHTML = unlocked.map(s => `<div class="unlock-item">${s.name} · coût ${Math.floor(s.cost).toLocaleString('fr-FR')} € · ${s.tier}</div>`).join('');
+    } else {
+      levelModalText.textContent = `Pas de nouveau stand exact à ce niveau, mais ta popularité et ta progression augmentent.`;
+      levelUnlockList.innerHTML = '';
+    }
+    levelModal.classList.add('show');
+  }
+
   function parseTile(t){ const [x,y] = t.split(',').map(Number); return {x,y}; }
   function standBonus(standId){ return getShop().products.filter(p => p.stand === standId && game.unlockedProducts.includes(p.id)).reduce((a,p)=>a+p.bonus,0); }
   function standPower(stand){ const def = getStandDef(stand.standId); const satMultiplier = 0.75 + (game.satisfaction / 100) * 0.45; return def.income * stand.level * (1 + standBonus(stand.standId)) * game.popularity * satMultiplier; }
@@ -356,6 +404,7 @@
     game.satisfaction = clamp(game.satisfaction, 45, 100);
     if(game.level > previousLevel){
       showToast(`Niveau ${game.level} atteint`);
+      showLevelModal(game.level);
     }
     maybeCompleteMission();
   }
@@ -609,6 +658,8 @@
   document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => { document.querySelectorAll('.panel').forEach(p => p.classList.remove('open')); document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active')); document.getElementById('panel-' + btn.dataset.panel).classList.add('open'); btn.classList.add('active'); }));
   legendToggle.addEventListener('click', () => legendDrawer.classList.toggle('open'));
   saveProfileBtn.addEventListener('click', () => saveProfile(profileNameInput.value));
+  closeLevelModalBtn.addEventListener('click', () => levelModal.classList.remove('show'));
+  levelModal.addEventListener('click', (e) => { if(e.target === levelModal) levelModal.classList.remove('show'); });
   document.getElementById('switchBtn').addEventListener('click', switchToShopMenu);
   document.getElementById('speedBtn').addEventListener('click', () => { speed = speed === 1 ? 2 : speed === 2 ? 3 : 1; if(game) game.speed = speed; showToast('Vitesse x' + speed); });
   document.getElementById('saveBtn').addEventListener('click', () => saveState(false));
