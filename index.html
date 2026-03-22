@@ -3,39 +3,35 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Mini Mall V2</title>
+  <title>Mini Mall V3</title>
   <style>
     :root{
-      --bg1:#f7efe6;
-      --bg2:#eadbc8;
+      --bg1:#f8efe5;
+      --bg2:#e7d5bf;
       --panel:#fff9f2;
-      --panel2:#f0dfcb;
-      --panel3:#e7d1b7;
+      --panel2:#f1e2d1;
+      --panel3:#e8d4bf;
       --accent:#ef8758;
       --accent2:#4f9b87;
       --accent3:#6e86d6;
-      --text:#2b2b2b;
-      --muted:#6c655f;
-      --danger:#c75b4c;
       --gold:#f0c85a;
+      --danger:#c75b4c;
+      --text:#2c2b2a;
+      --muted:#6d6761;
       --shadow:0 14px 28px rgba(0,0,0,.14);
-      --radius:18px;
     }
-
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
     html,body{margin:0;height:100%;overflow:hidden;background:linear-gradient(180deg,var(--bg1),var(--bg2));font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text)}
-    button,input,select{font:inherit}
-
+    button{font:inherit}
     #app{position:fixed;inset:0}
     canvas{display:block;width:100%;height:100%}
 
     .overlay{position:fixed;inset:0;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:10px;z-index:20}
-    .topbar,.bottombar,.panel,.floating,.toast,.shop-select{pointer-events:auto}
+    .topbar,.bottombar,.panel,.floating,.toast,.shop-select,.legend-toggle,.legend-drawer{pointer-events:auto}
 
     .topbar{
       display:flex;gap:8px;justify-content:space-between;align-items:center;
-      background:rgba(255,249,242,.92);backdrop-filter:blur(10px);
-      border-radius:20px;padding:8px;box-shadow:var(--shadow)
+      background:rgba(255,249,242,.92);backdrop-filter:blur(10px);border-radius:20px;padding:8px;box-shadow:var(--shadow)
     }
     .brand{display:flex;gap:10px;align-items:center;min-width:0}
     .brand-badge{
@@ -45,7 +41,6 @@
     .brand-text{min-width:0}
     .brand-text h1{margin:0;font-size:15px;line-height:1.1}
     .brand-text p{margin:2px 0 0;color:var(--muted);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-
     .money-wrap{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
     .pill{
       background:var(--panel2);padding:9px 12px;border-radius:999px;font-size:13px;font-weight:800;
@@ -53,14 +48,18 @@
     }
     .pill small{color:var(--muted);font-weight:700}
 
-    .legend{
-      position:fixed;left:10px;top:76px;z-index:21;max-width:min(82vw,340px);
-      background:rgba(255,249,242,.9);backdrop-filter:blur(8px);border-radius:18px;
-      box-shadow:var(--shadow);padding:10px 12px;font-size:12px;line-height:1.4
+    .legend-toggle{
+      position:fixed;left:10px;top:76px;z-index:22;border:0;border-radius:16px;background:rgba(255,249,242,.94);
+      box-shadow:var(--shadow);padding:10px 12px;font-weight:900;color:var(--text)
     }
-    .legend strong{display:block;margin-bottom:4px}
-    .legend span{color:var(--muted)}
-
+    .legend-drawer{
+      position:fixed;left:10px;top:122px;z-index:22;max-width:min(86vw,340px);
+      background:rgba(255,249,242,.94);backdrop-filter:blur(10px);border-radius:18px;box-shadow:var(--shadow);
+      padding:10px 12px;font-size:12px;line-height:1.4;display:none
+    }
+    .legend-drawer.open{display:block}
+    .legend-drawer strong{display:block;margin-bottom:4px}
+    .legend-drawer span{color:var(--muted)}
     .mini-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:9px}
     .stat{background:var(--panel2);padding:8px;border-radius:14px}
     .stat b{display:block;font-size:15px}
@@ -81,15 +80,15 @@
     .icon{font-size:18px;line-height:1}
 
     .panel{
-      position:fixed;left:10px;right:10px;bottom:98px;max-height:50vh;overflow:auto;
-      background:rgba(255,249,242,.97);backdrop-filter:blur(10px);border-radius:24px;
-      box-shadow:var(--shadow);padding:14px;z-index:25;display:none
+      position:fixed;left:10px;right:10px;bottom:98px;max-height:44vh;overflow:auto;
+      -webkit-overflow-scrolling:touch;
+      background:rgba(255,249,242,.97);backdrop-filter:blur(10px);border-radius:24px;box-shadow:var(--shadow);
+      padding:14px;z-index:25;display:none;touch-action:pan-y
     }
     .panel.open{display:block;animation:rise .2s ease}
     @keyframes rise{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
     .panel h2{margin:0 0 6px;font-size:18px}
     .panel p.desc{margin:0 0 12px;color:var(--muted);font-size:13px}
-
     .cards{display:grid;gap:10px;grid-template-columns:1fr}
     .grid2{display:grid;gap:10px;grid-template-columns:1fr 1fr}
     .card{
@@ -108,7 +107,6 @@
     .btn.secondary{background:var(--accent2);box-shadow:0 10px 18px rgba(79,155,135,.22)}
     .btn.blue{background:var(--accent3);box-shadow:0 10px 18px rgba(110,134,214,.22)}
     .btn.gold{background:var(--gold);color:#5d4313;box-shadow:0 10px 18px rgba(240,200,90,.22)}
-    .btn.ghost{background:var(--panel2);color:var(--text);box-shadow:none}
     .btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
 
     .floating{position:fixed;right:10px;top:76px;display:flex;flex-direction:column;gap:8px;z-index:22}
@@ -150,10 +148,12 @@
       .topbar{padding:10px 12px}
       .brand-text h1{font-size:18px}
       .brand-text p{font-size:12px}
-      .panel{left:14px;top:92px;right:auto;bottom:14px;width:410px;max-height:none}
+      .panel{left:14px;top:92px;right:auto;bottom:14px;width:420px;max-height:none}
       .bottombar{width:540px;margin:0 auto 14px}
       .cards{grid-template-columns:1fr 1fr}
       .choices{grid-template-columns:1fr 1fr 1fr}
+      .legend-toggle{left:14px;top:92px}
+      .legend-drawer{left:14px;top:140px}
     }
   </style>
 </head>
@@ -162,24 +162,35 @@
 
 <div class="shop-select" id="shopSelect">
   <div class="hero-badge">🏬</div>
-  <h1>Mini Mall V2</h1>
+  <h1>Mini Mall V3</h1>
   <p>
-    Une version plus riche, plus stable et plus proche d’un jeu de gestion vue du dessus.
-    Choisis ton magasin, place des stands, recrute du personnel, débloque des produits premium,
-    achète de nouveaux terrains et fais grandir ton commerce.
+    Version plus confortable sur téléphone avec panneau d’aide repliable, panneaux scrollables
+    et personnages améliorés. Choisis ton magasin, agrandis le terrain, recrute et développe ton commerce.
   </p>
   <div class="choices" id="choices"></div>
 </div>
 
 <div class="toast" id="toast"></div>
 
+<button class="legend-toggle" id="legendToggle">ℹ️ Aide</button>
+<div class="legend-drawer" id="legendDrawer">
+  <strong>Commandes</strong>
+  <span>Glisse sur la scène pour déplacer la caméra. Pince pour zoomer. Touche une case pour la sélectionner. Les panneaux en bas sont scrollables sur mobile.</span>
+  <div class="mini-stats">
+    <div class="stat"><b id="level">1</b><span>Niveau</span></div>
+    <div class="stat"><b id="popularity">1.0x</b><span>Popularité</span></div>
+    <div class="stat"><b id="served">0</b><span>Clients servis</span></div>
+    <div class="stat"><b id="rpm">0 €/m</b><span>Revenu estimé</span></div>
+  </div>
+</div>
+
 <div class="overlay">
   <div>
     <div class="topbar">
       <div class="brand">
-        <div class="brand-badge">V2</div>
+        <div class="brand-badge">V3</div>
         <div class="brand-text">
-          <h1 id="shopTitle">Mini Mall V2</h1>
+          <h1 id="shopTitle">Mini Mall V3</h1>
           <p id="shopSubtitle">Choisis un magasin pour commencer</p>
         </div>
       </div>
@@ -187,17 +198,6 @@
         <div class="pill">💶 <span id="money">100 €</span></div>
         <div class="pill">👥 <small>Employés</small> <span id="employees">1</span></div>
         <div class="pill">🏪 <small>Stands</small> <span id="stands">1</span></div>
-      </div>
-    </div>
-
-    <div class="legend">
-      <strong>Commandes</strong>
-      <span>Fais glisser pour déplacer la caméra. Pince pour zoomer sur mobile ou molette sur ordinateur. Touchez une case du magasin pour la sélectionner.</span>
-      <div class="mini-stats">
-        <div class="stat"><b id="level">1</b><span>Niveau</span></div>
-        <div class="stat"><b id="popularity">1.0x</b><span>Popularité</span></div>
-        <div class="stat"><b id="served">0</b><span>Clients servis</span></div>
-        <div class="stat"><b id="rpm">0 €/m</b><span>Revenu estimé</span></div>
       </div>
     </div>
   </div>
@@ -225,15 +225,14 @@
 
 <script>
 (() => {
-  const SAVE_KEY = 'mini-mall-v2-save';
-
+  const SAVE_KEY = 'mini-mall-v3-save';
   const SHOPS = {
     food: {
       key:'food',
       name:'Magasin Alimentaire',
       subtitle:'Un commerce vivant avec étals, produits frais et corners premium.',
       emoji:'🥬',
-      theme:{ floor:'#ead6b7', wall:'#d7b185', accent:'#7fa95e', roof:'#f1e7d5' },
+      theme:{ floor:'#ead6b7', accent:'#7fa95e', roof:'#f1e7d5', wall:'#cfb08b' },
       stands:[
         {id:'fruit', name:'Stand fruits', cost:0, income:6, service:1.0, tier:'Basique', premium:false, color:'#f09a4f'},
         {id:'bakery', name:'Boulangerie', cost:120, income:13, service:1.05, tier:'Chaud', premium:false, color:'#b78056'},
@@ -253,7 +252,7 @@
       name:'Magasin Décoration',
       subtitle:'Vases, plantes, luminaires et mobilier design pour booster le panier moyen.',
       emoji:'🛋️',
-      theme:{ floor:'#d8e6ee', wall:'#9eb9c7', accent:'#658ea7', roof:'#eef4f7' },
+      theme:{ floor:'#d8e6ee', accent:'#658ea7', roof:'#eef4f7', wall:'#9eb9c7' },
       stands:[
         {id:'vases', name:'Vases & cadres', cost:0, income:6, service:1.0, tier:'Basique', premium:false, color:'#83b4ca'},
         {id:'plants', name:'Coin plantes', cost:130, income:14, service:1.05, tier:'Nature', premium:false, color:'#6da46e'},
@@ -273,7 +272,7 @@
       name:'Magasin de Bonbons',
       subtitle:'Une boutique colorée avec chocolats premium, coffrets et ventes impulsives.',
       emoji:'🍬',
-      theme:{ floor:'#f1d8e5', wall:'#d99ab4', accent:'#d66b97', roof:'#fff2f8' },
+      theme:{ floor:'#f1d8e5', accent:'#d66b97', roof:'#fff2f8', wall:'#d99ab4' },
       stands:[
         {id:'classic', name:'Bonbons classiques', cost:0, income:6, service:1.0, tier:'Basique', premium:false, color:'#e58cb7'},
         {id:'choco', name:'Chocolats', cost:125, income:13, service:1.05, tier:'Gourmand', premium:false, color:'#8d6452'},
@@ -290,11 +289,13 @@
     }
   };
 
-  const ctx = document.getElementById('game').getContext('2d');
   const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
   const shopSelect = document.getElementById('shopSelect');
   const choices = document.getElementById('choices');
   const toast = document.getElementById('toast');
+  const legendToggle = document.getElementById('legendToggle');
+  const legendDrawer = document.getElementById('legendDrawer');
 
   const moneyEl = document.getElementById('money');
   const employeesEl = document.getElementById('employees');
@@ -308,19 +309,18 @@
 
   let DPR = Math.min(window.devicePixelRatio || 1, 2);
   let width = 0, height = 0;
-
   const camera = { x:0, y:0, zoom:1 };
   let speed = 1;
   let game = null;
-  let animationId = null;
   let lastTs = 0;
+  let animationId = null;
+  let selectedTile = null;
+  let floatingTexts = [];
+  let worldOrigin = {x:0, y:0};
   let dragging = false;
   let dragMoved = false;
   let dragStart = null;
   let pinchDist = null;
-  let worldOrigin = { x:0, y:0 };
-  let selectedTile = null;
-  let floatingTexts = [];
 
   function resize(){
     DPR = Math.min(window.devicePixelRatio || 1, 2);
@@ -330,27 +330,25 @@
     canvas.height = Math.floor(height * DPR);
     canvas.style.width = width + 'px';
     canvas.style.height = height + 'px';
-    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    ctx.setTransform(DPR,0,0,DPR,0,0);
   }
+
+  function uid(){ return Math.random().toString(36).slice(2,10); }
+  function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+  function formatMoney(v){ return Math.floor(v).toLocaleString('fr-FR') + ' €'; }
+  function deepClone(v){ return JSON.parse(JSON.stringify(v)); }
+  function dist(ax,ay,bx,by){ return Math.hypot(ax-bx, ay-by); }
 
   function showToast(msg){
     toast.textContent = msg;
     toast.classList.add('show');
     clearTimeout(showToast._t);
-    showToast._t = setTimeout(() => toast.classList.remove('show'), 1500);
-  }
-
-  function formatMoney(v){
-    return Math.floor(v).toLocaleString('fr-FR') + ' €';
-  }
-
-  function deepClone(v){
-    return JSON.parse(JSON.stringify(v));
+    showToast._t = setTimeout(()=>toast.classList.remove('show'), 1600);
   }
 
   function defaultState(shopKey){
     return {
-      version:2,
+      version:3,
       shopKey,
       money:100,
       employees:1,
@@ -366,19 +364,13 @@
       ownedTiles:['0,0','1,0','0,1','1,1'],
       stands:[{uid:uid(), tile:'0,0', standId:SHOPS[shopKey].stands[0].id, level:1}],
       unlockedProducts:[],
-      staff:[
-        {id:uid(), role:'vendeur', bonus:1.0},
-      ],
+      staff:[{id:uid(), role:'vendeur'}],
       expansionIndex:0,
       spawnTimer:1.2,
       customers:[],
-      camera:{ x:0, y:0, zoom:1 },
+      camera:{x:0,y:0,zoom:1},
       sessions:0
     };
-  }
-
-  function uid(){
-    return Math.random().toString(36).slice(2, 10);
   }
 
   function loadState(shopKey){
@@ -390,12 +382,17 @@
     }
   }
 
+  function serializableState(){
+    const s = deepClone(game);
+    s.customers = [];
+    return s;
+  }
+
   function saveState(){
     if(!game) return;
-    const state = serializableState();
     try{
       const all = JSON.parse(localStorage.getItem(SAVE_KEY) || '{}');
-      all[state.shopKey] = state;
+      all[game.shopKey] = serializableState();
       localStorage.setItem(SAVE_KEY, JSON.stringify(all));
       showToast('Partie sauvegardée');
     }catch(e){
@@ -403,83 +400,15 @@
     }
   }
 
-  function serializableState(){
-    const s = deepClone(game);
-    s.customers = [];
-    return s;
-  }
-
-  function resetGame(){
-    if(!game) return;
-    if(!confirm('Réinitialiser ce magasin ?')) return;
-    const key = game.shopKey;
-    game = defaultState(key);
-    game.sessions += 1;
-    camera.x = 0;
-    camera.y = 0;
-    camera.zoom = 1;
-    selectedTile = null;
-    floatingTexts = [];
-    renderPanels();
-    updateHud();
-    showToast('Magasin réinitialisé');
-  }
-
-  function startGame(shopKey, fresh = false){
-    game = fresh ? defaultState(shopKey) : loadState(shopKey);
-    game.sessions += 1;
-    speed = game.speed || 1;
-    camera.x = game.camera?.x || 0;
-    camera.y = game.camera?.y || 0;
-    camera.zoom = game.camera?.zoom || 1;
-    shopSelect.classList.add('hidden');
-    selectedTile = null;
-    floatingTexts = [];
-    lastTs = performance.now();
-    updateHud();
-    renderPanels();
-    if(!animationId) loop(lastTs);
-  }
-
-  function buildShopChoices(){
-    choices.innerHTML = Object.values(SHOPS).map(shop => `
-      <div class="choice">
-        <div class="choice-head">
-          <div>
-            <h3>${shop.name}</h3>
-            <p>${shop.subtitle}</p>
-          </div>
-          <div class="emoji">${shop.emoji}</div>
-        </div>
-        <div class="features">
-          <span class="tag">100 € de départ</span>
-          <span class="tag">1 employé</span>
-          <span class="tag">Agrandissement</span>
-        </div>
-        <button class="btn start-shop" data-shop="${shop.key}">Jouer</button>
-      </div>
-    `).join('');
-    choices.querySelectorAll('.start-shop').forEach(btn => {
-      btn.addEventListener('click', () => startGame(btn.dataset.shop));
-    });
-  }
-
-  function getShop(){
-    return SHOPS[game.shopKey];
-  }
-
-  function getStandDef(id){
-    return getShop().stands.find(s => s.id === id);
-  }
-
-  function getProductDef(id){
-    return getShop().products.find(p => p.id === id);
-  }
+  function getShop(){ return SHOPS[game.shopKey]; }
+  function getStandDef(id){ return getShop().stands.find(s => s.id === id); }
+  function getProductDef(id){ return getShop().products.find(p => p.id === id); }
+  function parseTile(t){ const [x,y] = t.split(',').map(Number); return {x,y}; }
 
   function standBonus(standId){
     return getShop().products
       .filter(p => p.stand === standId && game.unlockedProducts.includes(p.id))
-      .reduce((a,p) => a + p.bonus, 0);
+      .reduce((a,p)=>a+p.bonus,0);
   }
 
   function standPower(stand){
@@ -494,8 +423,7 @@
 
   function incomePerMinute(){
     if(!game || !game.stands.length) return 0;
-    const base = game.stands.reduce((a,s) => a + standPower(s), 0);
-    return base * (0.7 + game.employees * 0.2);
+    return game.stands.reduce((a,s)=>a+standPower(s),0) * (0.72 + game.employees * 0.2);
   }
 
   function updateProgression(){
@@ -515,6 +443,59 @@
     popularityEl.textContent = game.popularity.toFixed(1) + 'x';
     servedEl.textContent = String(game.customersServed);
     rpmEl.textContent = Math.floor(incomePerMinute()) + ' €/m';
+  }
+
+  function buildShopChoices(){
+    choices.innerHTML = Object.values(SHOPS).map(shop => `
+      <div class="choice">
+        <div class="choice-head">
+          <div>
+            <h3>${shop.name}</h3>
+            <p>${shop.subtitle}</p>
+          </div>
+          <div class="emoji">${shop.emoji}</div>
+        </div>
+        <div class="features">
+          <span class="tag">100 € de départ</span>
+          <span class="tag">1 employé</span>
+          <span class="tag">Mobile confort</span>
+        </div>
+        <button class="btn start-shop" data-shop="${shop.key}">Jouer</button>
+      </div>
+    `).join('');
+    choices.querySelectorAll('.start-shop').forEach(btn => {
+      btn.addEventListener('click', () => startGame(btn.dataset.shop));
+    });
+  }
+
+  function startGame(shopKey, fresh=false){
+    game = fresh ? defaultState(shopKey) : loadState(shopKey);
+    game.sessions += 1;
+    speed = game.speed || 1;
+    camera.x = game.camera?.x || 0;
+    camera.y = game.camera?.y || 0;
+    camera.zoom = game.camera?.zoom || 1;
+    selectedTile = null;
+    floatingTexts = [];
+    lastTs = performance.now();
+    shopSelect.classList.add('hidden');
+    renderPanels();
+    updateHud();
+    if(!animationId) loop(lastTs);
+  }
+
+  function resetGame(){
+    if(!game) return;
+    if(!confirm('Réinitialiser ce magasin ?')) return;
+    const key = game.shopKey;
+    game = defaultState(key);
+    game.sessions += 1;
+    camera.x = 0; camera.y = 0; camera.zoom = 1;
+    selectedTile = null;
+    floatingTexts = [];
+    renderPanels();
+    updateHud();
+    showToast('Magasin réinitialisé');
   }
 
   function renderPanels(){
@@ -560,7 +541,7 @@
               <p>${standReady ? 'Le stand associé est déjà présent.' : 'Nécessite le stand correspondant.'}</p>
               <div class="meta">
                 <span class="tag">Coût ${formatMoney(prod.cost)}</span>
-                <span class="tag">Bonus +${Math.round(prod.bonus * 100)}%</span>
+                <span class="tag">Bonus +${Math.round(prod.bonus*100)}%</span>
                 <span class="tag">Prix ${prod.price} €</span>
               </div>
               <div class="row">
@@ -575,10 +556,10 @@
 
     document.getElementById('panel-staff').innerHTML = `
       <h2>Équipe</h2>
-      <p class="desc">Chaque magasin démarre avec 1 employé. Plus tu recrutes, plus les ventes sont fluides.</p>
+      <p class="desc">Chaque magasin démarre avec 1 employé. Plus tu recrutes, plus le service est fluide.</p>
       <div class="card">
         <h3>Recruter un employé</h3>
-        <p>Les employés se déplacent automatiquement entre les stands et accélèrent la prise en charge.</p>
+        <p>Les employés se répartissent automatiquement entre les stands et accélèrent les ventes.</p>
         <div class="meta">
           <span class="tag">Effectif ${game.employees}</span>
           <span class="tag">Coût ${formatMoney(nextHireCost)}</span>
@@ -591,7 +572,7 @@
       <div class="grid2" style="margin-top:10px;">
         ${Array.from({length: game.employees}).map((_, i) => `
           <div class="card">
-            <h3>Employé ${i + 1}</h3>
+            <h3>Employé ${i+1}</h3>
             <p>Vente, rangement et assistance client.</p>
           </div>
         `).join('')}
@@ -644,7 +625,7 @@
     const stand = getStandDef(standId);
     if(game.money < stand.cost) return showToast('Pas assez d’argent');
     game.money -= stand.cost;
-    game.stands.push({ uid: uid(), tile: selectedTile, standId, level:1 });
+    game.stands.push({uid:uid(), tile:selectedTile, standId, level:1});
     updateProgression();
     updateHud();
     renderPanels();
@@ -669,7 +650,7 @@
     if(game.money < cost) return showToast('Pas assez d’argent');
     game.money -= cost;
     game.employees += 1;
-    game.staff.push({ id:uid(), role:'vendeur', bonus:1 });
+    game.staff.push({id:uid(), role:'vendeur'});
     updateProgression();
     updateHud();
     renderPanels();
@@ -683,16 +664,16 @@
     for(const t of game.ownedTiles){
       const [x,y] = t.split(',').map(Number);
       for(const [dx,dy] of dirs){
-        const nx = Math.max(0, x + dx);
-        const ny = Math.max(0, y + dy);
+        const nx = Math.max(0, x+dx);
+        const ny = Math.max(0, y+dy);
         const key = nx + ',' + ny;
         if(!owned.has(key) && !out.includes(key)) out.push(key);
       }
     }
-    return out.sort((a,b) => {
+    return out.sort((a,b)=>{
       const [ax,ay] = a.split(',').map(Number);
       const [bx,by] = b.split(',').map(Number);
-      return (ax + ay) - (bx + by);
+      return (ax+ay) - (bx+by);
     });
   }
 
@@ -705,8 +686,8 @@
     game.ownedTiles.push(next);
     game.expansionIndex += 1;
     const [x,y] = next.split(',').map(Number);
-    game.gridW = Math.max(game.gridW, x + 2);
-    game.gridH = Math.max(game.gridH, y + 2);
+    game.gridW = Math.max(game.gridW, x+2);
+    game.gridH = Math.max(game.gridH, y+2);
     updateProgression();
     updateHud();
     renderPanels();
@@ -716,8 +697,8 @@
   function chooseStand(){
     if(!game.stands.length) return null;
     const weights = game.stands.map(s => Math.max(1, standPower(s)));
-    const total = weights.reduce((a,b) => a + b, 0);
-    let r = Math.random() * total;
+    const total = weights.reduce((a,b)=>a+b,0);
+    let r = Math.random()*total;
     for(let i=0;i<weights.length;i++){
       r -= weights[i];
       if(r <= 0) return game.stands[i];
@@ -727,30 +708,27 @@
 
   function customerTargetFromStand(stand){
     const tile = parseTile(stand.tile);
-    return { x:tile.x + 0.52, y:tile.y + 0.18 };
+    return {x:tile.x + 0.52, y:tile.y + 0.18};
   }
 
   function spawnCustomer(){
     const stand = chooseStand();
     if(!stand) return;
-    const entrance = { x:-0.8 + Math.random()*0.2, y:0.9 + (Math.random()-0.5)*0.4 };
+    const entrance = {x:-0.8 + Math.random()*0.2, y:0.9 + (Math.random()-0.5)*0.4};
     const target = customerTargetFromStand(stand);
     game.customers.push({
       id:uid(),
-      x:entrance.x,
-      y:entrance.y,
-      tx:target.x,
-      ty:target.y,
-      standUid:stand.uid,
-      phase:'enter',
-      patience:5 + Math.random()*5,
+      x:entrance.x, y:entrance.y, tx:target.x, ty:target.y,
+      standUid:stand.uid, phase:'enter', patience:5 + Math.random()*5,
       color: Math.random() > .5 ? '#6787da' : '#dc826d',
+      outfit: Math.random() > .5 ? '#415ea8' : '#b65e4e',
+      hair: Math.random() > .5 ? '#624536' : '#2d2b2a',
       speed:0.75 + Math.random()*0.2
     });
   }
 
   function updateCustomers(dt){
-    const maxCustomers = Math.min(18, 4 + Math.floor(game.ownedTiles.length / 2) + game.employees);
+    const maxCustomers = Math.min(18, 4 + Math.floor(game.ownedTiles.length/2) + game.employees);
     game.spawnTimer -= dt;
     const spawnEvery = Math.max(0.8, 3.2 - game.popularity * 0.5 - game.stands.length * 0.08) / speed;
     if(game.spawnTimer <= 0 && game.customers.length < maxCustomers && game.stands.length){
@@ -758,123 +736,94 @@
       spawnCustomer();
     }
 
-    for(let i = game.customers.length - 1; i >= 0; i--){
+    for(let i=game.customers.length-1;i>=0;i--){
       const c = game.customers[i];
       if(c.phase === 'enter'){
         moveEntity(c, dt);
-        if(dist(c.x,c.y,c.tx,c.ty) < 0.05){
-          c.phase = 'wait';
-        }
+        if(dist(c.x,c.y,c.tx,c.ty) < 0.05) c.phase = 'wait';
       }else if(c.phase === 'wait'){
         c.patience -= dt * standService(game.stands.find(s => s.uid === c.standUid) || game.stands[0]);
         if(c.patience <= 0){
           const stand = game.stands.find(s => s.uid === c.standUid);
           if(stand){
-            const earn = standPower(stand) * (0.75 + Math.random() * 0.55);
+            const earn = standPower(stand) * (0.75 + Math.random()*0.55);
             game.money += earn;
             game.totalEarned += earn;
             game.sales += 1;
             game.customersServed += 1;
             updateProgression();
-            floatingTexts.push({
-              x:c.x, y:c.y - 0.15, value:'+' + Math.floor(earn) + '€', life:1
-            });
+            floatingTexts.push({x:c.x, y:c.y-0.15, value:'+' + Math.floor(earn) + '€', life:1});
           }
           c.phase = 'exit';
           c.tx = -0.9;
-          c.ty = 0.9 + (Math.random() - 0.5) * 0.3;
+          c.ty = 0.9 + (Math.random()-0.5)*0.3;
           updateHud();
           renderPanels();
         }
       }else{
-        moveEntity(c, dt * 1.1);
-        if(dist(c.x,c.y,c.tx,c.ty) < 0.06){
-          game.customers.splice(i, 1);
-        }
+        moveEntity(c, dt*1.1);
+        if(dist(c.x,c.y,c.tx,c.ty) < 0.06) game.customers.splice(i,1);
       }
     }
   }
 
   function moveEntity(c, dt){
-    const a = Math.atan2(c.ty - c.y, c.tx - c.x);
+    const a = Math.atan2(c.ty-c.y, c.tx-c.x);
     const step = c.speed * dt * speed;
-    c.x += Math.cos(a) * step;
-    c.y += Math.sin(a) * step;
+    c.x += Math.cos(a)*step;
+    c.y += Math.sin(a)*step;
   }
 
   function updateFloatingTexts(dt){
     for(let i=floatingTexts.length-1;i>=0;i--){
       const f = floatingTexts[i];
-      f.life -= dt * 0.9;
-      f.y -= dt * 0.18;
+      f.life -= dt*0.9;
+      f.y -= dt*0.18;
       if(f.life <= 0) floatingTexts.splice(i,1);
     }
   }
 
   function loop(ts){
     animationId = requestAnimationFrame(loop);
-    if(!game) {
-      drawBackdrop();
-      return;
-    }
-    const dt = Math.min(0.05, (ts - lastTs) / 1000);
+    if(!game){ drawBackdrop(); return; }
+    const dt = Math.min(0.05, (ts-lastTs)/1000);
     lastTs = ts;
-    game.minutesPlayed += dt / 60;
+    game.minutesPlayed += dt/60;
     game.speed = speed;
-    game.camera = { x:camera.x, y:camera.y, zoom:camera.zoom };
+    game.camera = {x:camera.x, y:camera.y, zoom:camera.zoom};
     updateCustomers(dt);
     updateFloatingTexts(dt);
     draw();
   }
 
   function drawBackdrop(){
-    const g = ctx.createLinearGradient(0, 0, 0, height);
-    g.addColorStop(0, '#f8efe4');
-    g.addColorStop(1, '#e8d5be');
+    const g = ctx.createLinearGradient(0,0,0,height);
+    g.addColorStop(0,'#f8efe4');
+    g.addColorStop(1,'#e8d5be');
     ctx.fillStyle = g;
     ctx.fillRect(0,0,width,height);
-  }
-
-  function draw(){
-    drawBackdrop();
-    const shop = getShop();
-    worldOrigin.x = width * 0.52 + camera.x;
-    worldOrigin.y = height * 0.26 + camera.y;
-
-    drawDecor(shop);
-    drawFloor(shop);
-    drawPathAndEntrance(shop);
-    drawStands(shop);
-    drawEmployees();
-    drawCustomers();
-    drawFloatingTexts();
-    drawSelection();
   }
 
   function tileW(){ return 92 * camera.zoom; }
   function tileH(){ return 46 * camera.zoom; }
 
-  function isoToScreen(x, y){
-    const sx = worldOrigin.x + (x - y) * tileW()/2;
-    const sy = worldOrigin.y + (x + y) * tileH()/2;
-    return { x:sx, y:sy };
+  function isoToScreen(x,y){
+    return {
+      x: worldOrigin.x + (x-y) * tileW()/2,
+      y: worldOrigin.y + (x+y) * tileH()/2
+    };
   }
 
-  function screenToTile(px, py){
+  function screenToTile(px,py){
     const dx = px - worldOrigin.x;
     const dy = py - worldOrigin.y;
-    const x = (dx / (tileW()/2) + dy / (tileH()/2)) / 2;
-    const y = (dy / (tileH()/2) - dx / (tileW()/2)) / 2;
-    return { x, y };
+    const x = (dx/(tileW()/2) + dy/(tileH()/2))/2;
+    const y = (dy/(tileH()/2) - dx/(tileW()/2))/2;
+    return {x,y};
   }
 
-  function parseTile(t){
-    const [x,y] = t.split(',').map(Number);
-    return { x, y };
-  }
-
-  function tilePolygon(tx, ty){
-    const c = isoToScreen(tx, ty);
+  function tilePolygon(tx,ty){
+    const c = isoToScreen(tx,ty);
     return [
       {x:c.x, y:c.y - tileH()/2},
       {x:c.x + tileW()/2, y:c.y},
@@ -883,29 +832,29 @@
     ];
   }
 
-  function drawIsoTile(tx, ty, top, left, right, stroke){
-    const p = tilePolygon(tx, ty);
+  function drawIsoTile(tx,ty,top,left,right,stroke){
+    const p = tilePolygon(tx,ty);
     ctx.beginPath();
-    ctx.moveTo(p[0].x, p[0].y);
-    for(let i=1;i<p.length;i++) ctx.lineTo(p[i].x, p[i].y);
+    ctx.moveTo(p[0].x,p[0].y);
+    for(let i=1;i<p.length;i++) ctx.lineTo(p[i].x,p[i].y);
     ctx.closePath();
     ctx.fillStyle = top;
     ctx.fill();
 
     ctx.beginPath();
-    ctx.moveTo(p[2].x, p[2].y);
-    ctx.lineTo(p[3].x, p[3].y);
-    ctx.lineTo(p[3].x, p[3].y + 10 * camera.zoom);
-    ctx.lineTo(p[2].x, p[2].y + 10 * camera.zoom);
+    ctx.moveTo(p[2].x,p[2].y);
+    ctx.lineTo(p[3].x,p[3].y);
+    ctx.lineTo(p[3].x,p[3].y + 10*camera.zoom);
+    ctx.lineTo(p[2].x,p[2].y + 10*camera.zoom);
     ctx.closePath();
     ctx.fillStyle = left;
     ctx.fill();
 
     ctx.beginPath();
-    ctx.moveTo(p[1].x, p[1].y);
-    ctx.lineTo(p[2].x, p[2].y);
-    ctx.lineTo(p[2].x, p[2].y + 10 * camera.zoom);
-    ctx.lineTo(p[1].x, p[1].y + 10 * camera.zoom);
+    ctx.moveTo(p[1].x,p[1].y);
+    ctx.lineTo(p[2].x,p[2].y);
+    ctx.lineTo(p[2].x,p[2].y + 10*camera.zoom);
+    ctx.lineTo(p[1].x,p[1].y + 10*camera.zoom);
     ctx.closePath();
     ctx.fillStyle = right;
     ctx.fill();
@@ -917,48 +866,34 @@
     }
   }
 
-  function drawFloor(shop){
-    for(let y=0;y<game.gridH;y++){
-      for(let x=0;x<game.gridW;x++){
-        const key = x + ',' + y;
-        const owned = game.ownedTiles.includes(key);
-        const occupied = game.stands.some(s => s.tile === key);
-        const selected = selectedTile === key;
-        let top = owned ? shop.theme.floor : '#ccb8a2';
-        let left = owned ? shade(shop.theme.floor, -18) : '#b8a28e';
-        let right = owned ? shade(shop.theme.floor, -10) : '#c2ac96';
-        if(occupied){ top = '#ead39d'; left = '#d3bc87'; right = '#dfc792'; }
-        if(selected){ top = '#ffd977'; left = '#e4bd4a'; right = '#f0cc62'; }
-        drawIsoTile(x, y, top, left, right, 'rgba(0,0,0,.08)');
-      }
-    }
-  }
+  function draw(){
+    drawBackdrop();
+    const shop = getShop();
+    const isMobile = width < 780;
+    worldOrigin.x = width * 0.56 + camera.x;
+    worldOrigin.y = (isMobile ? height * 0.22 : height * 0.28) + camera.y;
 
-  function drawPathAndEntrance(shop){
-    drawIsoTile(-1, 0, '#d4c4b2', '#b7a592', '#c8b6a2', null);
-    drawIsoTile(-1, 1, '#d4c4b2', '#b7a592', '#c8b6a2', null);
-
-    const e = isoToScreen(-1.05, .45);
-    ctx.fillStyle = shop.theme.accent;
-    roundRect(e.x - 18 * camera.zoom, e.y - 65 * camera.zoom, 36 * camera.zoom, 60 * camera.zoom, 8 * camera.zoom);
-    ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.font = `900 ${14 * camera.zoom}px Inter, sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.fillText(shop.emoji, e.x, e.y - 28 * camera.zoom);
+    drawDecor(shop);
+    drawFloor(shop);
+    drawPathAndEntrance(shop);
+    drawStands(shop);
+    drawEmployees();
+    drawCustomers();
+    drawFloatingTexts();
+    drawSelection();
   }
 
   function drawDecor(shop){
     for(let i=0;i<12;i++){
-      const a = (i / 12) * Math.PI * 2;
+      const a = (i/12) * Math.PI * 2;
       const rx = Math.cos(a) * 7.5;
       const ry = Math.sin(a) * 7.5;
-      drawTree(rx + 2, ry + 2, 0.7 + (i % 3) * .15, shop.theme.accent);
+      drawTree(rx+2, ry+2, 0.7 + (i%3)*.15, shop.theme.accent);
     }
   }
 
   function drawTree(x,y,scale,color){
-    const p = isoToScreen(x, y);
+    const p = isoToScreen(x,y);
     ctx.fillStyle = '#8b6a4b';
     roundRect(p.x - 4*scale*camera.zoom, p.y - 18*scale*camera.zoom, 8*scale*camera.zoom, 24*scale*camera.zoom, 4);
     ctx.fill();
@@ -968,29 +903,60 @@
     ctx.fill();
   }
 
+  function drawFloor(shop){
+    for(let y=0;y<game.gridH;y++){
+      for(let x=0;x<game.gridW;x++){
+        const key = x + ',' + y;
+        const owned = game.ownedTiles.includes(key);
+        const occupied = game.stands.some(s => s.tile === key);
+        const selected = selectedTile === key;
+        let top = owned ? shop.theme.floor : '#ccb8a2';
+        let left = owned ? shade(shop.theme.floor,-18) : '#b8a28e';
+        let right = owned ? shade(shop.theme.floor,-10) : '#c2ac96';
+        if(occupied){ top = '#ead39d'; left = '#d3bc87'; right = '#dfc792'; }
+        if(selected){ top = '#ffd977'; left = '#e4bd4a'; right = '#f0cc62'; }
+        drawIsoTile(x,y,top,left,right,'rgba(0,0,0,.08)');
+      }
+    }
+  }
+
+  function drawPathAndEntrance(shop){
+    drawIsoTile(-1,0,'#d4c4b2','#b7a592','#c8b6a2',null);
+    drawIsoTile(-1,1,'#d4c4b2','#b7a592','#c8b6a2',null);
+
+    const e = isoToScreen(-1.05, .45);
+    ctx.fillStyle = shop.theme.accent;
+    roundRect(e.x - 18*camera.zoom, e.y - 65*camera.zoom, 36*camera.zoom, 60*camera.zoom, 8*camera.zoom);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = `900 ${14*camera.zoom}px Inter, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText(shop.emoji, e.x, e.y - 28*camera.zoom);
+  }
+
   function drawStands(shop){
-    const sorted = [...game.stands].sort((a,b) => {
+    const sorted = [...game.stands].sort((a,b)=>{
       const pa = parseTile(a.tile), pb = parseTile(b.tile);
-      return (pa.x + pa.y) - (pb.x + pb.y);
+      return (pa.x+pa.y) - (pb.x+pb.y);
     });
 
     for(const stand of sorted){
       const t = parseTile(stand.tile);
-      const base = isoToScreen(t.x, t.y);
+      const base = isoToScreen(t.x,t.y);
       const def = getStandDef(stand.standId);
-      const w = 52 * camera.zoom, h = 42 * camera.zoom;
-      const bx = base.x - w/2, by = base.y - 48 * camera.zoom;
+      const w = 52*camera.zoom, h = 42*camera.zoom;
+      const bx = base.x - w/2, by = base.y - 48*camera.zoom;
 
-      ctx.fillStyle = '#f9f1e5';
-      roundRect(bx, by + 14*camera.zoom, w, h, 10*camera.zoom);
+      ctx.fillStyle = shop.theme.wall;
+      roundRect(bx, by+14*camera.zoom, w, h, 10*camera.zoom);
       ctx.fill();
 
       ctx.fillStyle = def.color;
-      roundRect(bx + 4*camera.zoom, by + 10*camera.zoom, w - 8*camera.zoom, h - 12*camera.zoom, 8*camera.zoom);
+      roundRect(bx+4*camera.zoom, by+10*camera.zoom, w-8*camera.zoom, h-12*camera.zoom, 8*camera.zoom);
       ctx.fill();
 
-      ctx.fillStyle = '#fff7ef';
-      roundRect(bx - 3*camera.zoom, by + 4*camera.zoom, w + 6*camera.zoom, 12*camera.zoom, 8*camera.zoom);
+      ctx.fillStyle = shop.theme.roof;
+      roundRect(bx-3*camera.zoom, by+4*camera.zoom, w+6*camera.zoom, 12*camera.zoom, 8*camera.zoom);
       ctx.fill();
 
       ctx.fillStyle = 'rgba(0,0,0,.12)';
@@ -1000,7 +966,6 @@
         ctx.fillStyle = '#ffd98e';
         ctx.fillRect(bx + 8*camera.zoom + i*8*camera.zoom, by + 16*camera.zoom, 6*camera.zoom, 6*camera.zoom);
       }
-
       if(def.premium){
         ctx.fillStyle = '#f0c85a';
         ctx.beginPath();
@@ -1009,7 +974,7 @@
       }
 
       ctx.fillStyle = '#2b2b2b';
-      ctx.font = `800 ${9 * camera.zoom}px Inter, sans-serif`;
+      ctx.font = `800 ${9*camera.zoom}px Inter, sans-serif`;
       ctx.textAlign = 'center';
       ctx.fillText(def.name, base.x, by - 3*camera.zoom);
     }
@@ -1018,44 +983,88 @@
   function drawEmployees(){
     const stands = game.stands;
     for(let i=0;i<game.employees;i++){
-      const anchorStand = stands[i % Math.max(1, stands.length)];
-      const tile = parseTile(anchorStand.tile);
-      const offset = (i % 2 === 0 ? -0.12 : 0.14);
-      drawPerson(tile.x + 0.25 + offset, tile.y + 0.52, '#4f9b87', '#ffd8c0');
+      const anchor = stands[i % Math.max(1, stands.length)];
+      const tile = parseTile(anchor.tile);
+      const offset = i % 2 === 0 ? -0.12 : 0.14;
+      drawCharacter(tile.x + 0.25 + offset, tile.y + 0.52, {
+        outfit:'#4f9b87',
+        shirt:'#e9f8f2',
+        skin:'#ffd7c0',
+        hair:i%2===0 ? '#64493b' : '#2c2a29'
+      }, true);
     }
   }
 
   function drawCustomers(){
     for(const c of game.customers){
-      drawPerson(c.x, c.y, c.color, '#ffe2cf');
+      drawCharacter(c.x, c.y, {
+        outfit:c.outfit,
+        shirt:c.color,
+        skin:'#ffe2cf',
+        hair:c.hair
+      }, false);
     }
   }
 
-  function drawPerson(x, y, body, head){
-    const p = isoToScreen(x, y);
-    ctx.fillStyle = 'rgba(0,0,0,.12)';
+  function drawCharacter(x,y,colors,isEmployee){
+    const p = isoToScreen(x,y);
+    const z = camera.zoom;
+
+    ctx.fillStyle = 'rgba(0,0,0,.14)';
     ctx.beginPath();
-    ctx.ellipse(p.x, p.y + 12*camera.zoom, 8*camera.zoom, 4*camera.zoom, 0, 0, Math.PI*2);
+    ctx.ellipse(p.x, p.y + 12*z, 10*z, 5*z, 0, 0, Math.PI*2);
     ctx.fill();
 
-    ctx.fillStyle = body;
-    roundRect(p.x - 7*camera.zoom, p.y - 16*camera.zoom, 14*camera.zoom, 18*camera.zoom, 7*camera.zoom);
+    ctx.fillStyle = colors.outfit;
+    roundRect(p.x - 9*z, p.y - 16*z, 18*z, 20*z, 7*z);
     ctx.fill();
 
-    ctx.fillStyle = head;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y - 22*camera.zoom, 7*camera.zoom, 0, Math.PI*2);
+    ctx.fillStyle = colors.shirt;
+    roundRect(p.x - 6*z, p.y - 13*z, 12*z, 8*z, 4*z);
     ctx.fill();
+
+    ctx.fillStyle = colors.skin;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y - 23*z, 8*z, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.fillStyle = colors.hair;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y - 25*z, 8*z, Math.PI, Math.PI*2);
+    ctx.lineTo(p.x + 8*z, p.y - 23*z);
+    ctx.lineTo(p.x - 8*z, p.y - 23*z);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = '#2a2a2a';
+    ctx.fillRect(p.x - 4*z, p.y + 4*z, 2*z, 7*z);
+    ctx.fillRect(p.x + 2*z, p.y + 4*z, 2*z, 7*z);
+
+    ctx.strokeStyle = '#2a2a2a';
+    ctx.lineWidth = 1.5*z;
+    ctx.beginPath();
+    ctx.moveTo(p.x - 7*z, p.y - 8*z);
+    ctx.lineTo(p.x - 11*z, p.y - 1*z);
+    ctx.moveTo(p.x + 7*z, p.y - 8*z);
+    ctx.lineTo(p.x + 11*z, p.y - 1*z);
+    ctx.stroke();
+
+    if(isEmployee){
+      ctx.fillStyle = '#f0c85a';
+      ctx.beginPath();
+      ctx.arc(p.x + 8*z, p.y - 28*z, 3.5*z, 0, Math.PI*2);
+      ctx.fill();
+    }
   }
 
   function drawFloatingTexts(){
     ctx.textAlign = 'center';
     for(const f of floatingTexts){
-      const p = isoToScreen(f.x, f.y);
+      const p = isoToScreen(f.x,f.y);
       ctx.globalAlpha = Math.max(0, f.life);
       ctx.fillStyle = '#2d8e57';
-      ctx.font = `900 ${14 * camera.zoom}px Inter, sans-serif`;
-      ctx.fillText(f.value, p.x, p.y - 20 * camera.zoom);
+      ctx.font = `900 ${14*camera.zoom}px Inter, sans-serif`;
+      ctx.fillText(f.value, p.x, p.y - 20*camera.zoom);
       ctx.globalAlpha = 1;
     }
   }
@@ -1063,30 +1072,26 @@
   function drawSelection(){
     if(!selectedTile) return;
     const [x,y] = selectedTile.split(',').map(Number);
-    const p = tilePolygon(x, y);
+    const p = tilePolygon(x,y);
     ctx.beginPath();
-    ctx.moveTo(p[0].x, p[0].y);
-    for(let i=1;i<p.length;i++) ctx.lineTo(p[i].x, p[i].y);
+    ctx.moveTo(p[0].x,p[0].y);
+    for(let i=1;i<p.length;i++) ctx.lineTo(p[i].x,p[i].y);
     ctx.closePath();
     ctx.strokeStyle = 'rgba(255,255,255,.95)';
     ctx.lineWidth = 3;
     ctx.stroke();
   }
 
-  function dist(ax, ay, bx, by){
-    return Math.hypot(ax - bx, ay - by);
-  }
-
   function shade(hex, percent){
     const c = hex.replace('#','');
     const num = parseInt(c,16);
-    let r = (num >> 16) + percent;
-    let g = ((num >> 8) & 0x00FF) + percent;
-    let b = (num & 0x0000FF) + percent;
+    let r = (num>>16) + percent;
+    let g = ((num>>8)&255) + percent;
+    let b = (num&255) + percent;
     r = Math.max(0, Math.min(255, r));
     g = Math.max(0, Math.min(255, g));
     b = Math.max(0, Math.min(255, b));
-    return '#' + (r << 16 | g << 8 | b).toString(16).padStart(6, '0');
+    return '#' + ((r<<16)|(g<<8)|b).toString(16).padStart(6,'0');
   }
 
   function roundRect(x,y,w,h,r){
@@ -1101,12 +1106,17 @@
   }
 
   function pointerPos(e){
-    if(e.touches && e.touches[0]) return { x:e.touches[0].clientX, y:e.touches[0].clientY };
-    return { x:e.clientX, y:e.clientY };
+    if(e.touches && e.touches[0]) return {x:e.touches[0].clientX, y:e.touches[0].clientY};
+    return {x:e.clientX, y:e.clientY};
+  }
+
+  function isInsidePanelTarget(target){
+    return target.closest && (target.closest('.panel') || target.closest('.bottombar') || target.closest('.topbar') || target.closest('.legend-drawer') || target.closest('.legend-toggle') || target.closest('.floating'));
   }
 
   function handleDown(e){
     if(!game) return;
+    if(isInsidePanelTarget(e.target)) return;
     dragging = true;
     dragMoved = false;
     if(e.touches && e.touches.length === 2){
@@ -1115,7 +1125,7 @@
       pinchDist = null;
     }
     const p = pointerPos(e);
-    dragStart = { x:p.x, y:p.y, camX:camera.x, camY:camera.y };
+    dragStart = {x:p.x, y:p.y, camX:camera.x, camY:camera.y};
   }
 
   function handleMove(e){
@@ -1124,7 +1134,7 @@
       const d = touchDist(e.touches[0], e.touches[1]);
       if(pinchDist){
         const ratio = d / pinchDist;
-        camera.zoom = clamp(camera.zoom * ratio, 0.6, 1.65);
+        camera.zoom = clamp(camera.zoom * ratio, 0.6, 1.7);
       }
       pinchDist = d;
       return;
@@ -1139,9 +1149,11 @@
 
   function handleUp(e){
     if(!game) return;
-    if(!dragMoved){
-      const p = pointerPos(e.changedTouches ? {clientX:e.changedTouches[0].clientX, clientY:e.changedTouches[0].clientY} : e);
-      const t = screenToTile(p.x, p.y);
+    if(!dragMoved && dragStart && !isInsidePanelTarget(e.target || document.body)){
+      const point = e.changedTouches && e.changedTouches[0]
+        ? {clientX:e.changedTouches[0].clientX, clientY:e.changedTouches[0].clientY}
+        : e;
+      const t = screenToTile(point.clientX, point.clientY);
       const tx = Math.round(t.x);
       const ty = Math.round(t.y);
       const key = tx + ',' + ty;
@@ -1159,10 +1171,6 @@
     return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
   }
 
-  function clamp(v, min, max){
-    return Math.max(min, Math.min(max, v));
-  }
-
   document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.panel').forEach(p => p.classList.remove('open'));
@@ -1172,26 +1180,30 @@
     });
   });
 
+  legendToggle.addEventListener('click', () => {
+    legendDrawer.classList.toggle('open');
+  });
+
   document.getElementById('speedBtn').addEventListener('click', () => {
     speed = speed === 1 ? 2 : speed === 2 ? 3 : 1;
     if(game) game.speed = speed;
     showToast('Vitesse x' + speed);
   });
-
   document.getElementById('saveBtn').addEventListener('click', saveState);
   document.getElementById('resetBtn').addEventListener('click', resetGame);
 
   canvas.addEventListener('mousedown', handleDown);
   window.addEventListener('mousemove', handleMove);
   window.addEventListener('mouseup', handleUp);
-  canvas.addEventListener('touchstart', handleDown, { passive:true });
-  window.addEventListener('touchmove', handleMove, { passive:true });
-  window.addEventListener('touchend', handleUp, { passive:true });
+  canvas.addEventListener('touchstart', handleDown, {passive:true});
+  window.addEventListener('touchmove', handleMove, {passive:true});
+  window.addEventListener('touchend', handleUp, {passive:true});
+
   canvas.addEventListener('wheel', e => {
     if(!game) return;
     e.preventDefault();
-    camera.zoom = clamp(camera.zoom + (e.deltaY < 0 ? 0.08 : -0.08), 0.6, 1.65);
-  }, { passive:false });
+    camera.zoom = clamp(camera.zoom + (e.deltaY < 0 ? 0.08 : -0.08), 0.6, 1.7);
+  }, {passive:false});
 
   window.addEventListener('resize', resize);
   window.addEventListener('beforeunload', saveState);
