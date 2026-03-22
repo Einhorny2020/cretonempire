@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Mini Mall V7</title>
+  <title>Mini Mall V8</title>
   <style>
     :root{
       --bg1:#f6eee4; --bg2:#e6d2bb; --panel:#fff9f2; --panel2:#f1e2d1; --panel3:#ead7c1;
@@ -29,10 +29,11 @@
     .money-wrap{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
     .pill{background:var(--panel2);padding:9px 12px;border-radius:999px;font-size:13px;font-weight:800;display:flex;gap:6px;align-items:center;white-space:nowrap}
     .pill small{color:var(--muted);font-weight:700}
-    .profile-chip,.mission-chip{position:fixed; left:10px; z-index:23; background:rgba(255,249,242,.94); box-shadow:var(--shadow); border-radius:16px; padding:10px 12px; font-size:12px; max-width:min(78vw,320px); display:none;}
+    .profile-chip,.mission-chip,.level-chip{position:fixed; left:10px; z-index:23; background:rgba(255,249,242,.94); box-shadow:var(--shadow); border-radius:16px; padding:10px 12px; font-size:12px; max-width:min(78vw,320px); display:none;}
     .profile-chip{bottom:172px}
     .mission-chip{bottom:232px}
-    body.game-active .profile-chip, body.game-active .mission-chip{display:block}
+    .level-chip{bottom:292px}
+    body.game-active .profile-chip, body.game-active .mission-chip, body.game-active .level-chip{display:block}
     .legend-toggle{position:fixed;left:10px;top:76px;z-index:22;border:0;border-radius:16px;background:rgba(255,249,242,.94);box-shadow:var(--shadow);padding:10px 12px;font-weight:900;color:var(--text);display:none}
     .legend-drawer{position:fixed;left:10px;top:122px;z-index:22;max-width:min(86vw,360px);background:rgba(255,249,242,.94);backdrop-filter:blur(10px);border-radius:18px;box-shadow:var(--shadow);padding:10px 12px;font-size:12px;line-height:1.4;display:none}
     body.game-active .legend-toggle{display:block}
@@ -95,7 +96,7 @@
       .panel{left:14px;top:92px;right:auto;bottom:14px;width:450px;max-height:none}
       .bottombar{width:540px;margin:0 auto 14px}.cards{grid-template-columns:1fr 1fr}.choices{grid-template-columns:1fr 1fr 1fr}
       .hero-preview{grid-template-columns:1fr 1fr 1fr}.legend-toggle{left:14px;top:92px}.legend-drawer{left:14px;top:140px}
-      .profile-chip{left:14px;bottom:24px;max-width:330px}.mission-chip{left:14px;bottom:88px;max-width:330px}
+      .profile-chip{left:14px;bottom:24px;max-width:330px}.mission-chip{left:14px;bottom:88px;max-width:330px}.level-chip{left:14px;bottom:152px;max-width:330px}
     }
   </style>
 </head>
@@ -104,7 +105,7 @@
 
 <div class="shop-select" id="shopSelect">
   <div class="hero-badge">🏬</div>
-  <h1>Mini Mall V7</h1>
+  <h1>Mini Mall V8</h1>
   <p>
     Cette version pousse encore plus loin le réalisme visuel, ajoute des niveaux plus difficiles à débloquer, et introduit encore de nouveaux stands dans chaque type de magasin.
   </p>
@@ -150,16 +151,17 @@
   </div>
 </div>
 
-<div class="profile-chip" id="profileChip">Profil : invité</div>
+<div class="level-chip" id="levelChip">Niveau 1 · progression</div>
 <div class="mission-chip" id="missionChip">Mission : servir 10 clients</div>
+<div class="profile-chip" id="profileChip">Profil : invité</div>
 
 <div class="overlay">
   <div>
     <div class="topbar">
       <div class="brand">
-        <div class="brand-badge">V7</div>
+        <div class="brand-badge">V8</div>
         <div class="brand-text">
-          <h1 id="shopTitle">Mini Mall V7</h1>
+          <h1 id="shopTitle">Mini Mall V8</h1>
           <p id="shopSubtitle">Choisis un magasin pour commencer</p>
         </div>
       </div>
@@ -274,6 +276,7 @@
   const saveProfileBtn = document.getElementById('saveProfileBtn');
   const profileChip = document.getElementById('profileChip');
   const missionChip = document.getElementById('missionChip');
+  const levelChip = document.getElementById('levelChip');
   const moneyEl = document.getElementById('money');
   const employeesEl = document.getElementById('employees');
   const standsEl = document.getElementById('stands');
@@ -347,13 +350,69 @@
   function updateMissionChip(){ if(!game) return; const m = game.mission; if(!m){ missionChip.textContent = 'Mission : aucune'; return; } const current = Math.min(game[m.field] || 0, m.target); missionChip.textContent = `Mission : ${m.text} (${current}/${m.target}) · récompense ${m.reward} €`; }
   function maybeCompleteMission(){ const m = game.mission; if(!m || m.claimed) return; const current = game[m.field] || 0; if(current >= m.target){ m.claimed = true; game.money += m.reward; showToast(`Mission accomplie : +${m.reward} €`); setTimeout(() => { game.mission = pickNewMission(); updateMissionChip(); renderPanels(); updateHud(); saveCurrentStateSilent(); }, 50); } }
   function updateProgression(){ game.level = levelFromCustomersServed(game.customersServed, game.totalEarned); game.popularity = 1 + game.stands.length * 0.05 + game.unlockedProducts.length * 0.05 + Math.min(2, game.level * 0.04); game.satisfaction = clamp(game.satisfaction, 45, 100); maybeCompleteMission(); }
+
+  function getLevelThresholds(){
+    return [
+      {served:0, earned:0},
+      {served:8, earned:150},
+      {served:20, earned:500},
+      {served:38, earned:1200},
+      {served:62, earned:2400},
+      {served:95, earned:4200},
+      {served:140, earned:6500},
+      {served:200, earned:9500},
+      {served:280, earned:13500},
+      {served:380, earned:19000},
+      {served:500, earned:26000}
+    ];
+  }
+
+  function getLevelProgressInfo(){
+    const steps = getLevelThresholds();
+    const currentLevelIndex = Math.max(0, Math.min(game.level - 1, steps.length - 1));
+    const current = steps[currentLevelIndex];
+    const next = steps[Math.min(currentLevelIndex + 1, steps.length - 1)];
+
+    if (currentLevelIndex >= steps.length - 1){
+      return {
+        currentLevel: game.level,
+        nextLevel: game.level,
+        clientsDone: game.customersServed,
+        clientsNeed: 0,
+        moneyDone: Math.floor(game.totalEarned),
+        moneyNeed: 0,
+        percent: 100
+      };
+    }
+
+    const servedSpan = Math.max(1, next.served - current.served);
+    const earnedSpan = Math.max(1, next.earned - current.earned);
+
+    const servedProgress = Math.max(0, Math.min(1, (game.customersServed - current.served) / servedSpan));
+    const earnedProgress = Math.max(0, Math.min(1, (game.totalEarned - current.earned) / earnedSpan));
+    const percent = Math.round(((servedProgress + earnedProgress) / 2) * 100);
+
+    return {
+      currentLevel: game.level,
+      nextLevel: game.level + 1,
+      clientsDone: Math.max(0, game.customersServed - current.served),
+      clientsNeed: Math.max(0, next.served - game.customersServed),
+      moneyDone: Math.max(0, Math.floor(game.totalEarned - current.earned)),
+      moneyNeed: Math.max(0, Math.floor(next.earned - game.totalEarned)),
+      percent
+    };
+  }
+
   function updateHud(){
     if(!game) return;
     const shop = getShop();
     moneyEl.textContent = formatMoney(game.money); employeesEl.textContent = String(game.employees); standsEl.textContent = String(game.stands.length);
     titleEl.textContent = shop.name;
     subtitleEl.textContent = moveStandUid ? 'Mode déplacement actif : choisis une case vide' : `${shop.subtitle} · Satisfaction ${Math.round(game.satisfaction)}%`;
-    levelEl.textContent = String(game.level); popularityEl.textContent = game.popularity.toFixed(1) + 'x'; servedEl.textContent = String(game.customersServed); rpmEl.textContent = Math.floor(incomePerMinute()) + ' €/m'; updateMissionChip();
+    levelEl.textContent = String(game.level); popularityEl.textContent = game.popularity.toFixed(1) + 'x'; servedEl.textContent = String(game.customersServed); rpmEl.textContent = Math.floor(incomePerMinute()) + ' €/m';
+    const lvl = getLevelProgressInfo();
+    levelChip.innerHTML = `Niveau <strong>${lvl.currentLevel}</strong>${lvl.percent >= 100 && lvl.currentLevel === lvl.nextLevel ? ' · max atteint' : ` · ${lvl.percent}% vers niveau ${lvl.nextLevel}<br><span style="color:var(--muted)">Il manque ${lvl.clientsNeed} client(s) et ${lvl.moneyNeed.toLocaleString('fr-FR')} €</span>`}`;
+    updateMissionChip();
   }
   function buildShopChoices(){
     const all = loadAllSaves();
@@ -399,7 +458,7 @@
     const nextStep = LEVEL_STEPS[Math.min(game.level, LEVEL_STEPS.length-1)];
     const needClients = Math.max(0, nextStep.served - game.customersServed);
     const needMoney = Math.max(0, nextStep.earned - game.totalEarned);
-    document.getElementById('panel-stats').innerHTML = `<h2>Statistiques</h2><p class="desc">Vue rapide sur la performance, la satisfaction et la progression de niveau.</p><div class="grid2"><div class="card"><h3>Argent</h3><p>${formatMoney(game.money)}</p></div><div class="card"><h3>Total gagné</h3><p>${formatMoney(game.totalEarned)}</p></div><div class="card"><h3>Clients servis</h3><p>${game.customersServed}</p></div><div class="card"><h3>Ventes</h3><p>${game.sales}</p></div><div class="card"><h3>Satisfaction</h3><p>${Math.round(game.satisfaction)}%</p></div><div class="card"><h3>Prochain niveau</h3><p>${needClients} client(s) + ${Math.floor(needMoney)} €</p></div><div class="card"><h3>Popularité</h3><p>${game.popularity.toFixed(2)}x</p></div><div class="card"><h3>Revenu/min</h3><p>${Math.floor(incomePerMinute())} €</p></div></div>`;
+    document.getElementById('panel-stats').innerHTML = `<h2>Statistiques</h2><p class="desc">Vue rapide sur la performance, la satisfaction et la progression de niveau.</p><div class="grid2"><div class="card"><h3>Argent</h3><p>${formatMoney(game.money)}</p></div><div class="card"><h3>Total gagné</h3><p>${formatMoney(game.totalEarned)}</p></div><div class="card"><h3>Clients servis</h3><p>${game.customersServed}</p></div><div class="card"><h3>Ventes</h3><p>${game.sales}</p></div><div class="card"><h3>Satisfaction</h3><p>${Math.round(game.satisfaction)}%</p></div><div class="card"><h3>Prochain niveau</h3><p>${needClients} client(s) + ${Math.floor(needMoney)} €</p><div style="margin-top:8px;background:#eadfce;border-radius:999px;height:10px;overflow:hidden;"><div style="height:100%;width:${getLevelProgressInfo().percent}%;background:linear-gradient(90deg,#ef8758,#f0c85a);border-radius:999px;"></div></div><p style="margin-top:6px;">Progression : ${getLevelProgressInfo().percent}%</p></div><div class="card"><h3>Popularité</h3><p>${game.popularity.toFixed(2)}x</p></div><div class="card"><h3>Revenu/min</h3><p>${Math.floor(incomePerMinute())} €</p></div></div>`;
     document.querySelectorAll('.buy-stand').forEach(btn => btn.onclick = () => buyStand(btn.dataset.id));
     document.querySelectorAll('.unlock-product').forEach(btn => btn.onclick = () => unlockProduct(btn.dataset.id));
     const hireBtn = document.getElementById('hireBtn'); if(hireBtn) hireBtn.onclick = hireEmployee;
