@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Étoiles & Maison 3D — V3</title>
+  <title>Étoiles & Maison 3D — V4</title>
   <style>
     :root {
       --bg: #fff8f2;
-      --bg2: #f8f3ff;
-      --card: rgba(255,255,255,0.9);
+      --card: rgba(255,255,255,0.92);
       --text: #312727;
       --muted: #7b6b6a;
       --primary: #ff946f;
@@ -17,7 +16,6 @@
       --shadow: 0 14px 34px rgba(82, 50, 45, 0.14);
       --radius: 22px;
     }
-
     * { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; }
     body {
@@ -27,562 +25,218 @@
       background: radial-gradient(circle at top, #fffdf9 0%, #fff7ef 35%, #fdf2fb 100%);
       overflow-x: hidden;
     }
-
     button, input { font: inherit; }
-
-    .app {
-      max-width: 560px;
-      margin: 0 auto;
-      padding: 14px 14px 110px;
-    }
-
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
+    .app { max-width: 620px; margin: 0 auto; padding: 14px 14px 120px; }
+    .topbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
+    .brand { display:flex; align-items:center; gap:12px; }
     .logo {
-      width: 54px;
-      height: 54px;
-      border-radius: 18px;
-      display: grid;
-      place-items: center;
-      font-size: 28px;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      box-shadow: var(--shadow);
+      width:54px; height:54px; border-radius:18px; display:grid; place-items:center; font-size:28px;
+      background:linear-gradient(135deg, var(--primary), var(--accent)); box-shadow:var(--shadow);
     }
-
-    .brand h1 { margin: 0; font-size: 1.08rem; line-height: 1.1; }
-    .brand p { margin: 4px 0 0; color: var(--muted); font-size: 0.84rem; }
-
+    .brand h1 { margin:0; font-size:1.08rem; line-height:1.1; }
+    .brand p { margin:4px 0 0; color:var(--muted); font-size:.84rem; }
     .stars-badge {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.95);
-      box-shadow: var(--shadow);
-      font-weight: 800;
-      white-space: nowrap;
+      display:flex; align-items:center; gap:8px; padding:10px 14px; border-radius:999px;
+      background:rgba(255,255,255,.95); box-shadow:var(--shadow); font-weight:800; white-space:nowrap;
     }
-
     .hero, .card, .profile-card, .daily-card {
-      background: var(--card);
-      backdrop-filter: blur(10px);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
+      background: var(--card); backdrop-filter: blur(10px); border-radius:24px; box-shadow:var(--shadow);
     }
-
     .hero {
-      padding: 18px;
-      margin-bottom: 16px;
-      position: relative;
-      overflow: hidden;
-      background: linear-gradient(145deg, rgba(255,255,255,0.92), rgba(255,237,227,0.92));
+      padding:18px; margin-bottom:16px; position:relative; overflow:hidden;
+      background:linear-gradient(145deg, rgba(255,255,255,.92), rgba(255,237,227,.92));
     }
-
     .hero::after {
-      content: "";
-      position: absolute;
-      right: -32px;
-      top: -32px;
-      width: 140px;
-      height: 140px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 72%);
+      content:""; position:absolute; right:-32px; top:-32px; width:140px; height:140px; border-radius:50%;
+      background:radial-gradient(circle, rgba(255,255,255,.85) 0%, rgba(255,255,255,0) 72%);
     }
-
     .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(255,255,255,0.78);
-      color: var(--primary-strong);
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-size: 0.78rem;
-      font-weight: 800;
-      margin-bottom: 12px;
+      display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,.78); color:var(--primary-strong);
+      padding:8px 12px; border-radius:999px; font-size:.78rem; font-weight:800; margin-bottom:12px;
     }
-
-    .hero h2 { margin: 0 0 10px; font-size: 1.6rem; line-height: 1.05; }
-    .hero p { margin: 0; color: var(--muted); line-height: 1.48; }
-
-    .hero-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 16px;
+    .hero h2 { margin:0 0 10px; font-size:1.6rem; line-height:1.05; }
+    .hero p { margin:0; color:var(--muted); line-height:1.48; }
+    .hero-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:16px; }
+    .btn-primary, .btn-secondary, .mini-btn, .shop-action {
+      border:0; border-radius:16px; padding:13px 14px; font-weight:800; cursor:pointer;
+      transition:transform .18s ease, opacity .18s ease;
     }
-
-    .btn-primary, .btn-secondary, .mini-btn {
-      border: 0;
-      border-radius: 16px;
-      padding: 13px 14px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: transform .18s ease, opacity .18s ease;
-    }
-
-    .btn-primary:active, .btn-secondary:active, .mini-btn:active { transform: scale(.98); }
-    .btn-primary { color: #fff; background: linear-gradient(135deg, var(--primary), var(--primary-strong)); box-shadow: var(--shadow); }
-    .btn-secondary { color: var(--text); background: #fff; box-shadow: var(--shadow); }
-    .mini-btn { background: #fff4ec; color: var(--text); }
-
-    .section-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin: 16px 2px 10px;
-    }
-
-    .section-title h3 { margin: 0; font-size: 1rem; }
-    .section-title span { color: var(--muted); font-size: .82rem; text-align: right; }
-
+    .btn-primary:active, .btn-secondary:active, .mini-btn:active, .shop-action:active { transform:scale(.98); }
+    .btn-primary { color:#fff; background:linear-gradient(135deg, var(--primary), var(--primary-strong)); box-shadow:var(--shadow); }
+    .btn-secondary { color:var(--text); background:#fff; box-shadow:var(--shadow); }
+    .mini-btn { background:#fff4ec; color:var(--text); }
+    .section-title { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:16px 2px 10px; }
+    .section-title h3 { margin:0; font-size:1rem; }
+    .section-title span { color:var(--muted); font-size:.82rem; text-align:right; }
     .daily-card {
-      padding: 14px;
-      margin-bottom: 14px;
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 10px;
-      align-items: center;
+      padding:14px; margin-bottom:14px; display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center;
     }
-
-    .daily-card h4 { margin: 0 0 4px; font-size: .96rem; }
-    .daily-card p, .small { margin: 0; color: var(--muted); font-size: .86rem; line-height: 1.45; }
-
+    .daily-card h4 { margin:0 0 4px; font-size:.96rem; }
+    .daily-card p, .small { margin:0; color:var(--muted); font-size:.86rem; line-height:1.45; }
     .reward-chip {
-      background: #fff4c8;
-      color: #8c6a00;
-      border-radius: 999px;
-      padding: 8px 12px;
-      font-weight: 800;
-      font-size: .82rem;
+      background:#fff4c8; color:#8c6a00; border-radius:999px; padding:8px 12px; font-weight:800; font-size:.82rem;
     }
-
-    .inside-layout { display: grid; gap: 12px; }
-    .inside-stage, .level-game-card { padding: 14px; }
-    .inside-shell { display: grid; grid-template-columns: 1fr 110px; gap: 10px; align-items: start; }
-
+    .inside-layout { display:grid; gap:12px; }
+    .inside-stage, .level-game-card, .shop-panel { padding:14px; }
+    .inside-shell { display:grid; grid-template-columns:1fr 110px; gap:10px; align-items:start; }
     .inside-room {
-      min-height: 360px;
-      border-radius: 24px;
-      position: relative;
-      overflow: hidden;
-      background: linear-gradient(180deg, #fffaf6 0%, #fff2ea 100%);
+      min-height:380px; border-radius:24px; position:relative; overflow:hidden;
+      background:linear-gradient(180deg, #fffaf6 0%, #fff2ea 100%);
       box-shadow: inset 0 0 0 1px rgba(255,255,255,.7);
     }
-
-    .wall-top {
-      position: absolute;
-      inset: 0 0 90px 0;
-      background: linear-gradient(180deg, #fff8f2, #ffeede);
-    }
-
-    .floor {
-      position: absolute;
-      left: 0; right: 0; bottom: 0;
-      height: 95px;
-      background: linear-gradient(180deg, #d9b28a, #b98559);
-    }
-
+    .wall-top { position:absolute; inset:0 0 90px 0; background:linear-gradient(180deg, #fff8f2, #ffeede); }
+    .floor { position:absolute; left:0; right:0; bottom:0; height:95px; background:linear-gradient(180deg, #d9b28a, #b98559); }
     .window-room {
-      position: absolute;
-      top: 34px;
-      left: 24px;
-      width: 88px;
-      height: 112px;
-      border-radius: 18px;
-      background: linear-gradient(180deg, #d9f1ff, #eefaff);
-      border: 8px solid #f3d9c8;
+      position:absolute; top:34px; left:24px; width:88px; height:112px; border-radius:18px;
+      background:linear-gradient(180deg, #d9f1ff, #eefaff); border:8px solid #f3d9c8;
     }
-
-    .window-room::before, .window-room::after {
-      content: "";
-      position: absolute;
-      background: rgba(255,255,255,.65);
-    }
-
-    .window-room::before { width: 6px; height: 100%; left: 50%; top: 0; transform: translateX(-50%); }
-    .window-room::after { height: 6px; width: 100%; left: 0; top: 50%; transform: translateY(-50%); }
-
-    .sofa {
-      position: absolute;
-      left: 130px;
-      bottom: 70px;
-      width: 120px;
-      height: 56px;
-      background: #efb39d;
-      border-radius: 20px 20px 14px 14px;
-      box-shadow: 0 10px 20px rgba(0,0,0,.08);
-    }
-
-    .sofa::before, .sofa::after {
-      content: "";
-      position: absolute;
-      bottom: 42px;
-      width: 46px;
-      height: 28px;
-      background: #f3c0ad;
-      border-radius: 16px 16px 8px 8px;
-    }
-
-    .sofa::before { left: 8px; }
-    .sofa::after { right: 8px; }
-
-    .table-room {
-      position: absolute;
-      left: 144px;
-      bottom: 36px;
-      width: 92px;
-      height: 20px;
-      background: #e9d3b8;
-      border-radius: 999px;
-    }
-
-    .table-room::before {
-      content: "";
-      position: absolute;
-      left: 50%; top: 16px;
-      transform: translateX(-50%);
-      width: 10px; height: 28px;
-      background: #b98b63;
-      border-radius: 999px;
-    }
-
-    .plant-room {
-      position: absolute;
-      right: 24px;
-      bottom: 80px;
-      width: 36px;
-      height: 46px;
-      background: #d39b72;
-      border-radius: 0 0 16px 16px;
-    }
-
-    .plant-room::before {
-      content: "";
-      position: absolute;
-      left: -10px;
-      top: -34px;
-      width: 56px;
-      height: 44px;
-      background: #79c687;
-      border-radius: 50% 50% 44% 44%;
-    }
-
-    .lamp-room {
-      position: absolute;
-      right: 72px;
-      bottom: 80px;
-      width: 8px;
-      height: 88px;
-      background: #8e6a56;
-      border-radius: 999px;
-    }
-
-    .lamp-room::before {
-      content: "";
-      position: absolute;
-      left: -12px;
-      top: -18px;
-      width: 32px;
-      height: 22px;
-      background: #ffe5a0;
-      border-radius: 16px 16px 8px 8px;
-      box-shadow: 0 0 20px rgba(255,216,107,.35);
-    }
-
+    .window-room::before, .window-room::after { content:""; position:absolute; background:rgba(255,255,255,.65); }
+    .window-room::before { width:6px; height:100%; left:50%; top:0; transform:translateX(-50%); }
+    .window-room::after { height:6px; width:100%; left:0; top:50%; transform:translateY(-50%); }
     .room-title {
-      position: absolute;
-      left: 16px;
-      bottom: 106px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.88);
-      font-size: .82rem;
-      font-weight: 800;
-      color: var(--primary-strong);
+      position:absolute; left:16px; bottom:106px; padding:8px 12px; border-radius:999px;
+      background:rgba(255,255,255,.88); font-size:.82rem; font-weight:800; color:var(--primary-strong);
     }
-
-    .level-panel { display: grid; gap: 8px; }
-
+    .decor { position:absolute; transition:all .25s ease; }
+    .sofa {
+      left:130px; bottom:70px; width:120px; height:56px; background:#efb39d;
+      border-radius:20px 20px 14px 14px; box-shadow:0 10px 20px rgba(0,0,0,.08);
+    }
+    .sofa::before, .sofa::after {
+      content:""; position:absolute; bottom:42px; width:46px; height:28px; background:#f3c0ad; border-radius:16px 16px 8px 8px;
+    }
+    .sofa::before { left:8px; }
+    .sofa::after { right:8px; }
+    .table-room {
+      left:144px; bottom:36px; width:92px; height:20px; background:#e9d3b8; border-radius:999px;
+    }
+    .table-room::before {
+      content:""; position:absolute; left:50%; top:16px; transform:translateX(-50%); width:10px; height:28px;
+      background:#b98b63; border-radius:999px;
+    }
+    .plant-room {
+      right:24px; bottom:80px; width:36px; height:46px; background:#d39b72; border-radius:0 0 16px 16px;
+    }
+    .plant-room::before {
+      content:""; position:absolute; left:-10px; top:-34px; width:56px; height:44px; background:#79c687; border-radius:50% 50% 44% 44%;
+    }
+    .lamp-room {
+      right:72px; bottom:80px; width:8px; height:88px; background:#8e6a56; border-radius:999px;
+    }
+    .lamp-room::before {
+      content:""; position:absolute; left:-12px; top:-18px; width:32px; height:22px; background:#ffe5a0; border-radius:16px 16px 8px 8px;
+      box-shadow:0 0 20px rgba(255,216,107,.35);
+    }
+    .flowers-room {
+      left:110px; bottom:94px; width:120px; height:36px; pointer-events:none;
+    }
+    .flowers-room::before {
+      content:"🌷 🌸 🌷 🌸"; position:absolute; inset:0; font-size:24px; letter-spacing:2px;
+    }
+    .shelf-room {
+      right:26px; top:54px; width:68px; height:10px; background:#c79a72; border-radius:999px;
+    }
+    .shelf-room::before {
+      content:"🕯️  📚  🪴"; position:absolute; left:-6px; bottom:8px; font-size:20px;
+    }
+    .rug-room {
+      left:118px; bottom:14px; width:145px; height:48px; background:linear-gradient(135deg, #f6d0bb, #efb393);
+      border-radius:999px; opacity:.95;
+    }
+    .hidden-decor { display:none; }
+    .level-panel { display:grid; gap:8px; }
     .level-btn {
-      border: 0;
-      border-radius: 18px;
-      padding: 12px 8px;
-      background: rgba(255,255,255,.9);
-      box-shadow: var(--shadow);
-      font-weight: 800;
-      color: var(--text);
-      cursor: pointer;
+      border:0; border-radius:18px; padding:12px 8px; background:rgba(255,255,255,.9); box-shadow:var(--shadow);
+      font-weight:800; color:var(--text); cursor:pointer;
     }
-
     .level-btn.active {
-      background: linear-gradient(135deg, #ffe7db, #fff4e5);
-      color: var(--primary-strong);
-      box-shadow: inset 0 0 0 1px #ffd2bf, var(--shadow);
+      background:linear-gradient(135deg, #ffe7db, #fff4e5); color:var(--primary-strong); box-shadow:inset 0 0 0 1px #ffd2bf, var(--shadow);
     }
-
-    .level-btn small {
-      display: block;
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: .72rem;
-      font-weight: 700;
-    }
-
+    .level-btn small { display:block; margin-top:4px; color:var(--muted); font-size:.72rem; font-weight:700; }
     .progress-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: #fff2e9;
-      color: var(--primary-strong);
-      font-size: .8rem;
-      font-weight: 800;
-      margin-bottom: 10px;
+      display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:#fff2e9;
+      color:var(--primary-strong); font-size:.8rem; font-weight:800; margin-bottom:10px;
     }
-
-    .house-meta {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .stat {
-      background: rgba(255,255,255,.68);
-      border-radius: 16px;
-      padding: 12px;
-      text-align: center;
-    }
-
-    .stat strong { display: block; font-size: 1rem; margin-bottom: 4px; }
-    .stat span { color: var(--muted); font-size: .78rem; }
-
-    .rewards-grid { display: grid; gap: 12px; }
-    .reward-card, .profile-card { padding: 14px; }
-
-    .reward-card {
-      display: grid;
-      grid-template-columns: 60px 1fr auto;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .reward-icon {
-      width: 60px;
-      height: 60px;
-      border-radius: 18px;
-      display: grid;
-      place-items: center;
-      font-size: 1.5rem;
-      background: linear-gradient(135deg, #fff0e5, #ffe1cf);
-    }
-
-    .reward-card h4, .profile-card h4 { margin: 0 0 4px; font-size: .98rem; }
-    .reward-card p, .profile-card p { margin: 0; color: var(--muted); font-size: .86rem; line-height: 1.42; }
-
-    .cost {
-      padding: 8px 10px;
-      border-radius: 14px;
-      background: #fff7d9;
-      color: #886500;
-      font-weight: 800;
-      font-size: .82rem;
-    }
-
-    .game-zone {
-      margin-top: 12px;
-      padding-top: 12px;
-    }
-
-    .letters {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin: 12px 0;
-    }
-
+    .house-meta { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px; }
+    .stat { background:rgba(255,255,255,.68); border-radius:16px; padding:12px; text-align:center; }
+    .stat strong { display:block; font-size:1rem; margin-bottom:4px; }
+    .stat span { color:var(--muted); font-size:.78rem; }
+    .game-zone { margin-top:12px; padding-top:12px; }
+    .letters { display:flex; gap:8px; flex-wrap:wrap; margin:12px 0; }
     .letter {
-      width: 42px;
-      height: 42px;
-      display: grid;
-      place-items: center;
-      border-radius: 14px;
-      background: #fff5ee;
-      box-shadow: inset 0 0 0 1px #f2dfd2;
-      font-weight: 800;
+      width:42px; height:42px; display:grid; place-items:center; border-radius:14px; background:#fff5ee;
+      box-shadow:inset 0 0 0 1px #f2dfd2; font-weight:800;
     }
-
-    .answer-row { display: flex; gap: 10px; }
-
+    .answer-row { display:flex; gap:10px; }
     .answer-row input, .profile-card input {
-      flex: 1;
-      min-width: 0;
-      border: 0;
-      background: #fff4ec;
-      border-radius: 14px;
-      padding: 13px 14px;
-      color: var(--text);
-      outline: none;
+      flex:1; min-width:0; border:0; background:#fff4ec; border-radius:14px; padding:13px 14px; color:var(--text); outline:none;
     }
-
-    .feedback {
-      min-height: 20px;
-      margin-top: 10px;
-      font-size: .88rem;
-      font-weight: 800;
-    }
-
-    .feedback.ok { color: #2f9150; }
-    .feedback.bad { color: #d25757; }
-
-    .tap-board {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-top: 12px;
-    }
-
+    .feedback { min-height:20px; margin-top:10px; font-size:.88rem; font-weight:800; }
+    .feedback.ok { color:#2f9150; }
+    .feedback.bad { color:#d25757; }
+    .tap-board { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:12px; }
     .bubble {
-      aspect-ratio: 1;
-      border-radius: 18px;
-      border: 0;
-      background: linear-gradient(135deg, #f7e9ff, #fff1e8);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.7), var(--shadow);
-      font-size: 1.3rem;
-      font-weight: 800;
+      aspect-ratio:1; border-radius:18px; border:0; background:linear-gradient(135deg, #f7e9ff, #fff1e8);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.7), var(--shadow); font-size:1.3rem; font-weight:800;
     }
-
-    .memory-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-top: 12px;
-    }
-
+    .memory-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:12px; }
     .memory-card {
-      aspect-ratio: 1;
-      border: 0;
-      border-radius: 16px;
-      background: linear-gradient(135deg, #fff1e7, #fff8f0);
-      box-shadow: inset 0 0 0 1px #f1ddd1;
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: transparent;
+      aspect-ratio:1; border:0; border-radius:16px; background:linear-gradient(135deg, #fff1e7, #fff8f0);
+      box-shadow:inset 0 0 0 1px #f1ddd1; font-size:1.2rem; font-weight:800; color:transparent;
     }
-
-    .memory-card.revealed, .memory-card.matched {
-      color: var(--text);
-      background: linear-gradient(135deg, #eefdeb, #fff6e9);
-    }
-
-    .hidden { display: none !important; }
-
+    .memory-card.revealed, .memory-card.matched { color:var(--text); background:linear-gradient(135deg, #eefdeb, #fff6e9); }
+    .hidden { display:none !important; }
     .swipe-track {
-      margin-top: 12px;
-      height: 52px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, #fff3eb, #fff9f3);
-      position: relative;
-      box-shadow: inset 0 0 0 1px #f2dfd4;
-      overflow: hidden;
+      margin-top:12px; height:52px; border-radius:999px; background:linear-gradient(135deg, #fff3eb, #fff9f3); position:relative;
+      box-shadow:inset 0 0 0 1px #f2dfd4; overflow:hidden;
     }
-
     .swipe-knob {
-      position: absolute;
-      left: 6px;
-      top: 6px;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--primary-strong));
-      box-shadow: var(--shadow);
-      touch-action: none;
+      position:absolute; left:6px; top:6px; width:40px; height:40px; border-radius:50%;
+      background:linear-gradient(135deg, var(--primary), var(--primary-strong)); box-shadow:var(--shadow); touch-action:none;
     }
-
     .swipe-label {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      font-size: .86rem;
-      font-weight: 800;
-      color: var(--muted);
-      pointer-events: none;
+      position:absolute; inset:0; display:grid; place-items:center; font-size:.86rem; font-weight:800; color:var(--muted); pointer-events:none;
     }
-
+    .shop-list { display:grid; gap:10px; }
+    .shop-item {
+      display:grid; grid-template-columns:54px 1fr; gap:10px; align-items:center; background:#fff8f2; border-radius:18px; padding:10px;
+    }
+    .shop-icon {
+      width:54px; height:54px; display:grid; place-items:center; border-radius:16px; background:linear-gradient(135deg, #fff0e5, #ffe1cf); font-size:1.4rem;
+    }
+    .shop-item h4 { margin:0 0 4px; font-size:.95rem; }
+    .shop-item p { margin:0; color:var(--muted); font-size:.82rem; line-height:1.35; }
+    .shop-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+    .shop-action.buy { background:#fff7d9; color:#886500; }
+    .shop-action.place { background:#eaf9ee; color:#2f9150; }
+    .shop-action:disabled { opacity:.45; cursor:not-allowed; }
+    .owned-badge {
+      display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:#eef9f1; color:#2f9150;
+      font-size:.76rem; font-weight:800;
+    }
     .profile-card {
-      display: grid;
-      grid-template-columns: 72px 1fr;
-      gap: 14px;
-      align-items: center;
+      display:grid; grid-template-columns:72px 1fr; gap:14px; align-items:center; padding:14px;
     }
-
     .avatar {
-      width: 72px;
-      height: 72px;
-      border-radius: 22px;
-      display: grid;
-      place-items: center;
-      font-size: 1.8rem;
-      background: linear-gradient(135deg, #ffe4b9, #ffd0c5);
-      box-shadow: var(--shadow);
+      width:72px; height:72px; border-radius:22px; display:grid; place-items:center; font-size:1.8rem;
+      background:linear-gradient(135deg, #ffe4b9, #ffd0c5); box-shadow:var(--shadow);
     }
-
     .bottom-nav {
-      position: fixed;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: 12px;
-      width: calc(100% - 24px);
-      max-width: 496px;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      padding: 10px;
-      background: rgba(255,255,255,.94);
-      backdrop-filter: blur(12px);
-      border-radius: 22px;
-      box-shadow: 0 14px 30px rgba(63, 42, 38, .16);
+      position:fixed; left:50%; transform:translateX(-50%); bottom:12px; width:calc(100% - 24px); max-width:596px;
+      display:grid; grid-template-columns:repeat(4,1fr); gap:8px; padding:10px; background:rgba(255,255,255,.94); backdrop-filter:blur(12px);
+      border-radius:22px; box-shadow:0 14px 30px rgba(63, 42, 38, .16);
     }
-
     .nav-item {
-      border: 0;
-      background: transparent;
-      color: var(--muted);
-      border-radius: 16px;
-      padding: 10px 8px;
-      font-size: .77rem;
-      font-weight: 800;
-      display: grid;
-      place-items: center;
-      gap: 4px;
+      border:0; background:transparent; color:var(--muted); border-radius:16px; padding:10px 8px; font-size:.77rem; font-weight:800;
+      display:grid; place-items:center; gap:4px;
     }
-
-    .nav-item strong { font-size: 1.04rem; }
-    .nav-item.active { color: var(--primary-strong); background: #fff1e8; }
-
-    @media (min-width: 760px) {
-      .app { max-width: 980px; }
-      .inside-layout { grid-template-columns: 1.1fr .9fr; }
-      .inside-shell { grid-template-columns: 1fr 128px; }
-      .rewards-grid { grid-template-columns: 1fr 1fr; }
-      .bottom-nav { max-width: 956px; }
+    .nav-item strong { font-size:1.04rem; }
+    .nav-item.active { color:var(--primary-strong); background:#fff1e8; }
+    @media (min-width: 900px) {
+      .app { max-width:1100px; }
+      .inside-layout { grid-template-columns:1.1fr .9fr; }
+      .inside-shell { grid-template-columns:1fr 128px; }
+      .bottom-nav { max-width:1076px; }
     }
   </style>
 </head>
@@ -593,50 +247,56 @@
         <div class="logo">🏡</div>
         <div>
           <h1>Étoiles & Maison 3D</h1>
-          <p>Intérieur cosy, niveaux à droite, étoiles à gagner</p>
+          <p>V4 — achats corrigés + pose de décorations</p>
         </div>
       </div>
       <div class="stars-badge"><span>⭐</span><span id="starsCount">24</span></div>
     </header>
 
     <section class="hero">
-      <div class="pill">✨ V3 • intérieur de maison + niveaux à droite + mini-jeux par niveau</div>
-      <h2>Entre dans la maison et lance des niveaux anti-stress pour gagner des étoiles</h2>
+      <div class="pill">✨ V4 • boutique fonctionnelle + poser les décorations</div>
+      <h2>Achète une déco puis pose-la vraiment dans la maison</h2>
       <p>
-        Le jeu se déroule maintenant à l’intérieur de la maison. À droite de l’écran, tu retrouves une colonne de niveaux. Quand tu appuies sur un niveau, un mini-jeu anti-stress s’ouvre et, une fois terminé, tu gagnes des étoiles.
+        J’ai corrigé le problème d’achat. Maintenant, quand tu achètes une décoration, elle passe en “possédée”, puis tu peux appuyer sur “Poser” pour l’afficher dans la pièce.
       </p>
       <div class="hero-actions">
-        <button class="btn-primary" onclick="scrollToSection('insideSection')">Entrer dans la maison</button>
-        <button class="btn-secondary" onclick="scrollToSection('levelsSection')">Voir les niveaux</button>
+        <button class="btn-primary" onclick="scrollToSection('insideSection')">Voir la maison</button>
+        <button class="btn-secondary" onclick="scrollToSection('shopSection')">Voir la boutique</button>
       </div>
     </section>
 
     <section class="daily-card">
       <div>
         <h4>Défi du jour</h4>
-        <p>Termine 3 niveaux dans la maison pour gagner un bonus spécial.</p>
+        <p>Termine 3 niveaux pour acheter plus vite tes décorations.</p>
       </div>
       <div class="reward-chip">⭐ +10</div>
     </section>
 
     <div class="section-title" id="insideSection">
       <h3>Dans la maison</h3>
-      <span>Les niveaux sont à droite de l’écran</span>
+      <span>Niveaux à droite + déco visible dans la pièce</span>
     </div>
 
     <section class="inside-layout">
       <article class="card inside-stage">
         <div class="inside-shell">
-          <div class="inside-room">
+          <div class="inside-room" id="insideRoom">
             <div class="wall-top"></div>
             <div class="floor"></div>
             <div class="window-room"></div>
-            <div class="sofa"></div>
-            <div class="table-room"></div>
-            <div class="plant-room"></div>
-            <div class="lamp-room"></div>
             <div class="room-title">Salon détente</div>
+
+            <div class="decor sofa" id="decor-sofa"></div>
+            <div class="decor table-room" id="decor-table"></div>
+            <div class="decor plant-room" id="decor-plant-base"></div>
+
+            <div class="decor lamp-room hidden-decor" id="decor-lamp"></div>
+            <div class="decor flowers-room hidden-decor" id="decor-flowers"></div>
+            <div class="decor shelf-room hidden-decor" id="decor-shelf"></div>
+            <div class="decor rug-room hidden-decor" id="decor-rug"></div>
           </div>
+
           <div class="level-panel" id="levelsSection">
             <button class="level-btn active" onclick="openLevel(1, this)">Niveau 1<small>Anagramme</small></button>
             <button class="level-btn" onclick="openLevel(2, this)">Niveau 2<small>Bubble zen</small></button>
@@ -646,7 +306,7 @@
         </div>
         <div class="house-meta">
           <div class="stat"><strong id="roomCount">3</strong><span>Pièces</span></div>
-          <div class="stat"><strong id="decoCount">7</strong><span>Décos</span></div>
+          <div class="stat"><strong id="placedCount">0</strong><span>Décos posées</span></div>
           <div class="stat"><strong id="starsStat">24</strong><span>Étoiles</span></div>
         </div>
       </article>
@@ -657,7 +317,7 @@
         <div id="level1Game">
           <h4>Anagramme zen</h4>
           <p class="small">Trouve le mot. Quand tu réussis, tu gagnes des étoiles.</p>
-          <div class="game-zone" style="border-top:0; padding-top:8px; margin-top:0;">
+          <div class="game-zone">
             <div class="small">Indice : pièce douce pour se détendre</div>
             <div class="letters" id="lettersBox"></div>
             <div class="answer-row">
@@ -671,7 +331,7 @@
         <div id="level2Game" class="hidden">
           <h4>Bubble zen</h4>
           <p class="small">Éclate 6 bulles pour finir le niveau.</p>
-          <div class="game-zone" style="border-top:0; padding-top:8px; margin-top:0;">
+          <div class="game-zone">
             <div class="small">Bulles éclatées : <span id="bubbleCount">0</span> / 6</div>
             <div class="tap-board" id="tapBoard"></div>
             <div id="bubbleFeedback" class="feedback"></div>
@@ -681,7 +341,7 @@
         <div id="level3Game" class="hidden">
           <h4>Mémoire douce</h4>
           <p class="small">Retourne les cartes pour retrouver toutes les paires.</p>
-          <div class="game-zone" style="border-top:0; padding-top:8px; margin-top:0;">
+          <div class="game-zone">
             <div class="small">Paires trouvées : <span id="memoryPairs">0</span> / 4</div>
             <div class="memory-grid" id="memoryGrid"></div>
             <div id="memoryFeedback" class="feedback"></div>
@@ -691,7 +351,7 @@
         <div id="level4Game" class="hidden">
           <h4>Glisser relax</h4>
           <p class="small">Fais glisser le bouton jusqu’au bout pour terminer le niveau.</p>
-          <div class="game-zone" style="border-top:0; padding-top:8px; margin-top:0;">
+          <div class="game-zone">
             <div class="swipe-track" id="swipeTrack">
               <div class="swipe-label">Glisse jusqu’à la fin</div>
               <div class="swipe-knob" id="swipeKnob"></div>
@@ -702,44 +362,14 @@
       </article>
     </section>
 
-    <div class="section-title" id="rewards">
-      <h3>Décorations à gagner</h3>
-      <span>Débloque le jardin et la maison</span>
+    <div class="section-title" id="shopSection">
+      <h3>Boutique déco</h3>
+      <span>Acheter puis poser dans la maison</span>
     </div>
 
-    <section class="rewards-grid">
-      <article class="card reward-card">
-        <div class="reward-icon">🌷</div>
-        <div>
-          <h4>Fleurs pastel</h4>
-          <p>Ajoute plus de couleur devant la maison.</p>
-        </div>
-        <div class="cost">⭐ 10</div>
-      </article>
-      <article class="card reward-card">
-        <div class="reward-icon">🪴</div>
-        <div>
-          <h4>Plantes chic</h4>
-          <p>Deux pots décoratifs à l’entrée.</p>
-        </div>
-        <div class="cost">⭐ 18</div>
-      </article>
-      <article class="card reward-card">
-        <div class="reward-icon">💡</div>
-        <div>
-          <h4>Lampadaire doux</h4>
-          <p>Pour une ambiance chaleureuse le soir.</p>
-        </div>
-        <div class="cost">⭐ 24</div>
-      </article>
-      <article class="card reward-card">
-        <div class="reward-icon">🛋️</div>
-        <div>
-          <h4>Salon cocoon</h4>
-          <p>Un espace détente plus raffiné à débloquer.</p>
-        </div>
-        <div class="cost">⭐ 35</div>
-      </article>
+    <section class="card shop-panel">
+      <div class="shop-list" id="shopList"></div>
+      <div id="shopFeedback" class="feedback"></div>
     </section>
 
     <div class="section-title">
@@ -760,7 +390,7 @@
   <nav class="bottom-nav">
     <button class="nav-item active" onclick="scrollToSection('insideSection')"><strong>🏠</strong>Maison</button>
     <button class="nav-item" onclick="scrollToSection('levelsSection')"><strong>🎮</strong>Niveaux</button>
-    <button class="nav-item" onclick="scrollToSection('rewards')"><strong>🪴</strong>Déco</button>
+    <button class="nav-item" onclick="scrollToSection('shopSection')"><strong>🪴</strong>Boutique</button>
     <button class="nav-item" onclick="window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })"><strong>👤</strong>Profil</button>
   </nav>
 
@@ -771,19 +401,35 @@
     const anagramSolution = 'SALON';
     const shuffledLetters = ['L', 'O', 'N', 'A', 'S'];
 
+    const shopItems = [
+      { id: 'flowers', icon: '🌷', name: 'Fleurs pastel', desc: 'Ajoute des fleurs devant le canapé.', cost: 10, decorId: 'decor-flowers', owned: false, placed: false },
+      { id: 'lamp', icon: '💡', name: 'Lampadaire doux', desc: 'Une lumière cosy dans le salon.', cost: 18, decorId: 'decor-lamp', owned: false, placed: false },
+      { id: 'shelf', icon: '🪵', name: 'Étagère déco', desc: 'Une étagère avec livres et objets.', cost: 22, decorId: 'decor-shelf', owned: false, placed: false },
+      { id: 'rug', icon: '🧶', name: 'Tapis cocoon', desc: 'Un grand tapis sous la table.', cost: 14, decorId: 'decor-rug', owned: false, placed: false }
+    ];
+
     function updateStars() {
       document.getElementById('starsCount').textContent = stars;
       document.getElementById('starsStat').textContent = stars;
     }
 
+    function updatePlacedCount() {
+      const placed = shopItems.filter(item => item.placed).length;
+      document.getElementById('placedCount').textContent = placed;
+    }
+
+    function setFeedback(targetId, message, ok = true) {
+      const target = document.getElementById(targetId);
+      if (!target) return;
+      target.textContent = message;
+      target.className = ok ? 'feedback ok' : 'feedback bad';
+    }
+
     function gainStars(amount, message, targetId) {
       stars += amount;
       updateStars();
-      const target = document.getElementById(targetId);
-      if (target) {
-        target.textContent = message;
-        target.className = 'feedback ok';
-      }
+      setFeedback(targetId, message, true);
+      renderShop();
     }
 
     function renderLetters() {
@@ -793,19 +439,16 @@
 
     function checkAnagram() {
       const input = document.getElementById('anagramInput');
-      const feedback = document.getElementById('anagramFeedback');
       const value = input.value.trim().toUpperCase();
       if (!value) {
-        feedback.textContent = 'Écris un mot avant de valider.';
-        feedback.className = 'feedback bad';
+        setFeedback('anagramFeedback', 'Écris un mot avant de valider.', false);
         return;
       }
       if (value === anagramSolution) {
         gainStars(5, 'Niveau terminé : +5 étoiles ⭐', 'anagramFeedback');
         input.value = '';
       } else {
-        feedback.textContent = 'Pas encore. Essaie une autre combinaison.';
-        feedback.className = 'feedback bad';
+        setFeedback('anagramFeedback', 'Pas encore. Essaie une autre combinaison.', false);
       }
     }
 
@@ -901,11 +544,9 @@
     function openLevel(level, btn) {
       document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
       if (btn) btn.classList.add('active');
-
       ['level1Game','level2Game','level3Game','level4Game'].forEach(id => {
         document.getElementById(id).classList.add('hidden');
       });
-
       const labels = {
         1: 'Niveau 1 — Anagramme',
         2: 'Niveau 2 — Bubble zen',
@@ -960,6 +601,67 @@
       }
     });
 
+    function renderShop() {
+      const container = document.getElementById('shopList');
+      container.innerHTML = '';
+      shopItems.forEach(item => {
+        const article = document.createElement('article');
+        article.className = 'shop-item';
+        article.innerHTML = `
+          <div class="shop-icon">${item.icon}</div>
+          <div>
+            <h4>${item.name}</h4>
+            <p>${item.desc}</p>
+            <div class="shop-actions">
+              <button class="shop-action buy" ${item.owned ? 'disabled' : ''} onclick="buyDecoration('${item.id}')">
+                ${item.owned ? 'Acheté' : 'Acheter ⭐ ' + item.cost}
+              </button>
+              <button class="shop-action place" ${item.owned ? '' : 'disabled'} onclick="togglePlaceDecoration('${item.id}')">
+                ${item.placed ? 'Retirer' : 'Poser'}
+              </button>
+              ${item.owned ? '<span class="owned-badge">✔ Possédée</span>' : ''}
+            </div>
+          </div>
+        `;
+        container.appendChild(article);
+      });
+    }
+
+    function buyDecoration(id) {
+      const item = shopItems.find(obj => obj.id === id);
+      if (!item) return;
+      if (item.owned) {
+        setFeedback('shopFeedback', 'Cette décoration est déjà achetée.', false);
+        return;
+      }
+      if (stars < item.cost) {
+        setFeedback('shopFeedback', 'Tu n’as pas assez d’étoiles.', false);
+        return;
+      }
+      stars -= item.cost;
+      item.owned = true;
+      updateStars();
+      renderShop();
+      setFeedback('shopFeedback', `Achat réussi : ${item.name}. Tu peux maintenant appuyer sur Poser.`, true);
+    }
+
+    function togglePlaceDecoration(id) {
+      const item = shopItems.find(obj => obj.id === id);
+      if (!item) return;
+      if (!item.owned) {
+        setFeedback('shopFeedback', 'Tu dois d’abord acheter cette décoration.', false);
+        return;
+      }
+      item.placed = !item.placed;
+      const decor = document.getElementById(item.decorId);
+      if (decor) {
+        decor.classList.toggle('hidden-decor', !item.placed);
+      }
+      updatePlacedCount();
+      renderShop();
+      setFeedback('shopFeedback', item.placed ? `${item.name} a été posée dans la maison.` : `${item.name} a été retirée de la maison.`, true);
+    }
+
     function scrollToSection(id) {
       const el = document.getElementById(id);
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -974,6 +676,8 @@
     renderBubbleGame();
     renderMemory();
     updateStars();
+    updatePlacedCount();
+    renderShop();
     openLevel(1, document.querySelector('.level-btn'));
   </script>
 </body>
