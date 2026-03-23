@@ -1,1042 +1,175 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Étoiles & Maison — V6 mobile corrigée</title>
-  <style>
-    :root{
-      --bg:#fff8f2;
-      --card:rgba(255,255,255,.96);
-      --text:#2f2524;
-      --muted:#7f6d6a;
-      --primary:#ff946f;
-      --primary-strong:#ff6f47;
-      --accent:#ffd86b;
-      --ok:#2f9150;
-      --bad:#d25757;
-      --shadow:0 10px 24px rgba(82,50,45,.12);
-      --radius:18px;
-    }
-    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    html,body{margin:0;padding:0;height:100%}
-    body{
-      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      color:var(--text);
-      background:radial-gradient(circle at top,#fffdf9 0%,#fff7ef 35%,#fdf2fb 100%);
-      overflow:hidden;
-    }
-    button,input,select{font:inherit}
-    .hidden{display:none!important}
-    .screen{width:100%;height:100dvh}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maison V7</title>
 
-    .menu{
-      display:flex;align-items:center;justify-content:center;
-      padding:16px;
-    }
-    .menu-card{
-      width:min(100%,420px);
-      background:var(--card);
-      border-radius:24px;
-      box-shadow:var(--shadow);
-      padding:20px 16px;
-      text-align:center;
-    }
-    .logo{
-      width:68px;height:68px;border-radius:20px;margin:0 auto 12px;
-      display:grid;place-items:center;font-size:34px;
-      background:linear-gradient(135deg,var(--primary),var(--accent));
-      box-shadow:var(--shadow);
-    }
-    h1,h2,h3,h4,p{margin:0}
-    .menu h1{font-size:1.45rem;line-height:1.05;margin-bottom:8px}
-    .menu p{color:var(--muted);line-height:1.42;font-size:.92rem}
-    .pill{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:8px 12px;border-radius:999px;
-      background:#fff2e9;color:var(--primary-strong);
-      font-weight:800;font-size:.76rem;margin-bottom:12px;
-    }
-    .menu-actions{display:grid;gap:10px;margin-top:16px}
-    .btn{
-      border:0;border-radius:16px;padding:13px 14px;font-weight:800;cursor:pointer;
-    }
-    .btn-primary{color:#fff;background:linear-gradient(135deg,var(--primary),var(--primary-strong));box-shadow:var(--shadow)}
-    .btn-secondary{background:#fff;color:var(--text);box-shadow:var(--shadow)}
+<style>
+body{margin:0;font-family:sans-serif;background:#f5f5f5}
 
-    #gameScreen{
-      display:grid;
-      grid-template-rows:auto 1fr auto;
-      height:100dvh;
-      overflow:hidden;
-    }
-    .topbar{
-      display:flex;align-items:center;justify-content:space-between;gap:8px;
-      padding:8px 10px;
-      background:rgba(255,255,255,.92);
-      backdrop-filter:blur(10px);
-      border-bottom:1px solid rgba(0,0,0,.05);
-      z-index:50;
-    }
-    .brand{display:flex;align-items:center;gap:8px;min-width:0}
-    .brand-badge{
-      width:38px;height:38px;border-radius:14px;display:grid;place-items:center;font-size:20px;
-      background:linear-gradient(135deg,var(--primary),var(--accent));
-      flex:0 0 auto;
-    }
-    .brand-text h2{font-size:.92rem;line-height:1.05}
-    .brand-text p{font-size:.68rem;color:var(--muted)}
-    .stats{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-    .stat-pill{
-      background:#fff;border-radius:999px;padding:8px 10px;font-weight:800;font-size:.76rem;
-      box-shadow:var(--shadow);white-space:nowrap;
-    }
+/* MENU */
+#menu{text-align:center;padding:30px}
+button{padding:10px;border-radius:10px;border:none;margin:5px}
 
-    .game-wrap{position:relative;overflow:hidden;background:linear-gradient(180deg,#fff9f4,#fff0e6)}
-    #camera{position:absolute;inset:0;overflow:hidden;touch-action:none}
-    #world{
-      position:absolute;
-      width:1400px;
-      height:980px;
-      transform-origin:0 0;
-      background:linear-gradient(180deg,#fff8f2 0 72%, #ca9a6b 72% 100%);
-    }
+/* GAME */
+#game{display:none;height:100vh;overflow:hidden;position:relative}
 
-    .label-room{
-      position:absolute;left:18px;top:18px;padding:8px 11px;border-radius:999px;background:#fff;
-      color:var(--primary-strong);font-weight:800;box-shadow:var(--shadow);font-size:.78rem;
-    }
-    .window-room{
-      position:absolute;left:72px;top:84px;width:112px;height:132px;border-radius:20px;
-      background:linear-gradient(180deg,#d9f1ff,#eefaff);
-      border:10px solid #f3d9c8;box-shadow:var(--shadow);
-    }
-    .window-room::before,.window-room::after{content:"";position:absolute;background:rgba(255,255,255,.65)}
-    .window-room::before{width:7px;height:100%;left:50%;top:0;transform:translateX(-50%)}
-    .window-room::after{height:7px;width:100%;left:0;top:50%;transform:translateY(-50%)}
-    .wall-art{
-      position:absolute;background:#fff;border-radius:18px;box-shadow:var(--shadow);
-      display:grid;place-items:center;
-    }
-    .floor-rug-base{
-      position:absolute;left:470px;top:650px;width:250px;height:90px;border-radius:999px;
-      background:linear-gradient(135deg,#f6d0bb,#efb393);opacity:.45;
-    }
+/* WORLD */
+#world{
+ width:1200px;height:800px;
+ position:absolute;
+ background:#ddd;
+}
 
-    .placed{
-      position:absolute;user-select:none;touch-action:none;cursor:grab;
-      transform:translate(-50%,-50%);display:grid;place-items:center;text-align:center;line-height:1;
-      z-index:30;
-    }
-    .placed.selected{outline:3px solid var(--primary-strong);outline-offset:3px;border-radius:16px}
-    .item-emoji{font-size:34px}
-    .item-label{
-      margin-top:2px;font-size:.54rem;font-weight:800;background:rgba(255,255,255,.84);
-      padding:2px 6px;border-radius:999px;
-    }
+/* PLAYER */
+#player{
+ width:40px;height:40px;
+ background:#3498db;
+ position:absolute;
+ border-radius:10px;
+}
 
-    #player{
-      position:absolute;width:60px;height:82px;transform:translate(-50%,-50%);z-index:20;pointer-events:none;
-    }
-    .player-shadow{position:absolute;left:50%;bottom:4px;transform:translateX(-50%);width:38px;height:12px;border-radius:50%;background:rgba(0,0,0,.12)}
-    .player-body{
-      position:absolute;left:50%;bottom:11px;transform:translateX(-50%);
-      width:36px;height:48px;border-radius:15px 15px 12px 12px;background:var(--outfit-top,#8ec5ff);
-    }
-    .player-bottom{
-      position:absolute;left:50%;bottom:2px;transform:translateX(-50%);
-      width:30px;height:18px;border-radius:10px;background:var(--outfit-bottom,#8b6cff);
-    }
-    .player-head{
-      position:absolute;left:50%;top:4px;transform:translateX(-50%);
-      width:34px;height:34px;border-radius:50%;background:var(--skin,#ffd4b8);
-    }
-    .player-hat{
-      position:absolute;left:50%;top:-1px;transform:translateX(-50%);
-      width:40px;height:12px;border-radius:16px 16px 8px 8px;background:var(--hat,#f6b0a6);
-    }
-    .player-accessory{position:absolute;left:50%;top:18px;transform:translateX(-50%);font-size:12px;line-height:1}
+/* OBJECTS (now REAL blocks, not emoji) */
+.object{
+ width:50px;height:50px;
+ position:absolute;
+ border-radius:8px;
+ background:#8e44ad;
+}
 
-    .right-panel{
-      position:absolute;right:8px;top:8px;width:88px;display:grid;gap:8px;z-index:40;
-    }
-    .panel-card{
-      background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-radius:16px;box-shadow:var(--shadow);padding:8px;
-    }
-    .panel-card h4{font-size:.74rem;margin-bottom:6px}
-    .level-btn{
-      width:100%;border:0;border-radius:12px;padding:8px 6px;margin-bottom:5px;background:#fff4ec;color:var(--text);font-weight:800;font-size:.72rem;
-    }
-    .level-btn.active{background:linear-gradient(135deg,#ffe7db,#fff4e5);color:var(--primary-strong)}
-    .level-btn:last-child{margin-bottom:0}
+/* DIFFERENT OBJECT TYPES */
+.chair{background:#b5651d}
+.bed{background:#d35400;width:80px;height:50px}
+.table{background:#7f8c8d}
+.plant{background:#27ae60;border-radius:50%}
+.lamp{background:#f1c40f}
 
-    .minigame{
-      position:absolute;left:8px;right:104px;top:8px;background:rgba(255,255,255,.96);
-      backdrop-filter:blur(12px);border-radius:18px;box-shadow:var(--shadow);padding:10px;z-index:39;max-height:42%;overflow:auto;
-    }
-    .mini-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
-    .mini-head h4{font-size:.86rem}
-    .mini-close{padding:7px 9px;border-radius:12px}
-    .feedback{font-size:.78rem;font-weight:800;min-height:18px;margin-top:8px}
-    .ok{color:var(--ok)} .bad{color:var(--bad)}
-    .tiny{font-size:.68rem;color:var(--muted)}
+/* LEVEL PANEL SCROLLABLE */
+#levels{
+ position:absolute;
+ right:0;top:0;
+ width:120px;height:100%;
+ overflow-y:auto;
+ background:#fff;
+}
 
-    .letters{display:flex;gap:6px;flex-wrap:wrap;margin:9px 0}
-    .letter{
-      width:36px;height:36px;border-radius:12px;display:grid;place-items:center;
-      background:#fff5ee;box-shadow:inset 0 0 0 1px #f2dfd2;font-weight:800;font-size:.86rem;
-    }
-    .answer-row{display:flex;gap:6px}
-    .answer-row input{
-      flex:1;min-width:0;border:0;background:#fff4ec;border-radius:12px;padding:11px 12px;outline:none;color:var(--text);
-    }
+.level{
+ padding:10px;
+ border-bottom:1px solid #ccc;
+ cursor:pointer;
+}
 
-    .tap-board{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
-    .bubble{
-      aspect-ratio:1;border-radius:16px;border:0;background:linear-gradient(135deg,#f7e9ff,#fff1e8);
-      box-shadow:inset 0 0 0 1px rgba(255,255,255,.7), var(--shadow);font-size:1rem;font-weight:800;
-    }
-    .memory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
-    .memory-card{
-      aspect-ratio:1;border:0;border-radius:14px;background:linear-gradient(135deg,#fff1e7,#fff8f0);
-      box-shadow:inset 0 0 0 1px #f1ddd1;font-size:1rem;font-weight:800;color:transparent;
-    }
-    .memory-card.revealed,.memory-card.matched{color:var(--text);background:linear-gradient(135deg,#eefdeb,#fff6e9)}
-    .swipe-track{
-      margin-top:8px;height:46px;border-radius:999px;background:linear-gradient(135deg,#fff3eb,#fff9f3);
-      position:relative;box-shadow:inset 0 0 0 1px #f2dfd4;overflow:hidden;
-    }
-    .swipe-knob{
-      position:absolute;left:5px;top:5px;width:36px;height:36px;border-radius:50%;
-      background:linear-gradient(135deg,var(--primary),var(--primary-strong));box-shadow:var(--shadow);touch-action:none;
-    }
-    .swipe-label{
-      position:absolute;inset:0;display:grid;place-items:center;font-size:.76rem;font-weight:800;color:var(--muted);pointer-events:none;
-    }
+/* SHOP */
+#shop{
+ position:absolute;
+ bottom:0;left:0;right:120px;
+ background:#fff;
+ display:flex;
+ overflow-x:auto;
+}
 
-    .bottom-ui{
-      padding:8px 8px 10px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);
-      border-top:1px solid rgba(0,0,0,.06);z-index:50;
-    }
-    .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px}
-    .tab-btn{
-      border:0;border-radius:14px;padding:9px 6px;font-weight:800;background:#fff4ec;color:var(--text);font-size:.74rem;
-    }
-    .tab-btn.active{background:linear-gradient(135deg,#ffe7db,#fff4e5);color:var(--primary-strong)}
-    .panel{display:none}
-    .panel.active{display:block}
+.shop-item{
+ min-width:100px;
+ padding:10px;
+ border-right:1px solid #eee;
+}
 
-    .shop-strip,.palette-strip{display:flex;gap:8px;overflow:auto;padding-bottom:2px}
-    .shop-item{
-      min-width:144px;background:#fff8f2;border-radius:16px;padding:8px;box-shadow:var(--shadow);
-    }
-    .shop-icon{
-      width:42px;height:42px;display:grid;place-items:center;border-radius:12px;
-      background:linear-gradient(135deg,#fff0e5,#ffe1cf);font-size:1.15rem;margin-bottom:6px;
-    }
-    .shop-item h4{font-size:.8rem;margin-bottom:4px}
-    .shop-item p{font-size:.68rem;color:var(--muted);line-height:1.28;margin-bottom:7px}
-    .shop-actions{display:flex;gap:6px;flex-wrap:wrap}
-    .shop-action{padding:8px 9px;border-radius:11px;font-size:.68rem}
-    .buy{background:#fff7d9;color:#886500}
-    .owned-badge{
-      display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;background:#eef9f1;color:#2f9150;
-      font-size:.65rem;font-weight:800;
-    }
-
-    .palette-btn{
-      min-width:84px;border:0;border-radius:14px;background:#fff8f2;box-shadow:var(--shadow);
-      padding:8px 6px;font-weight:800;font-size:.72rem;
-    }
-    .palette-btn.active{background:linear-gradient(135deg,#ffe7db,#fff4e5);color:var(--primary-strong)}
-    .palette-btn div:first-child{font-size:1.3rem;margin-bottom:3px}
-
-    .outfit-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
-    .outfit-card{background:#fff8f2;border-radius:14px;padding:8px;box-shadow:var(--shadow)}
-    .outfit-card label{display:block;font-size:.7rem;font-weight:800;margin-bottom:5px}
-    .outfit-card select{width:100%;border:0;background:#fff;border-radius:10px;padding:9px;outline:none;font-size:.74rem}
-
-    .move-grid{
-      width:156px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,48px);gap:6px;margin:0 auto;
-    }
-    .move-btn{border:0;border-radius:12px;background:#fff8f2;box-shadow:var(--shadow);font-size:1rem;font-weight:900}
-    .move-btn.empty{opacity:0;pointer-events:none}
-    .move-help{font-size:.66rem;color:var(--muted);text-align:center;margin-top:7px}
-    .hint-bar{
-      margin-top:8px;padding:9px 11px;border-radius:12px;background:#fff4ec;color:var(--text);font-size:.7rem;font-weight:800;
-    }
-
-    @media (min-width:700px){
-      #world{width:1800px;height:1200px}
-      .right-panel{width:112px}
-      .minigame{right:124px}
-      .shop-item{min-width:170px}
-      .outfit-grid{grid-template-columns:repeat(5,1fr)}
-    }
-  </style>
+</style>
 </head>
+
 <body>
-  <section id="menuScreen" class="screen menu">
-    <div class="menu-card">
-      <div class="logo">🏡</div>
-      <div class="pill">✨ V6 • achats corrigés • mobile plus compact</div>
-      <h1>Maison sandbox mobile</h1>
-      <p>
-        Les achats sont corrigés et toute l’interface prend moins de place sur téléphone.
-        Tu peux entrer dans la maison, te déplacer, acheter, poser et déplacer tes objets.
-      </p>
-      <div class="menu-actions">
-        <button class="btn btn-primary" onclick="enterHouse()">Entrer dans la maison</button>
-        <button class="btn btn-secondary" onclick="loadSaveAndEnter()">Reprendre la partie</button>
-      </div>
-    </div>
-  </section>
 
-  <section id="gameScreen" class="screen hidden">
-    <header class="topbar">
-      <div class="brand">
-        <div class="brand-badge">🏠</div>
-        <div class="brand-text">
-          <h2>Maison intérieure</h2>
-          <p>Version mobile compacte</p>
-        </div>
-      </div>
-      <div class="stats">
-        <div class="stat-pill">⭐ <span id="starsCount">24</span></div>
-        <div class="stat-pill">🪑 <span id="placedCount">0</span></div>
-      </div>
-    </header>
+<div id="menu">
+<h1>🏡 Jeu Maison V7</h1>
+<button onclick="start()">Entrer dans la maison</button>
+</div>
+
+<div id="game">
+
+<div id="world">
+<div id="player"></div>
+</div>
+
+<div id="levels"></div>
+<div id="shop"></div>
+
+</div>
+
+<script>
+
+/* PLAYER */
+let player={x:200,y:200}
+let speed=5
+
+function updatePlayer(){
+ let p=document.getElementById("player")
+ p.style.left=player.x+"px"
+ p.style.top=player.y+"px"
+}
+
+/* MOVE */
+document.addEventListener("keydown",(e)=>{
+ if(e.key==="ArrowUp")player.y-=speed
+ if(e.key==="ArrowDown")player.y+=speed
+ if(e.key==="ArrowLeft")player.x-=speed
+ if(e.key==="ArrowRight")player.x+=speed
+ updatePlayer()
+})
+
+/* OBJECTS */
+let objects=[
+ {type:"chair"},
+ {type:"bed"},
+ {type:"table"},
+ {type:"plant"},
+ {type:"lamp"}
+]
+
+/* SHOP */
+function renderShop(){
+ let shop=document.getElementById("shop")
+ shop.innerHTML=""
+ objects.forEach(obj=>{
+  let div=document.createElement("div")
+  div.className="shop-item"
+  div.innerHTML="<button>Placer</button>"
+  div.onclick=()=>placeObject(obj.type)
+  shop.appendChild(div)
+ })
+}
+
+/* PLACE OBJECT */
+function placeObject(type){
+ let el=document.createElement("div")
+ el.className="object "+type
+ el.style.left=player.x+"px"
+ el.style.top=player.y+"px"
+ document.getElementById("world").appendChild(el)
+}
+
+/* LEVELS SCROLL */
+function renderLevels(){
+ let levels=document.getElementById("levels")
+ for(let i=1;i<=20;i++){
+  let div=document.createElement("div")
+  div.className="level"
+  div.innerText="Niveau "+i
+  div.onclick=()=>alert("Mini jeu niveau "+i)
+  levels.appendChild(div)
+ }
+}
+
+/* START */
+function start(){
+ document.getElementById("menu").style.display="none"
+ document.getElementById("game").style.display="block"
+ updatePlayer()
+ renderShop()
+ renderLevels()
+}
+
+</script>
 
-    <div class="game-wrap">
-      <div id="camera">
-        <div id="world">
-          <div class="label-room">Salon détente</div>
-          <div class="window-room"></div>
-          <div class="floor-rug-base"></div>
-          <div class="wall-art" style="left:310px; top:110px; width:110px; height:80px; font-size:34px;">🖼️</div>
-          <div class="wall-art" style="left:600px; top:92px; width:130px; height:95px; font-size:40px;">🌿</div>
-          <div class="wall-art" style="left:930px; top:120px; width:120px; height:82px; font-size:34px;">☀️</div>
-
-          <div id="placedLayer"></div>
-
-          <div id="player">
-            <div class="player-head"></div>
-            <div class="player-hat"></div>
-            <div class="player-accessory">✨</div>
-            <div class="player-body"></div>
-            <div class="player-bottom"></div>
-            <div class="player-shadow"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="right-panel">
-        <div class="panel-card">
-          <h4>Niveaux</h4>
-          <button class="level-btn active" onclick="openLevel(1, this)">Niv. 1</button>
-          <button class="level-btn" onclick="openLevel(2, this)">Niv. 2</button>
-          <button class="level-btn" onclick="openLevel(3, this)">Niv. 3</button>
-          <button class="level-btn" onclick="openLevel(4, this)">Niv. 4</button>
-        </div>
-        <div class="panel-card">
-          <h4>Objet</h4>
-          <div class="tiny" id="placementStatus">Aucun</div>
-        </div>
-      </div>
-
-      <div class="minigame" id="minigameBox">
-        <div class="mini-head">
-          <h4 id="currentLevelLabel">Niveau 1 — Anagramme</h4>
-          <button class="btn btn-secondary mini-close" onclick="toggleMinigame()">Fermer</button>
-        </div>
-
-        <div id="level1Game">
-          <p class="tiny">Trouve le mot. +5 étoiles.</p>
-          <div class="letters" id="lettersBox"></div>
-          <div class="answer-row">
-            <input id="anagramInput" type="text" maxlength="5" placeholder="Réponse">
-            <button class="btn btn-primary" style="padding:10px 12px" onclick="checkAnagram()">Valider</button>
-          </div>
-          <div id="anagramFeedback" class="feedback"></div>
-        </div>
-
-        <div id="level2Game" class="hidden">
-          <p class="tiny">Éclate 6 bulles. +4 étoiles.</p>
-          <div class="tiny">Bulles : <span id="bubbleCount">0</span> / 6</div>
-          <div class="tap-board" id="tapBoard"></div>
-          <div id="bubbleFeedback" class="feedback"></div>
-        </div>
-
-        <div id="level3Game" class="hidden">
-          <p class="tiny">Trouve 4 paires. +6 étoiles.</p>
-          <div class="tiny">Paires : <span id="memoryPairs">0</span> / 4</div>
-          <div class="memory-grid" id="memoryGrid"></div>
-          <div id="memoryFeedback" class="feedback"></div>
-        </div>
-
-        <div id="level4Game" class="hidden">
-          <p class="tiny">Glisse jusqu’au bout. +5 étoiles.</p>
-          <div class="swipe-track" id="swipeTrack">
-            <div class="swipe-label">Glisse</div>
-            <div class="swipe-knob" id="swipeKnob"></div>
-          </div>
-          <div id="swipeFeedback" class="feedback"></div>
-        </div>
-      </div>
-    </div>
-
-    <footer class="bottom-ui">
-      <div class="tabs">
-        <button class="tab-btn active" onclick="openTab('shopTab', this)">Boutique</button>
-        <button class="tab-btn" onclick="openTab('buildTab', this)">Placer</button>
-        <button class="tab-btn" onclick="openTab('outfitTab', this)">Tenue</button>
-        <button class="tab-btn" onclick="openTab('moveTab', this)">Bouger</button>
-      </div>
-
-      <div id="shopTab" class="panel active">
-        <div class="shop-strip" id="shopList"></div>
-        <div id="shopFeedback" class="feedback"></div>
-      </div>
-
-      <div id="buildTab" class="panel">
-        <div class="palette-strip" id="paletteList"></div>
-        <div class="hint-bar">Choisis un objet possédé, puis touche la maison pour le poser.</div>
-      </div>
-
-      <div id="outfitTab" class="panel">
-        <div class="outfit-grid">
-          <div class="outfit-card">
-            <label>Peau</label>
-            <select id="skinSelect" onchange="updateOutfit()">
-              <option value="#ffd4b8">Clair</option>
-              <option value="#f1b996">Doré</option>
-              <option value="#c98763">Mat</option>
-              <option value="#8b5b42">Foncé</option>
-            </select>
-          </div>
-          <div class="outfit-card">
-            <label>Haut</label>
-            <select id="topSelect" onchange="updateOutfit()">
-              <option value="#8ec5ff">Bleu</option>
-              <option value="#ff9db3">Rose</option>
-              <option value="#9be0a2">Vert</option>
-              <option value="#ffd36f">Jaune</option>
-              <option value="#b8a0ff">Violet</option>
-            </select>
-          </div>
-          <div class="outfit-card">
-            <label>Bas</label>
-            <select id="bottomSelect" onchange="updateOutfit()">
-              <option value="#8b6cff">Violet</option>
-              <option value="#5f7cff">Bleu nuit</option>
-              <option value="#343434">Noir</option>
-              <option value="#c97f5d">Marron</option>
-            </select>
-          </div>
-          <div class="outfit-card">
-            <label>Chapeau</label>
-            <select id="hatSelect" onchange="updateOutfit()">
-              <option value="#f6b0a6">Rose</option>
-              <option value="#9ac8ff">Bleu</option>
-              <option value="#e5c67a">Beige</option>
-              <option value="#7fd1a2">Vert</option>
-            </select>
-          </div>
-          <div class="outfit-card">
-            <label>Accessoire</label>
-            <select id="accSelect" onchange="updateOutfit()">
-              <option value="✨">Étoile</option>
-              <option value="🕶️">Lunettes</option>
-              <option value="🌸">Fleur</option>
-              <option value="💎">Bijou</option>
-              <option value="🎀">Nœud</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div id="moveTab" class="panel">
-        <div class="move-grid">
-          <button class="move-btn empty"></button>
-          <button class="move-btn" onpointerdown="startMove('up')" onpointerup="stopMove()" onpointerleave="stopMove()">▲</button>
-          <button class="move-btn empty"></button>
-          <button class="move-btn" onpointerdown="startMove('left')" onpointerup="stopMove()" onpointerleave="stopMove()">◀</button>
-          <button class="move-btn" onpointerdown="startMove('down')" onpointerup="stopMove()" onpointerleave="stopMove()">▼</button>
-          <button class="move-btn" onpointerdown="startMove('right')" onpointerup="stopMove()" onpointerleave="stopMove()">▶</button>
-          <button class="move-btn empty"></button>
-          <button class="move-btn" onclick="centerOnPlayer()">◎</button>
-          <button class="move-btn empty"></button>
-        </div>
-        <div class="move-help">Flèches, ZQSD ou WASD fonctionnent aussi.</div>
-      </div>
-    </footer>
-  </section>
-
-  <script>
-    let stars = 24;
-    let selectedPaletteId = null;
-    let bubbleHits = 0;
-    let memoryPairs = 0;
-    let firstCard = null;
-    let lockBoard = false;
-    let currentMove = null;
-
-    const world = document.getElementById('world');
-    const camera = document.getElementById('camera');
-    const placedLayer = document.getElementById('placedLayer');
-    const player = document.getElementById('player');
-
-    const worldSize = { w: 1400, h: 980 };
-    const playerState = { x: 700, y: 650, speed: 4.5 };
-
-    const shuffledLetters = ['L', 'O', 'N', 'A', 'S'];
-    const anagramSolution = 'SALON';
-
-    const shopItems = [
-      { id:'flowers', icon:'🌷', name:'Fleurs', desc:'Déco fleurie.', cost:10, owned:false },
-      { id:'lamp', icon:'💡', name:'Lampe', desc:'Lumière cosy.', cost:18, owned:false },
-      { id:'shelf', icon:'🪵', name:'Étagère', desc:'Livres et objets.', cost:22, owned:false },
-      { id:'rug', icon:'🧶', name:'Tapis', desc:'Tapis cocoon.', cost:14, owned:false },
-      { id:'chair', icon:'🪑', name:'Chaise', desc:'Chaise simple.', cost:9, owned:false },
-      { id:'bed', icon:'🛏️', name:'Lit', desc:'Grand lit.', cost:28, owned:false },
-      { id:'mirror', icon:'🪞', name:'Miroir', desc:'Miroir déco.', cost:16, owned:false },
-      { id:'plant', icon:'🪴', name:'Plante', desc:'Plante intérieure.', cost:13, owned:false },
-      { id:'frame', icon:'🖼️', name:'Cadre', desc:'Cadre mural.', cost:12, owned:false },
-      { id:'basket', icon:'🧺', name:'Panier', desc:'Rangement.', cost:8, owned:false },
-      { id:'teddy', icon:'🧸', name:'Peluche', desc:'Déco douce.', cost:11, owned:false },
-      { id:'clock', icon:'🕰️', name:'Horloge', desc:'Horloge chic.', cost:17, owned:false },
-      { id:'window2', icon:'🪟', name:'Fenêtre', desc:'Fenêtre déco.', cost:21, owned:false },
-      { id:'candle', icon:'🕯️', name:'Bougie', desc:'Ambiance relax.', cost:7, owned:false }
-    ];
-
-    let placedItems = [];
-    let placedCounter = 0;
-
-    function saveGame(){
-      const data = {
-        stars,
-        shopItems: shopItems.map(i => ({ id:i.id, owned:i.owned })),
-        placedItems,
-        placedCounter,
-        outfit:{
-          skin: document.getElementById('skinSelect').value,
-          top: document.getElementById('topSelect').value,
-          bottom: document.getElementById('bottomSelect').value,
-          hat: document.getElementById('hatSelect').value,
-          acc: document.getElementById('accSelect').value
-        },
-        playerState
-      };
-      localStorage.setItem('maison_v6_save', JSON.stringify(data));
-    }
-
-    function loadGame(){
-      const raw = localStorage.getItem('maison_v6_save');
-      if(!raw) return false;
-      try{
-        const data = JSON.parse(raw);
-        if(typeof data.stars === 'number') stars = data.stars;
-        if(Array.isArray(data.shopItems)){
-          data.shopItems.forEach(saved=>{
-            const item = shopItems.find(i=>i.id===saved.id);
-            if(item) item.owned = !!saved.owned;
-          });
-        }
-        if(data.playerState){
-          playerState.x = data.playerState.x || playerState.x;
-          playerState.y = data.playerState.y || playerState.y;
-        }
-        if(data.outfit){
-          if(data.outfit.skin) document.getElementById('skinSelect').value = data.outfit.skin;
-          if(data.outfit.top) document.getElementById('topSelect').value = data.outfit.top;
-          if(data.outfit.bottom) document.getElementById('bottomSelect').value = data.outfit.bottom;
-          if(data.outfit.hat) document.getElementById('hatSelect').value = data.outfit.hat;
-          if(data.outfit.acc) document.getElementById('accSelect').value = data.outfit.acc;
-        }
-        placedItems = Array.isArray(data.placedItems) ? data.placedItems : [];
-        placedCounter = data.placedCounter || 0;
-        return true;
-      }catch(e){
-        return false;
-      }
-    }
-
-    function enterHouse(){
-      document.getElementById('menuScreen').classList.add('hidden');
-      document.getElementById('gameScreen').classList.remove('hidden');
-      initAfterEnter();
-    }
-
-    function loadSaveAndEnter(){
-      loadGame();
-      enterHouse();
-    }
-
-    function initAfterEnter(){
-      updateStars();
-      renderLetters();
-      renderBubbleGame();
-      renderMemory();
-      renderShop();
-      renderPalette();
-      renderPlacedItems();
-      updatePlacedCount();
-      updateOutfit();
-      updatePlayer();
-      centerOnPlayer();
-      openLevel(1, document.querySelector('.level-btn'));
-    }
-
-    function updateStars(){
-      document.getElementById('starsCount').textContent = stars;
-    }
-
-    function updatePlacedCount(){
-      document.getElementById('placedCount').textContent = placedItems.length;
-    }
-
-    function setFeedback(id, msg, ok=true){
-      const el = document.getElementById(id);
-      if(!el) return;
-      el.textContent = msg;
-      el.className = 'feedback ' + (ok ? 'ok' : 'bad');
-    }
-
-    function gainStars(amount, message, targetId){
-      stars += amount;
-      updateStars();
-      setFeedback(targetId, message, true);
-      renderShop();
-      saveGame();
-    }
-
-    function openTab(id, btn){
-      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-    }
-
-    function openLevel(level, btn){
-      document.querySelectorAll('.level-btn').forEach(b=>b.classList.remove('active'));
-      if(btn) btn.classList.add('active');
-      ['level1Game','level2Game','level3Game','level4Game'].forEach(id=>{
-        document.getElementById(id).classList.add('hidden');
-      });
-      const labels = {
-        1:'Niveau 1 — Anagramme',
-        2:'Niveau 2 — Bubble zen',
-        3:'Niveau 3 — Mémoire',
-        4:'Niveau 4 — Glisser relax'
-      };
-      document.getElementById('currentLevelLabel').textContent = labels[level];
-      document.getElementById('level' + level + 'Game').classList.remove('hidden');
-      document.getElementById('minigameBox').classList.remove('hidden');
-    }
-
-    function toggleMinigame(){
-      document.getElementById('minigameBox').classList.toggle('hidden');
-    }
-
-    function renderLetters(){
-      document.getElementById('lettersBox').innerHTML = shuffledLetters.map(l => `<div class="letter">${l}</div>`).join('');
-    }
-
-    function checkAnagram(){
-      const input = document.getElementById('anagramInput');
-      const value = input.value.trim().toUpperCase();
-      if(!value){
-        setFeedback('anagramFeedback','Écris un mot avant de valider.', false);
-        return;
-      }
-      if(value === anagramSolution){
-        gainStars(5,'Niveau terminé : +5 étoiles ⭐','anagramFeedback');
-        input.value = '';
-      }else{
-        setFeedback('anagramFeedback','Pas encore. Essaie une autre combinaison.', false);
-      }
-    }
-
-    function renderBubbleGame(){
-      const board = document.getElementById('tapBoard');
-      board.innerHTML = '';
-      const icons = ['🫧','✨','🌸','💧','☁️','🌷','⭐','🕯️','🍃'];
-      icons.forEach(icon=>{
-        const btn = document.createElement('button');
-        btn.className = 'bubble';
-        btn.textContent = icon;
-        btn.onclick = () => popBubble(btn);
-        board.appendChild(btn);
-      });
-    }
-
-    function popBubble(btn){
-      if(btn.disabled) return;
-      btn.disabled = true;
-      btn.style.opacity = '.35';
-      bubbleHits += 1;
-      document.getElementById('bubbleCount').textContent = bubbleHits;
-      if(bubbleHits >= 6){
-        gainStars(4,'Niveau terminé : +4 étoiles ⭐','bubbleFeedback');
-        bubbleHits = 0;
-        setTimeout(()=>{
-          document.getElementById('bubbleCount').textContent = '0';
-          renderBubbleGame();
-        }, 900);
-      }
-    }
-
-    const memoryIcons = ['🌷','🌷','🪴','🪴','🛋️','🛋️','💡','💡'];
-
-    function shuffle(array){
-      return array.map(value => ({ value, sort: Math.random() })).sort((a,b)=>a.sort-b.sort).map(({value})=>value);
-    }
-
-    function renderMemory(){
-      const grid = document.getElementById('memoryGrid');
-      grid.innerHTML = '';
-      memoryPairs = 0;
-      firstCard = null;
-      lockBoard = false;
-      document.getElementById('memoryPairs').textContent = '0';
-      document.getElementById('memoryFeedback').textContent = '';
-      shuffle(memoryIcons).forEach(icon=>{
-        const btn = document.createElement('button');
-        btn.className = 'memory-card';
-        btn.dataset.icon = icon;
-        btn.textContent = icon;
-        btn.onclick = () => flipCard(btn);
-        grid.appendChild(btn);
-      });
-    }
-
-    function flipCard(card){
-      if(lockBoard || card.classList.contains('matched') || card === firstCard) return;
-      card.classList.add('revealed');
-      if(!firstCard){
-        firstCard = card;
-        return;
-      }
-      if(firstCard.dataset.icon === card.dataset.icon){
-        firstCard.classList.remove('revealed');
-        card.classList.remove('revealed');
-        firstCard.classList.add('matched');
-        card.classList.add('matched');
-        firstCard = null;
-        memoryPairs += 1;
-        document.getElementById('memoryPairs').textContent = memoryPairs;
-        if(memoryPairs === 4){
-          gainStars(6,'Niveau terminé : +6 étoiles ⭐','memoryFeedback');
-          setTimeout(renderMemory, 1100);
-        }
-      }else{
-        lockBoard = true;
-        const previous = firstCard;
-        setTimeout(()=>{
-          previous.classList.remove('revealed');
-          card.classList.remove('revealed');
-          firstCard = null;
-          lockBoard = false;
-        }, 700);
-      }
-    }
-
-    const swipeKnob = document.getElementById('swipeKnob');
-    const swipeTrack = document.getElementById('swipeTrack');
-    let swipeActive = false;
-    let startX = 0;
-    let knobStart = 5;
-
-    function resetSwipe(){
-      swipeKnob.style.left = '5px';
-      swipeActive = false;
-    }
-    function completeSwipe(){
-      gainStars(5,'Niveau terminé : +5 étoiles ⭐','swipeFeedback');
-      setTimeout(resetSwipe, 700);
-    }
-
-    swipeKnob.addEventListener('pointerdown', (e)=>{
-      swipeActive = true;
-      startX = e.clientX;
-      knobStart = parseFloat(swipeKnob.style.left || '5');
-      swipeKnob.setPointerCapture(e.pointerId);
-    });
-    swipeKnob.addEventListener('pointermove', (e)=>{
-      if(!swipeActive) return;
-      const max = swipeTrack.clientWidth - swipeKnob.clientWidth - 5;
-      let next = knobStart + (e.clientX - startX);
-      if(next < 5) next = 5;
-      if(next > max) next = max;
-      swipeKnob.style.left = next + 'px';
-      if(next >= max - 2){
-        swipeActive = false;
-        completeSwipe();
-      }
-    });
-    swipeKnob.addEventListener('pointerup', ()=>{
-      if(!swipeActive) return;
-      swipeActive = false;
-      const max = swipeTrack.clientWidth - swipeKnob.clientWidth - 16;
-      if(parseFloat(swipeKnob.style.left || '5') < max){
-        resetSwipe();
-      }
-    });
-
-    function renderShop(){
-      const container = document.getElementById('shopList');
-      container.innerHTML = '';
-      shopItems.forEach(item=>{
-        const article = document.createElement('div');
-        article.className = 'shop-item';
-        article.innerHTML = `
-          <div class="shop-icon">${item.icon}</div>
-          <h4>${item.name}</h4>
-          <p>${item.desc}</p>
-          <div class="shop-actions">
-            <button class="shop-action buy" type="button" ${item.owned ? 'disabled' : ''} data-buy-id="${item.id}">
-              ${item.owned ? 'Acheté' : 'Acheter ⭐ ' + item.cost}
-            </button>
-            ${item.owned ? '<span class="owned-badge">✔ Possédé</span>' : ''}
-          </div>
-        `;
-        const buyBtn = article.querySelector('[data-buy-id]');
-        if (buyBtn) {
-          buyBtn.addEventListener('click', () => buyDecoration(item.id));
-          buyBtn.addEventListener('touchend', (e) => { e.preventDefault(); buyDecoration(item.id); }, { passive:false });
-        }
-        container.appendChild(article);
-      });
-    }
-
-    function buyDecoration(id){
-      const item = shopItems.find(obj=>obj.id === id);
-      if(!item) return;
-      if(item.owned){
-        setFeedback('shopFeedback', 'Cet objet est déjà acheté.', false);
-        return;
-      }
-      if(stars < item.cost){
-        setFeedback('shopFeedback', 'Tu n’as pas assez d’étoiles.', false);
-        return;
-      }
-      stars -= item.cost;
-      item.owned = true;
-      updateStars();
-      renderShop();
-      renderPalette();
-      setFeedback('shopFeedback', `${item.name} acheté. Va dans Placer pour le poser.`, true);
-      saveGame();
-    }
-
-    function renderPalette(){
-      const container = document.getElementById('paletteList');
-      container.innerHTML = '';
-      const owned = shopItems.filter(item=>item.owned);
-      if(owned.length === 0){
-        container.innerHTML = '<div class="hint-bar">Achète d’abord un objet dans Boutique.</div>';
-        document.getElementById('placementStatus').textContent = 'Aucun';
-        return;
-      }
-      owned.forEach(item=>{
-        const btn = document.createElement('button');
-        btn.className = 'palette-btn' + (selectedPaletteId === item.id ? ' active' : '');
-        btn.innerHTML = `<div>${item.icon}</div><div>${item.name}</div><div class="tiny">Poser</div>`;
-        btn.addEventListener('click', ()=>selectPaletteItem(item.id));
-        container.appendChild(btn);
-      });
-      if(selectedPaletteId){
-        const current = shopItems.find(i=>i.id === selectedPaletteId);
-        document.getElementById('placementStatus').textContent = current ? current.name : 'Aucun';
-      }else{
-        document.getElementById('placementStatus').textContent = 'Aucun';
-      }
-    }
-
-    function selectPaletteItem(id){
-      selectedPaletteId = id;
-      renderPalette();
-      saveGame();
-    }
-
-    function placeSelectedItem(worldX, worldY){
-      if(!selectedPaletteId){
-        setFeedback('shopFeedback', 'Choisis un objet dans Placer.', false);
-        return;
-      }
-      const item = shopItems.find(i=>i.id === selectedPaletteId && i.owned);
-      if(!item) return;
-      const placed = {
-        placedId: 'p' + (++placedCounter) + '_' + Date.now(),
-        itemId: item.id,
-        icon: item.icon,
-        name: item.name,
-        x: clamp(worldX, 50, worldSize.w - 50),
-        y: clamp(worldY, 50, worldSize.h - 50)
-      };
-      placedItems.push(placed);
-      renderPlacedItems();
-      updatePlacedCount();
-      saveGame();
-      setFeedback('shopFeedback', `${item.name} posé dans la maison.`, true);
-    }
-
-    function renderPlacedItems(){
-      placedLayer.innerHTML = '';
-      placedItems.forEach(obj=>{
-        const el = document.createElement('div');
-        el.className = 'placed';
-        el.style.left = obj.x + 'px';
-        el.style.top = obj.y + 'px';
-        el.dataset.id = obj.placedId;
-        el.innerHTML = `<div class="item-emoji">${obj.icon}</div><div class="item-label">${obj.name}</div>`;
-        enableDragPlaced(el, obj);
-        el.addEventListener('dblclick', ()=>removePlacedItem(obj.placedId));
-        placedLayer.appendChild(el);
-      });
-      updatePlacedCount();
-    }
-
-    function removePlacedItem(id){
-      placedItems = placedItems.filter(i=>i.placedId !== id);
-      renderPlacedItems();
-      saveGame();
-    }
-
-    function enableDragPlaced(el, obj){
-      let dragging = false;
-      let startPointerWorldX = 0;
-      let startPointerWorldY = 0;
-      let startObjX = 0;
-      let startObjY = 0;
-
-      el.addEventListener('pointerdown', (e)=>{
-        dragging = true;
-        el.setPointerCapture(e.pointerId);
-        const p = screenToWorld(e.clientX, e.clientY);
-        startPointerWorldX = p.x;
-        startPointerWorldY = p.y;
-        startObjX = obj.x;
-        startObjY = obj.y;
-        document.querySelectorAll('.placed').forEach(n=>n.classList.remove('selected'));
-        el.classList.add('selected');
-      });
-
-      el.addEventListener('pointermove', (e)=>{
-        if(!dragging) return;
-        const p = screenToWorld(e.clientX, e.clientY);
-        const dx = p.x - startPointerWorldX;
-        const dy = p.y - startPointerWorldY;
-        obj.x = clamp(startObjX + dx, 50, worldSize.w - 50);
-        obj.y = clamp(startObjY + dy, 50, worldSize.h - 50);
-        el.style.left = obj.x + 'px';
-        el.style.top = obj.y + 'px';
-      });
-
-      const stop = ()=>{
-        if(dragging){
-          dragging = false;
-          saveGame();
-        }
-      };
-      el.addEventListener('pointerup', stop);
-      el.addEventListener('pointercancel', stop);
-    }
-
-    function clamp(v, min, max){
-      return Math.max(min, Math.min(max, v));
-    }
-
-    function getCameraOffset(){
-      const transform = world.style.transform || 'translate(0px, 0px)';
-      const match = transform.match(/translate\(([-0-9.]+)px,\s*([-0-9.]+)px\)/);
-      return {
-        x: match ? -parseFloat(match[1]) : 0,
-        y: match ? -parseFloat(match[2]) : 0
-      };
-    }
-
-    function screenToWorld(clientX, clientY){
-      const rect = camera.getBoundingClientRect();
-      const cam = getCameraOffset();
-      return {
-        x: cam.x + (clientX - rect.left),
-        y: cam.y + (clientY - rect.top)
-      };
-    }
-
-    camera.addEventListener('click', (e)=>{
-      if(e.target.closest('.placed')) return;
-      const p = screenToWorld(e.clientX, e.clientY);
-      placeSelectedItem(p.x, p.y);
-    });
-    camera.addEventListener('touchend', (e)=>{
-      const touch = e.changedTouches && e.changedTouches[0];
-      if(!touch) return;
-      if(e.target.closest('.placed')) return;
-      const p = screenToWorld(touch.clientX, touch.clientY);
-      placeSelectedItem(p.x, p.y);
-    }, { passive:true });
-
-    function updateOutfit(){
-      const skin = document.getElementById('skinSelect').value;
-      const top = document.getElementById('topSelect').value;
-      const bottom = document.getElementById('bottomSelect').value;
-      const hat = document.getElementById('hatSelect').value;
-      const acc = document.getElementById('accSelect').value;
-
-      player.style.setProperty('--skin', skin);
-      player.style.setProperty('--outfit-top', top);
-      player.style.setProperty('--outfit-bottom', bottom);
-      player.style.setProperty('--hat', hat);
-      player.querySelector('.player-accessory').textContent = acc;
-      saveGame();
-    }
-
-    function updatePlayer(){
-      player.style.left = playerState.x + 'px';
-      player.style.top = playerState.y + 'px';
-    }
-
-    function centerOnPlayer(){
-      const camW = camera.clientWidth;
-      const camH = camera.clientHeight;
-      const camX = clamp(playerState.x - camW / 2, 0, worldSize.w - camW);
-      const camY = clamp(playerState.y - camH / 2, 0, worldSize.h - camH);
-      world.style.transform = `translate(${-camX}px, ${-camY}px)`;
-    }
-
-    function movePlayer(dx, dy){
-      playerState.x = clamp(playerState.x + dx, 42, worldSize.w - 42);
-      playerState.y = clamp(playerState.y + dy, 42, worldSize.h - 42);
-      updatePlayer();
-      centerOnPlayer();
-      saveGame();
-    }
-
-    function startMove(dir){ currentMove = dir; }
-    function stopMove(){ currentMove = null; }
-
-    window.addEventListener('keydown', (e)=>{
-      const key = e.key.toLowerCase();
-      if(['arrowup','z','w'].includes(key)) currentMove = 'up';
-      if(['arrowdown','s'].includes(key)) currentMove = 'down';
-      if(['arrowleft','q','a'].includes(key)) currentMove = 'left';
-      if(['arrowright','d'].includes(key)) currentMove = 'right';
-    });
-    window.addEventListener('keyup', (e)=>{
-      const key = e.key.toLowerCase();
-      if(['arrowup','z','w','arrowdown','s','arrowleft','q','a','arrowright','d'].includes(key)) currentMove = null;
-    });
-
-    function gameLoop(){
-      if(currentMove === 'up') movePlayer(0, -playerState.speed);
-      if(currentMove === 'down') movePlayer(0, playerState.speed);
-      if(currentMove === 'left') movePlayer(-playerState.speed, 0);
-      if(currentMove === 'right') movePlayer(playerState.speed, 0);
-      requestAnimationFrame(gameLoop);
-    }
-    requestAnimationFrame(gameLoop);
-  </script>
 </body>
 </html>
