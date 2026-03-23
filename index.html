@@ -2,12 +2,12 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Étoiles & Maison — V5 intérieur libre</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Étoiles & Maison — V6 mobile corrigée</title>
   <style>
     :root{
       --bg:#fff8f2;
-      --card:rgba(255,255,255,.94);
+      --card:rgba(255,255,255,.96);
       --text:#2f2524;
       --muted:#7f6d6a;
       --primary:#ff946f;
@@ -15,11 +15,10 @@
       --accent:#ffd86b;
       --ok:#2f9150;
       --bad:#d25757;
-      --shadow:0 14px 34px rgba(82,50,45,.14);
-      --radius:22px;
-      --ui-h:116px;
+      --shadow:0 10px 24px rgba(82,50,45,.12);
+      --radius:18px;
     }
-    *{box-sizing:border-box}
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
     html,body{margin:0;padding:0;height:100%}
     body{
       font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
@@ -29,56 +28,42 @@
     }
     button,input,select{font:inherit}
     .hidden{display:none!important}
-
-    .screen{
-      width:100%;
-      min-height:100dvh;
-    }
+    .screen{width:100%;height:100dvh}
 
     .menu{
-      padding:20px 16px 32px;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      align-items:center;
-      text-align:center;
-      gap:14px;
-      min-height:100dvh;
+      display:flex;align-items:center;justify-content:center;
+      padding:16px;
     }
     .menu-card{
-      width:min(100%,540px);
+      width:min(100%,420px);
       background:var(--card);
-      border-radius:28px;
+      border-radius:24px;
       box-shadow:var(--shadow);
-      padding:22px 18px;
+      padding:20px 16px;
+      text-align:center;
     }
     .logo{
-      width:72px;height:72px;border-radius:22px;margin:0 auto 14px;
-      display:grid;place-items:center;font-size:36px;
+      width:68px;height:68px;border-radius:20px;margin:0 auto 12px;
+      display:grid;place-items:center;font-size:34px;
       background:linear-gradient(135deg,var(--primary),var(--accent));
       box-shadow:var(--shadow);
     }
     h1,h2,h3,h4,p{margin:0}
-    .menu h1{font-size:1.7rem;line-height:1.04;margin-bottom:8px}
-    .menu p{color:var(--muted);line-height:1.45}
+    .menu h1{font-size:1.45rem;line-height:1.05;margin-bottom:8px}
+    .menu p{color:var(--muted);line-height:1.42;font-size:.92rem}
     .pill{
       display:inline-flex;align-items:center;gap:8px;
       padding:8px 12px;border-radius:999px;
       background:#fff2e9;color:var(--primary-strong);
-      font-weight:800;font-size:.8rem;margin-bottom:12px;
+      font-weight:800;font-size:.76rem;margin-bottom:12px;
     }
-    .menu-actions{
-      display:grid;grid-template-columns:1fr;gap:10px;margin-top:16px;
-    }
+    .menu-actions{display:grid;gap:10px;margin-top:16px}
     .btn{
-      border:0;border-radius:18px;padding:14px 16px;font-weight:800;cursor:pointer;
-      transition:transform .18s ease,opacity .18s ease;
+      border:0;border-radius:16px;padding:13px 14px;font-weight:800;cursor:pointer;
     }
-    .btn:active{transform:scale(.98)}
     .btn-primary{color:#fff;background:linear-gradient(135deg,var(--primary),var(--primary-strong));box-shadow:var(--shadow)}
     .btn-secondary{background:#fff;color:var(--text);box-shadow:var(--shadow)}
 
-    /* GAME */
     #gameScreen{
       display:grid;
       grid-template-rows:auto 1fr auto;
@@ -86,307 +71,207 @@
       overflow:hidden;
     }
     .topbar{
-      display:flex;align-items:center;justify-content:space-between;gap:10px;
-      padding:10px 12px;
-      background:rgba(255,255,255,.9);
+      display:flex;align-items:center;justify-content:space-between;gap:8px;
+      padding:8px 10px;
+      background:rgba(255,255,255,.92);
       backdrop-filter:blur(10px);
       border-bottom:1px solid rgba(0,0,0,.05);
-      z-index:40;
+      z-index:50;
     }
-    .brand{
-      display:flex;align-items:center;gap:10px;min-width:0;
-    }
+    .brand{display:flex;align-items:center;gap:8px;min-width:0}
     .brand-badge{
-      width:44px;height:44px;border-radius:16px;display:grid;place-items:center;font-size:24px;
+      width:38px;height:38px;border-radius:14px;display:grid;place-items:center;font-size:20px;
       background:linear-gradient(135deg,var(--primary),var(--accent));
+      flex:0 0 auto;
     }
-    .brand-text h2{font-size:1rem;line-height:1.1}
-    .brand-text p{font-size:.78rem;color:var(--muted)}
-    .stats{
-      display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;
-    }
+    .brand-text h2{font-size:.92rem;line-height:1.05}
+    .brand-text p{font-size:.68rem;color:var(--muted)}
+    .stats{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
     .stat-pill{
-      background:#fff;border-radius:999px;padding:9px 12px;font-weight:800;font-size:.84rem;
-      box-shadow:var(--shadow);
-      white-space:nowrap;
+      background:#fff;border-radius:999px;padding:8px 10px;font-weight:800;font-size:.76rem;
+      box-shadow:var(--shadow);white-space:nowrap;
     }
 
-    .game-wrap{
-      position:relative;
-      overflow:hidden;
-      background:linear-gradient(180deg,#fff9f4,#fff0e6);
-    }
-    #camera{
-      position:absolute;inset:0;overflow:hidden;
-      touch-action:none;
-    }
+    .game-wrap{position:relative;overflow:hidden;background:linear-gradient(180deg,#fff9f4,#fff0e6)}
+    #camera{position:absolute;inset:0;overflow:hidden;touch-action:none}
     #world{
       position:absolute;
-      width:2200px;
-      height:1600px;
+      width:1400px;
+      height:980px;
       transform-origin:0 0;
-      background:
-        linear-gradient(180deg,#fff8f2 0 72%, #ca9a6b 72% 100%);
+      background:linear-gradient(180deg,#fff8f2 0 72%, #ca9a6b 72% 100%);
     }
 
-    .wall-art{
-      position:absolute;background:#fff;border-radius:22px;box-shadow:var(--shadow);
+    .label-room{
+      position:absolute;left:18px;top:18px;padding:8px 11px;border-radius:999px;background:#fff;
+      color:var(--primary-strong);font-weight:800;box-shadow:var(--shadow);font-size:.78rem;
     }
     .window-room{
-      position:absolute;left:120px;top:120px;width:160px;height:180px;border-radius:24px;
+      position:absolute;left:72px;top:84px;width:112px;height:132px;border-radius:20px;
       background:linear-gradient(180deg,#d9f1ff,#eefaff);
-      border:12px solid #f3d9c8;
-      box-shadow:var(--shadow);
+      border:10px solid #f3d9c8;box-shadow:var(--shadow);
     }
-    .window-room::before,.window-room::after{
-      content:"";position:absolute;background:rgba(255,255,255,.65);
+    .window-room::before,.window-room::after{content:"";position:absolute;background:rgba(255,255,255,.65)}
+    .window-room::before{width:7px;height:100%;left:50%;top:0;transform:translateX(-50%)}
+    .window-room::after{height:7px;width:100%;left:0;top:50%;transform:translateY(-50%)}
+    .wall-art{
+      position:absolute;background:#fff;border-radius:18px;box-shadow:var(--shadow);
+      display:grid;place-items:center;
     }
-    .window-room::before{width:8px;height:100%;left:50%;top:0;transform:translateX(-50%)}
-    .window-room::after{height:8px;width:100%;left:0;top:50%;transform:translateY(-50%)}
-
     .floor-rug-base{
-      position:absolute;left:680px;top:1080px;width:420px;height:150px;border-radius:999px;
-      background:linear-gradient(135deg,#f6d0bb,#efb393);
-      opacity:.55;
-    }
-    .label-room{
-      position:absolute;left:28px;top:28px;padding:10px 14px;border-radius:999px;background:#fff;
-      color:var(--primary-strong);font-weight:800;box-shadow:var(--shadow);
+      position:absolute;left:470px;top:650px;width:250px;height:90px;border-radius:999px;
+      background:linear-gradient(135deg,#f6d0bb,#efb393);opacity:.45;
     }
 
     .placed{
-      position:absolute;
-      user-select:none;
-      -webkit-user-select:none;
-      touch-action:none;
-      cursor:grab;
-      transform:translate(-50%,-50%);
-      display:grid;place-items:center;
-      text-align:center;
-      line-height:1;
+      position:absolute;user-select:none;touch-action:none;cursor:grab;
+      transform:translate(-50%,-50%);display:grid;place-items:center;text-align:center;line-height:1;
+      z-index:30;
     }
-    .placed.selected{
-      outline:3px solid var(--primary-strong);
-      outline-offset:4px;
-      border-radius:18px;
-    }
-    .item-emoji{font-size:44px}
+    .placed.selected{outline:3px solid var(--primary-strong);outline-offset:3px;border-radius:16px}
+    .item-emoji{font-size:34px}
     .item-label{
-      margin-top:2px;
-      font-size:.6rem;
-      font-weight:800;
-      background:rgba(255,255,255,.82);
-      padding:3px 6px;
-      border-radius:999px;
+      margin-top:2px;font-size:.54rem;font-weight:800;background:rgba(255,255,255,.84);
+      padding:2px 6px;border-radius:999px;
     }
 
     #player{
-      position:absolute;
-      width:72px;height:96px;
-      transform:translate(-50%,-50%);
-      z-index:20;
-      pointer-events:none;
+      position:absolute;width:60px;height:82px;transform:translate(-50%,-50%);z-index:20;pointer-events:none;
     }
-    .player-shadow{
-      position:absolute;left:50%;bottom:4px;transform:translateX(-50%);
-      width:44px;height:14px;border-radius:50%;background:rgba(0,0,0,.12);
-    }
+    .player-shadow{position:absolute;left:50%;bottom:4px;transform:translateX(-50%);width:38px;height:12px;border-radius:50%;background:rgba(0,0,0,.12)}
     .player-body{
-      position:absolute;left:50%;bottom:12px;transform:translateX(-50%);
-      width:44px;height:58px;border-radius:18px 18px 14px 14px;
-      background:var(--outfit-top,#8ec5ff);
-      border:3px solid rgba(0,0,0,.05);
+      position:absolute;left:50%;bottom:11px;transform:translateX(-50%);
+      width:36px;height:48px;border-radius:15px 15px 12px 12px;background:var(--outfit-top,#8ec5ff);
     }
     .player-bottom{
       position:absolute;left:50%;bottom:2px;transform:translateX(-50%);
-      width:38px;height:22px;border-radius:10px;background:var(--outfit-bottom,#8b6cff);
+      width:30px;height:18px;border-radius:10px;background:var(--outfit-bottom,#8b6cff);
     }
     .player-head{
       position:absolute;left:50%;top:4px;transform:translateX(-50%);
-      width:42px;height:42px;border-radius:50%;background:var(--skin,#ffd4b8);
-      box-shadow:0 4px 0 rgba(0,0,0,.04) inset;
+      width:34px;height:34px;border-radius:50%;background:var(--skin,#ffd4b8);
     }
     .player-hat{
-      position:absolute;left:50%;top:-2px;transform:translateX(-50%);
-      width:48px;height:16px;border-radius:16px 16px 8px 8px;background:var(--hat,#f6b0a6);
+      position:absolute;left:50%;top:-1px;transform:translateX(-50%);
+      width:40px;height:12px;border-radius:16px 16px 8px 8px;background:var(--hat,#f6b0a6);
     }
-    .player-accessory{
-      position:absolute;left:50%;top:22px;transform:translateX(-50%);
-      font-size:14px;line-height:1;
-    }
+    .player-accessory{position:absolute;left:50%;top:18px;transform:translateX(-50%);font-size:12px;line-height:1}
 
     .right-panel{
-      position:absolute;
-      right:10px;top:10px;
-      width:124px;
-      display:grid;gap:8px;
-      z-index:35;
+      position:absolute;right:8px;top:8px;width:88px;display:grid;gap:8px;z-index:40;
     }
     .panel-card{
-      background:rgba(255,255,255,.94);
-      backdrop-filter:blur(10px);
-      border-radius:18px;
-      box-shadow:var(--shadow);
-      padding:10px;
+      background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-radius:16px;box-shadow:var(--shadow);padding:8px;
     }
-    .panel-card h4{
-      font-size:.82rem;margin-bottom:8px;
-    }
+    .panel-card h4{font-size:.74rem;margin-bottom:6px}
     .level-btn{
-      width:100%;border:0;border-radius:14px;padding:10px 8px;margin-bottom:6px;
-      background:#fff4ec;color:var(--text);font-weight:800;cursor:pointer;
+      width:100%;border:0;border-radius:12px;padding:8px 6px;margin-bottom:5px;background:#fff4ec;color:var(--text);font-weight:800;font-size:.72rem;
     }
     .level-btn.active{background:linear-gradient(135deg,#ffe7db,#fff4e5);color:var(--primary-strong)}
     .level-btn:last-child{margin-bottom:0}
 
     .minigame{
-      position:absolute;
-      left:12px;right:146px;top:10px;
-      background:rgba(255,255,255,.95);
-      backdrop-filter:blur(12px);
-      border-radius:20px;
-      box-shadow:var(--shadow);
-      padding:12px;
-      z-index:34;
-      max-height:44%;
-      overflow:auto;
+      position:absolute;left:8px;right:104px;top:8px;background:rgba(255,255,255,.96);
+      backdrop-filter:blur(12px);border-radius:18px;box-shadow:var(--shadow);padding:10px;z-index:39;max-height:42%;overflow:auto;
     }
-    .mini-head{
-      display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;
-    }
-    .mini-head h4{font-size:.95rem}
-    .feedback{font-size:.84rem;font-weight:800;min-height:20px;margin-top:8px}
+    .mini-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+    .mini-head h4{font-size:.86rem}
+    .mini-close{padding:7px 9px;border-radius:12px}
+    .feedback{font-size:.78rem;font-weight:800;min-height:18px;margin-top:8px}
     .ok{color:var(--ok)} .bad{color:var(--bad)}
+    .tiny{font-size:.68rem;color:var(--muted)}
 
-    .letters{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+    .letters{display:flex;gap:6px;flex-wrap:wrap;margin:9px 0}
     .letter{
-      width:42px;height:42px;border-radius:14px;display:grid;place-items:center;
-      background:#fff5ee;box-shadow:inset 0 0 0 1px #f2dfd2;font-weight:800;
+      width:36px;height:36px;border-radius:12px;display:grid;place-items:center;
+      background:#fff5ee;box-shadow:inset 0 0 0 1px #f2dfd2;font-weight:800;font-size:.86rem;
     }
-    .answer-row{display:flex;gap:8px}
+    .answer-row{display:flex;gap:6px}
     .answer-row input{
-      flex:1;min-width:0;border:0;background:#fff4ec;border-radius:14px;padding:13px 14px;outline:none;color:var(--text);
+      flex:1;min-width:0;border:0;background:#fff4ec;border-radius:12px;padding:11px 12px;outline:none;color:var(--text);
     }
 
-    .tap-board{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+    .tap-board{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
     .bubble{
-      aspect-ratio:1;border-radius:18px;border:0;background:linear-gradient(135deg,#f7e9ff,#fff1e8);
-      box-shadow:inset 0 0 0 1px rgba(255,255,255,.7), var(--shadow);font-size:1.2rem;font-weight:800;
+      aspect-ratio:1;border-radius:16px;border:0;background:linear-gradient(135deg,#f7e9ff,#fff1e8);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.7), var(--shadow);font-size:1rem;font-weight:800;
     }
-
-    .memory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+    .memory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
     .memory-card{
-      aspect-ratio:1;border:0;border-radius:16px;background:linear-gradient(135deg,#fff1e7,#fff8f0);
-      box-shadow:inset 0 0 0 1px #f1ddd1;font-size:1.2rem;font-weight:800;color:transparent;
+      aspect-ratio:1;border:0;border-radius:14px;background:linear-gradient(135deg,#fff1e7,#fff8f0);
+      box-shadow:inset 0 0 0 1px #f1ddd1;font-size:1rem;font-weight:800;color:transparent;
     }
     .memory-card.revealed,.memory-card.matched{color:var(--text);background:linear-gradient(135deg,#eefdeb,#fff6e9)}
-
     .swipe-track{
-      margin-top:10px;height:52px;border-radius:999px;background:linear-gradient(135deg,#fff3eb,#fff9f3);
+      margin-top:8px;height:46px;border-radius:999px;background:linear-gradient(135deg,#fff3eb,#fff9f3);
       position:relative;box-shadow:inset 0 0 0 1px #f2dfd4;overflow:hidden;
     }
     .swipe-knob{
-      position:absolute;left:6px;top:6px;width:40px;height:40px;border-radius:50%;
+      position:absolute;left:5px;top:5px;width:36px;height:36px;border-radius:50%;
       background:linear-gradient(135deg,var(--primary),var(--primary-strong));box-shadow:var(--shadow);touch-action:none;
     }
     .swipe-label{
-      position:absolute;inset:0;display:grid;place-items:center;font-size:.86rem;font-weight:800;color:var(--muted);pointer-events:none;
+      position:absolute;inset:0;display:grid;place-items:center;font-size:.76rem;font-weight:800;color:var(--muted);pointer-events:none;
     }
 
     .bottom-ui{
-      padding:10px 10px 12px;
-      background:rgba(255,255,255,.94);
-      backdrop-filter:blur(10px);
-      border-top:1px solid rgba(0,0,0,.06);
-      z-index:40;
+      padding:8px 8px 10px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);
+      border-top:1px solid rgba(0,0,0,.06);z-index:50;
     }
-    .tabs{
-      display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;
-    }
+    .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px}
     .tab-btn{
-      border:0;border-radius:16px;padding:10px 8px;font-weight:800;background:#fff4ec;color:var(--text);
+      border:0;border-radius:14px;padding:9px 6px;font-weight:800;background:#fff4ec;color:var(--text);font-size:.74rem;
     }
     .tab-btn.active{background:linear-gradient(135deg,#ffe7db,#fff4e5);color:var(--primary-strong)}
-    .panel{
-      display:none;
-    }
+    .panel{display:none}
     .panel.active{display:block}
 
-    .shop-strip{
-      display:flex;gap:8px;overflow:auto;padding-bottom:4px;
-    }
+    .shop-strip,.palette-strip{display:flex;gap:8px;overflow:auto;padding-bottom:2px}
     .shop-item{
-      min-width:168px;background:#fff8f2;border-radius:18px;padding:10px;box-shadow:var(--shadow);
+      min-width:144px;background:#fff8f2;border-radius:16px;padding:8px;box-shadow:var(--shadow);
     }
     .shop-icon{
-      width:48px;height:48px;display:grid;place-items:center;border-radius:14px;
-      background:linear-gradient(135deg,#fff0e5,#ffe1cf);font-size:1.3rem;margin-bottom:6px;
+      width:42px;height:42px;display:grid;place-items:center;border-radius:12px;
+      background:linear-gradient(135deg,#fff0e5,#ffe1cf);font-size:1.15rem;margin-bottom:6px;
     }
-    .shop-item h4{font-size:.88rem;margin-bottom:4px}
-    .shop-item p{font-size:.76rem;color:var(--muted);line-height:1.35;margin-bottom:8px}
+    .shop-item h4{font-size:.8rem;margin-bottom:4px}
+    .shop-item p{font-size:.68rem;color:var(--muted);line-height:1.28;margin-bottom:7px}
     .shop-actions{display:flex;gap:6px;flex-wrap:wrap}
-    .shop-action{
-      padding:9px 10px;border-radius:12px;font-size:.76rem;
-    }
+    .shop-action{padding:8px 9px;border-radius:11px;font-size:.68rem}
     .buy{background:#fff7d9;color:#886500}
-    .place{background:#eaf9ee;color:#2f9150}
     .owned-badge{
-      display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#eef9f1;color:#2f9150;
-      font-size:.72rem;font-weight:800;
+      display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;background:#eef9f1;color:#2f9150;
+      font-size:.65rem;font-weight:800;
     }
 
-    .palette-strip{
-      display:flex;gap:8px;overflow:auto;padding-bottom:4px;
-    }
     .palette-btn{
-      min-width:92px;border:0;border-radius:16px;background:#fff8f2;box-shadow:var(--shadow);
-      padding:10px 8px;font-weight:800;
+      min-width:84px;border:0;border-radius:14px;background:#fff8f2;box-shadow:var(--shadow);
+      padding:8px 6px;font-weight:800;font-size:.72rem;
     }
-    .palette-btn.active{
-      background:linear-gradient(135deg,#ffe7db,#fff4e5);color:var(--primary-strong);
-    }
-    .palette-btn div:first-child{font-size:1.5rem;margin-bottom:4px}
-    .tiny{font-size:.7rem;color:var(--muted)}
+    .palette-btn.active{background:linear-gradient(135deg,#ffe7db,#fff4e5);color:var(--primary-strong)}
+    .palette-btn div:first-child{font-size:1.3rem;margin-bottom:3px}
 
-    .outfit-grid{
-      display:grid;grid-template-columns:repeat(2,1fr);gap:8px;
-    }
-    .outfit-card{
-      background:#fff8f2;border-radius:16px;padding:10px;box-shadow:var(--shadow);
-    }
-    .outfit-card label{
-      display:block;font-size:.78rem;font-weight:800;margin-bottom:6px;
-    }
-    .outfit-card select{
-      width:100%;border:0;background:#fff;border-radius:12px;padding:10px;outline:none;
-    }
+    .outfit-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+    .outfit-card{background:#fff8f2;border-radius:14px;padding:8px;box-shadow:var(--shadow)}
+    .outfit-card label{display:block;font-size:.7rem;font-weight:800;margin-bottom:5px}
+    .outfit-card select{width:100%;border:0;background:#fff;border-radius:10px;padding:9px;outline:none;font-size:.74rem}
 
     .move-grid{
-      width:170px;
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      grid-template-rows:repeat(3,54px);
-      gap:6px;
-      margin:0 auto;
+      width:156px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,48px);gap:6px;margin:0 auto;
     }
-    .move-btn{
-      border:0;border-radius:14px;background:#fff8f2;box-shadow:var(--shadow);font-size:1.2rem;font-weight:900;
-    }
+    .move-btn{border:0;border-radius:12px;background:#fff8f2;box-shadow:var(--shadow);font-size:1rem;font-weight:900}
     .move-btn.empty{opacity:0;pointer-events:none}
-    .move-help{font-size:.76rem;color:var(--muted);text-align:center;margin-top:8px}
-
+    .move-help{font-size:.66rem;color:var(--muted);text-align:center;margin-top:7px}
     .hint-bar{
-      margin-top:8px;padding:10px 12px;border-radius:14px;background:#fff4ec;color:var(--text);font-size:.78rem;font-weight:800;
+      margin-top:8px;padding:9px 11px;border-radius:12px;background:#fff4ec;color:var(--text);font-size:.7rem;font-weight:800;
     }
 
-    @media (min-width:900px){
-      .menu-actions{grid-template-columns:1fr 1fr}
-      .right-panel{width:138px}
-      .minigame{right:160px}
-      .bottom-ui{padding-left:14px;padding-right:14px}
-      .shop-item{min-width:210px}
-      .palette-btn{min-width:108px}
-      .outfit-grid{grid-template-columns:repeat(4,1fr)}
+    @media (min-width:700px){
+      #world{width:1800px;height:1200px}
+      .right-panel{width:112px}
+      .minigame{right:124px}
+      .shop-item{min-width:170px}
+      .outfit-grid{grid-template-columns:repeat(5,1fr)}
     }
   </style>
 </head>
@@ -394,11 +279,11 @@
   <section id="menuScreen" class="screen menu">
     <div class="menu-card">
       <div class="logo">🏡</div>
-      <div class="pill">✨ V5+ • entrer dans la maison • se déplacer • poser librement</div>
-      <h1>Maison sandbox avec déco libre</h1>
+      <div class="pill">✨ V6 • achats corrigés • mobile plus compact</div>
+      <h1>Maison sandbox mobile</h1>
       <p>
-        Tu peux maintenant entrer dans la maison, te déplacer dedans, acheter des décorations et des meubles,
-        choisir un objet, puis le poser où tu veux. Tu peux aussi composer ta tenue.
+        Les achats sont corrigés et toute l’interface prend moins de place sur téléphone.
+        Tu peux entrer dans la maison, te déplacer, acheter, poser et déplacer tes objets.
       </p>
       <div class="menu-actions">
         <button class="btn btn-primary" onclick="enterHouse()">Entrer dans la maison</button>
@@ -413,7 +298,7 @@
         <div class="brand-badge">🏠</div>
         <div class="brand-text">
           <h2>Maison intérieure</h2>
-          <p>Déplace-toi et pose tes objets où tu veux</p>
+          <p>Version mobile compacte</p>
         </div>
       </div>
       <div class="stats">
@@ -428,10 +313,9 @@
           <div class="label-room">Salon détente</div>
           <div class="window-room"></div>
           <div class="floor-rug-base"></div>
-
-          <div class="wall-art" style="left:520px; top:160px; width:150px; height:100px; display:grid; place-items:center; font-size:42px;">🖼️</div>
-          <div class="wall-art" style="left:840px; top:120px; width:190px; height:130px; display:grid; place-items:center; font-size:54px;">🌿</div>
-          <div class="wall-art" style="left:1240px; top:180px; width:170px; height:110px; display:grid; place-items:center; font-size:44px;">☀️</div>
+          <div class="wall-art" style="left:310px; top:110px; width:110px; height:80px; font-size:34px;">🖼️</div>
+          <div class="wall-art" style="left:600px; top:92px; width:130px; height:95px; font-size:40px;">🌿</div>
+          <div class="wall-art" style="left:930px; top:120px; width:120px; height:82px; font-size:34px;">☀️</div>
 
           <div id="placedLayer"></div>
 
@@ -449,51 +333,51 @@
       <div class="right-panel">
         <div class="panel-card">
           <h4>Niveaux</h4>
-          <button class="level-btn active" onclick="openLevel(1, this)">Niveau 1</button>
-          <button class="level-btn" onclick="openLevel(2, this)">Niveau 2</button>
-          <button class="level-btn" onclick="openLevel(3, this)">Niveau 3</button>
-          <button class="level-btn" onclick="openLevel(4, this)">Niveau 4</button>
+          <button class="level-btn active" onclick="openLevel(1, this)">Niv. 1</button>
+          <button class="level-btn" onclick="openLevel(2, this)">Niv. 2</button>
+          <button class="level-btn" onclick="openLevel(3, this)">Niv. 3</button>
+          <button class="level-btn" onclick="openLevel(4, this)">Niv. 4</button>
         </div>
         <div class="panel-card">
-          <h4>Mode</h4>
-          <div class="tiny" id="placementStatus">Aucun objet sélectionné</div>
+          <h4>Objet</h4>
+          <div class="tiny" id="placementStatus">Aucun</div>
         </div>
       </div>
 
       <div class="minigame" id="minigameBox">
         <div class="mini-head">
           <h4 id="currentLevelLabel">Niveau 1 — Anagramme</h4>
-          <button class="btn btn-secondary" style="padding:8px 10px;border-radius:12px" onclick="toggleMinigame()">Fermer</button>
+          <button class="btn btn-secondary mini-close" onclick="toggleMinigame()">Fermer</button>
         </div>
 
         <div id="level1Game">
-          <p class="tiny">Trouve le mot. Tu gagnes 5 étoiles.</p>
+          <p class="tiny">Trouve le mot. +5 étoiles.</p>
           <div class="letters" id="lettersBox"></div>
           <div class="answer-row">
-            <input id="anagramInput" type="text" maxlength="5" placeholder="Ta réponse">
-            <button class="btn btn-primary" style="padding:12px 14px" onclick="checkAnagram()">Valider</button>
+            <input id="anagramInput" type="text" maxlength="5" placeholder="Réponse">
+            <button class="btn btn-primary" style="padding:10px 12px" onclick="checkAnagram()">Valider</button>
           </div>
           <div id="anagramFeedback" class="feedback"></div>
         </div>
 
         <div id="level2Game" class="hidden">
-          <p class="tiny">Éclate 6 bulles pour gagner 4 étoiles.</p>
-          <div class="tiny">Bulles éclatées : <span id="bubbleCount">0</span> / 6</div>
+          <p class="tiny">Éclate 6 bulles. +4 étoiles.</p>
+          <div class="tiny">Bulles : <span id="bubbleCount">0</span> / 6</div>
           <div class="tap-board" id="tapBoard"></div>
           <div id="bubbleFeedback" class="feedback"></div>
         </div>
 
         <div id="level3Game" class="hidden">
-          <p class="tiny">Trouve les 4 paires pour gagner 6 étoiles.</p>
+          <p class="tiny">Trouve 4 paires. +6 étoiles.</p>
           <div class="tiny">Paires : <span id="memoryPairs">0</span> / 4</div>
           <div class="memory-grid" id="memoryGrid"></div>
           <div id="memoryFeedback" class="feedback"></div>
         </div>
 
         <div id="level4Game" class="hidden">
-          <p class="tiny">Glisse jusqu’au bout pour gagner 5 étoiles.</p>
+          <p class="tiny">Glisse jusqu’au bout. +5 étoiles.</p>
           <div class="swipe-track" id="swipeTrack">
-            <div class="swipe-label">Glisse jusqu’à la fin</div>
+            <div class="swipe-label">Glisse</div>
             <div class="swipe-knob" id="swipeKnob"></div>
           </div>
           <div id="swipeFeedback" class="feedback"></div>
@@ -506,7 +390,7 @@
         <button class="tab-btn active" onclick="openTab('shopTab', this)">Boutique</button>
         <button class="tab-btn" onclick="openTab('buildTab', this)">Placer</button>
         <button class="tab-btn" onclick="openTab('outfitTab', this)">Tenue</button>
-        <button class="tab-btn" onclick="openTab('moveTab', this)">Déplacement</button>
+        <button class="tab-btn" onclick="openTab('moveTab', this)">Bouger</button>
       </div>
 
       <div id="shopTab" class="panel active">
@@ -516,9 +400,7 @@
 
       <div id="buildTab" class="panel">
         <div class="palette-strip" id="paletteList"></div>
-        <div class="hint-bar">
-          Sélectionne un objet possédé, puis touche l’endroit de la maison où tu veux le poser.
-        </div>
+        <div class="hint-bar">Choisis un objet possédé, puis touche la maison pour le poser.</div>
       </div>
 
       <div id="outfitTab" class="panel">
@@ -585,7 +467,7 @@
           <button class="move-btn" onclick="centerOnPlayer()">◎</button>
           <button class="move-btn empty"></button>
         </div>
-        <div class="move-help">Tu peux aussi utiliser le clavier : ZQSD, WASD ou flèches.</div>
+        <div class="move-help">Flèches, ZQSD ou WASD fonctionnent aussi.</div>
       </div>
     </footer>
   </section>
@@ -604,27 +486,26 @@
     const placedLayer = document.getElementById('placedLayer');
     const player = document.getElementById('player');
 
-    const worldSize = { w: 2200, h: 1600 };
-    const playerState = { x: 860, y: 1020, speed: 6 };
+    const worldSize = { w: 1400, h: 980 };
+    const playerState = { x: 700, y: 650, speed: 4.5 };
 
     const shuffledLetters = ['L', 'O', 'N', 'A', 'S'];
     const anagramSolution = 'SALON';
 
     const shopItems = [
-      { id:'flowers', icon:'🌷', name:'Fleurs pastel', desc:'Petites fleurs décoratives.', cost:10, owned:false },
-      { id:'lamp', icon:'💡', name:'Lampadaire', desc:'Lumière chaude pour le salon.', cost:18, owned:false },
-      { id:'shelf', icon:'🪵', name:'Étagère', desc:'Petits objets et livres.', cost:22, owned:false },
-      { id:'rug', icon:'🧶', name:'Tapis', desc:'Tapis cocoon au sol.', cost:14, owned:false },
-
+      { id:'flowers', icon:'🌷', name:'Fleurs', desc:'Déco fleurie.', cost:10, owned:false },
+      { id:'lamp', icon:'💡', name:'Lampe', desc:'Lumière cosy.', cost:18, owned:false },
+      { id:'shelf', icon:'🪵', name:'Étagère', desc:'Livres et objets.', cost:22, owned:false },
+      { id:'rug', icon:'🧶', name:'Tapis', desc:'Tapis cocoon.', cost:14, owned:false },
       { id:'chair', icon:'🪑', name:'Chaise', desc:'Chaise simple.', cost:9, owned:false },
-      { id:'bed', icon:'🛏️', name:'Lit', desc:'Grand lit douillet.', cost:28, owned:false },
+      { id:'bed', icon:'🛏️', name:'Lit', desc:'Grand lit.', cost:28, owned:false },
       { id:'mirror', icon:'🪞', name:'Miroir', desc:'Miroir déco.', cost:16, owned:false },
-      { id:'plant', icon:'🪴', name:'Grande plante', desc:'Plante intérieure.', cost:13, owned:false },
-      { id:'frame', icon:'🖼️', name:'Cadre photo', desc:'Cadre mural.', cost:12, owned:false },
-      { id:'basket', icon:'🧺', name:'Panier', desc:'Panier de rangement.', cost:8, owned:false },
+      { id:'plant', icon:'🪴', name:'Plante', desc:'Plante intérieure.', cost:13, owned:false },
+      { id:'frame', icon:'🖼️', name:'Cadre', desc:'Cadre mural.', cost:12, owned:false },
+      { id:'basket', icon:'🧺', name:'Panier', desc:'Rangement.', cost:8, owned:false },
       { id:'teddy', icon:'🧸', name:'Peluche', desc:'Déco douce.', cost:11, owned:false },
       { id:'clock', icon:'🕰️', name:'Horloge', desc:'Horloge chic.', cost:17, owned:false },
-      { id:'desk', icon:'🪟', name:'Fenêtre déco', desc:'Ouverture supplémentaire.', cost:21, owned:false },
+      { id:'window2', icon:'🪟', name:'Fenêtre', desc:'Fenêtre déco.', cost:21, owned:false },
       { id:'candle', icon:'🕯️', name:'Bougie', desc:'Ambiance relax.', cost:7, owned:false }
     ];
 
@@ -634,8 +515,9 @@
     function saveGame(){
       const data = {
         stars,
-        shopItems,
+        shopItems: shopItems.map(i => ({ id:i.id, owned:i.owned })),
         placedItems,
+        placedCounter,
         outfit:{
           skin: document.getElementById('skinSelect').value,
           top: document.getElementById('topSelect').value,
@@ -645,11 +527,11 @@
         },
         playerState
       };
-      localStorage.setItem('maison_v5_save', JSON.stringify(data));
+      localStorage.setItem('maison_v6_save', JSON.stringify(data));
     }
 
     function loadGame(){
-      const raw = localStorage.getItem('maison_v5_save');
+      const raw = localStorage.getItem('maison_v6_save');
       if(!raw) return false;
       try{
         const data = JSON.parse(raw);
@@ -672,6 +554,7 @@
           if(data.outfit.acc) document.getElementById('accSelect').value = data.outfit.acc;
         }
         placedItems = Array.isArray(data.placedItems) ? data.placedItems : [];
+        placedCounter = data.placedCounter || 0;
         return true;
       }catch(e){
         return false;
@@ -806,10 +689,7 @@
     const memoryIcons = ['🌷','🌷','🪴','🪴','🛋️','🛋️','💡','💡'];
 
     function shuffle(array){
-      return array
-        .map(value => ({ value, sort: Math.random() }))
-        .sort((a,b)=>a.sort-b.sort)
-        .map(({value})=>value);
+      return array.map(value => ({ value, sort: Math.random() })).sort((a,b)=>a.sort-b.sort).map(({value})=>value);
     }
 
     function renderMemory(){
@@ -865,10 +745,10 @@
     const swipeTrack = document.getElementById('swipeTrack');
     let swipeActive = false;
     let startX = 0;
-    let knobStart = 6;
+    let knobStart = 5;
 
     function resetSwipe(){
-      swipeKnob.style.left = '6px';
+      swipeKnob.style.left = '5px';
       swipeActive = false;
     }
     function completeSwipe(){
@@ -879,14 +759,14 @@
     swipeKnob.addEventListener('pointerdown', (e)=>{
       swipeActive = true;
       startX = e.clientX;
-      knobStart = parseFloat(swipeKnob.style.left || '6');
+      knobStart = parseFloat(swipeKnob.style.left || '5');
       swipeKnob.setPointerCapture(e.pointerId);
     });
     swipeKnob.addEventListener('pointermove', (e)=>{
       if(!swipeActive) return;
-      const max = swipeTrack.clientWidth - swipeKnob.clientWidth - 6;
+      const max = swipeTrack.clientWidth - swipeKnob.clientWidth - 5;
       let next = knobStart + (e.clientX - startX);
-      if(next < 6) next = 6;
+      if(next < 5) next = 5;
       if(next > max) next = max;
       swipeKnob.style.left = next + 'px';
       if(next >= max - 2){
@@ -897,8 +777,8 @@
     swipeKnob.addEventListener('pointerup', ()=>{
       if(!swipeActive) return;
       swipeActive = false;
-      const max = swipeTrack.clientWidth - swipeKnob.clientWidth - 20;
-      if(parseFloat(swipeKnob.style.left || '6') < max){
+      const max = swipeTrack.clientWidth - swipeKnob.clientWidth - 16;
+      if(parseFloat(swipeKnob.style.left || '5') < max){
         resetSwipe();
       }
     });
@@ -914,12 +794,17 @@
           <h4>${item.name}</h4>
           <p>${item.desc}</p>
           <div class="shop-actions">
-            <button class="shop-action buy" ${item.owned ? 'disabled' : ''} onclick="buyDecoration('${item.id}')">
+            <button class="shop-action buy" type="button" ${item.owned ? 'disabled' : ''} data-buy-id="${item.id}">
               ${item.owned ? 'Acheté' : 'Acheter ⭐ ' + item.cost}
             </button>
             ${item.owned ? '<span class="owned-badge">✔ Possédé</span>' : ''}
           </div>
         `;
+        const buyBtn = article.querySelector('[data-buy-id]');
+        if (buyBtn) {
+          buyBtn.addEventListener('click', () => buyDecoration(item.id));
+          buyBtn.addEventListener('touchend', (e) => { e.preventDefault(); buyDecoration(item.id); }, { passive:false });
+        }
         container.appendChild(article);
       });
     }
@@ -940,7 +825,7 @@
       updateStars();
       renderShop();
       renderPalette();
-      setFeedback('shopFeedback', `${item.name} acheté. Va dans l’onglet Placer pour le poser dans la maison.`, true);
+      setFeedback('shopFeedback', `${item.name} acheté. Va dans Placer pour le poser.`, true);
       saveGame();
     }
 
@@ -949,22 +834,22 @@
       container.innerHTML = '';
       const owned = shopItems.filter(item=>item.owned);
       if(owned.length === 0){
-        container.innerHTML = '<div class="hint-bar">Achète d’abord un objet dans la boutique.</div>';
-        document.getElementById('placementStatus').textContent = 'Aucun objet sélectionné';
+        container.innerHTML = '<div class="hint-bar">Achète d’abord un objet dans Boutique.</div>';
+        document.getElementById('placementStatus').textContent = 'Aucun';
         return;
       }
       owned.forEach(item=>{
         const btn = document.createElement('button');
         btn.className = 'palette-btn' + (selectedPaletteId === item.id ? ' active' : '');
-        btn.innerHTML = `<div>${item.icon}</div><div>${item.name}</div><div class="tiny">Poser librement</div>`;
-        btn.onclick = ()=>selectPaletteItem(item.id);
+        btn.innerHTML = `<div>${item.icon}</div><div>${item.name}</div><div class="tiny">Poser</div>`;
+        btn.addEventListener('click', ()=>selectPaletteItem(item.id));
         container.appendChild(btn);
       });
       if(selectedPaletteId){
         const current = shopItems.find(i=>i.id === selectedPaletteId);
-        document.getElementById('placementStatus').textContent = current ? 'Objet choisi : ' + current.name : 'Aucun objet sélectionné';
+        document.getElementById('placementStatus').textContent = current ? current.name : 'Aucun';
       }else{
-        document.getElementById('placementStatus').textContent = 'Aucun objet sélectionné';
+        document.getElementById('placementStatus').textContent = 'Aucun';
       }
     }
 
@@ -976,19 +861,18 @@
 
     function placeSelectedItem(worldX, worldY){
       if(!selectedPaletteId){
-        setFeedback('shopFeedback', 'Sélectionne un objet dans l’onglet Placer.', false);
+        setFeedback('shopFeedback', 'Choisis un objet dans Placer.', false);
         return;
       }
       const item = shopItems.find(i=>i.id === selectedPaletteId && i.owned);
       if(!item) return;
-
       const placed = {
         placedId: 'p' + (++placedCounter) + '_' + Date.now(),
         itemId: item.id,
         icon: item.icon,
         name: item.name,
-        x: Math.max(60, Math.min(worldSize.w - 60, worldX)),
-        y: Math.max(60, Math.min(worldSize.h - 60, worldY))
+        x: clamp(worldX, 50, worldSize.w - 50),
+        y: clamp(worldY, 50, worldSize.h - 50)
       };
       placedItems.push(placed);
       renderPlacedItems();
@@ -1007,9 +891,7 @@
         el.dataset.id = obj.placedId;
         el.innerHTML = `<div class="item-emoji">${obj.icon}</div><div class="item-label">${obj.name}</div>`;
         enableDragPlaced(el, obj);
-        el.addEventListener('dblclick', ()=>{
-          removePlacedItem(obj.placedId);
-        });
+        el.addEventListener('dblclick', ()=>removePlacedItem(obj.placedId));
         placedLayer.appendChild(el);
       });
       updatePlacedCount();
@@ -1023,7 +905,6 @@
 
     function enableDragPlaced(el, obj){
       let dragging = false;
-      let moved = false;
       let startPointerWorldX = 0;
       let startPointerWorldY = 0;
       let startObjX = 0;
@@ -1031,7 +912,6 @@
 
       el.addEventListener('pointerdown', (e)=>{
         dragging = true;
-        moved = false;
         el.setPointerCapture(e.pointerId);
         const p = screenToWorld(e.clientX, e.clientY);
         startPointerWorldX = p.x;
@@ -1047,9 +927,8 @@
         const p = screenToWorld(e.clientX, e.clientY);
         const dx = p.x - startPointerWorldX;
         const dy = p.y - startPointerWorldY;
-        if(Math.abs(dx) > 2 || Math.abs(dy) > 2) moved = true;
-        obj.x = clamp(startObjX + dx, 60, worldSize.w - 60);
-        obj.y = clamp(startObjY + dy, 60, worldSize.h - 60);
+        obj.x = clamp(startObjX + dx, 50, worldSize.w - 50);
+        obj.y = clamp(startObjY + dy, 50, worldSize.h - 50);
         el.style.left = obj.x + 'px';
         el.style.top = obj.y + 'px';
       });
@@ -1062,39 +941,28 @@
       };
       el.addEventListener('pointerup', stop);
       el.addEventListener('pointercancel', stop);
-
-      el.addEventListener('click', (e)=>{
-        if(moved) {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      });
     }
 
     function clamp(v, min, max){
       return Math.max(min, Math.min(max, v));
     }
 
-    function screenToWorld(clientX, clientY){
-      const rect = camera.getBoundingClientRect();
-      const camX = getCameraX();
-      const camY = getCameraY();
+    function getCameraOffset(){
+      const transform = world.style.transform || 'translate(0px, 0px)';
+      const match = transform.match(/translate\(([-0-9.]+)px,\s*([-0-9.]+)px\)/);
       return {
-        x: camX + (clientX - rect.left),
-        y: camY + (clientY - rect.top)
+        x: match ? -parseFloat(match[1]) : 0,
+        y: match ? -parseFloat(match[2]) : 0
       };
     }
 
-    function getCameraX(){
-      const transform = world.style.transform || 'translate(0px, 0px)';
-      const match = transform.match(/translate\(([-0-9.]+)px,\s*([-0-9.]+)px\)/);
-      return match ? -parseFloat(match[1]) : 0;
-    }
-
-    function getCameraY(){
-      const transform = world.style.transform || 'translate(0px, 0px)';
-      const match = transform.match(/translate\(([-0-9.]+)px,\s*([-0-9.]+)px\)/);
-      return match ? -parseFloat(match[2]) : 0;
+    function screenToWorld(clientX, clientY){
+      const rect = camera.getBoundingClientRect();
+      const cam = getCameraOffset();
+      return {
+        x: cam.x + (clientX - rect.left),
+        y: cam.y + (clientY - rect.top)
+      };
     }
 
     camera.addEventListener('click', (e)=>{
@@ -1102,6 +970,13 @@
       const p = screenToWorld(e.clientX, e.clientY);
       placeSelectedItem(p.x, p.y);
     });
+    camera.addEventListener('touchend', (e)=>{
+      const touch = e.changedTouches && e.changedTouches[0];
+      if(!touch) return;
+      if(e.target.closest('.placed')) return;
+      const p = screenToWorld(touch.clientX, touch.clientY);
+      placeSelectedItem(p.x, p.y);
+    }, { passive:true });
 
     function updateOutfit(){
       const skin = document.getElementById('skinSelect').value;
@@ -1132,19 +1007,15 @@
     }
 
     function movePlayer(dx, dy){
-      playerState.x = clamp(playerState.x + dx, 50, worldSize.w - 50);
-      playerState.y = clamp(playerState.y + dy, 50, worldSize.h - 50);
+      playerState.x = clamp(playerState.x + dx, 42, worldSize.w - 42);
+      playerState.y = clamp(playerState.y + dy, 42, worldSize.h - 42);
       updatePlayer();
       centerOnPlayer();
       saveGame();
     }
 
-    function startMove(dir){
-      currentMove = dir;
-    }
-    function stopMove(){
-      currentMove = null;
-    }
+    function startMove(dir){ currentMove = dir; }
+    function stopMove(){ currentMove = null; }
 
     window.addEventListener('keydown', (e)=>{
       const key = e.key.toLowerCase();
