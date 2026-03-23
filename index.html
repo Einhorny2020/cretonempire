@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Étoiles & Maison — V8 3D</title>
+  <title>Étoiles & Maison — V7 3D</title>
   <style>
     :root{
-      --bg:#fff8f2;
       --card:rgba(255,255,255,.96);
       --text:#2f2524;
       --muted:#7f6d6a;
@@ -64,9 +63,7 @@
       background:#fff;border-radius:999px;padding:8px 10px;font-weight:800;font-size:.76rem;box-shadow:var(--shadow);white-space:nowrap;
     }
     .game-wrap{position:relative;overflow:hidden;background:linear-gradient(180deg,#fff9f4,#fff0e6)}
-    #scene3d{
-      position:absolute;inset:0;background:linear-gradient(180deg,#fef8f2,#f7e6d8);
-    }
+    #scene3d{position:absolute;inset:0;background:linear-gradient(180deg,#fef8f2,#f7e6d8)}
     .right-panel{
       position:absolute;right:8px;top:8px;width:104px;display:grid;gap:8px;z-index:40;max-height:calc(100% - 16px);
     }
@@ -142,11 +139,10 @@
   <section id="menuScreen" class="screen menu">
     <div class="menu-card">
       <div class="logo">🏡</div>
-      <div class="pill">✨ V8 • maison 3D + mini-jeux différents</div>
+      <div class="pill">✨ V7 + 3D + mini-jeux différents</div>
       <h1>Maison 3D anti-stress</h1>
       <p>
-        La maison est maintenant en 3D, et chaque niveau ouvre un mini-jeu anti-stress différent.
-        Tu peux toujours acheter, poser et déplacer tes meubles illustrés.
+        Base V7 conservée, avec maison en 3D et un mini-jeu anti-stress différent pour chaque niveau.
       </p>
       <div class="menu-actions">
         <button class="btn btn-primary" onclick="enterHouse()">Entrer dans la maison</button>
@@ -161,7 +157,7 @@
         <div class="brand-badge">🏠</div>
         <div class="brand-text">
           <h2>Maison intérieure 3D</h2>
-          <p>Chaque niveau = mini-jeu différent</p>
+          <p>Base V7 conservée</p>
         </div>
       </div>
       <div class="stats">
@@ -274,14 +270,14 @@
 
       <div id="buildTab" class="panel">
         <div class="palette-strip" id="paletteList"></div>
-        <div class="hint-bar">Choisis un meuble possédé, puis touche la scène 3D pour le poser au centre de la pièce.</div>
+        <div class="hint-bar">Choisis un meuble possédé, puis touche la scène 3D pour le poser.</div>
       </div>
 
       <div id="outfitTab" class="panel">
         <div class="outfit-grid">
           <div class="outfit-card">
             <label>Peau</label>
-            <select id="skinSelect" onchange="updateOutfit()">
+            <select id="skinSelect" onchange="saveGame()">
               <option value="#ffd4b8">Clair</option>
               <option value="#f1b996">Doré</option>
               <option value="#c98763">Mat</option>
@@ -290,7 +286,7 @@
           </div>
           <div class="outfit-card">
             <label>Haut</label>
-            <select id="topSelect" onchange="updateOutfit()">
+            <select id="topSelect" onchange="saveGame()">
               <option value="#8ec5ff">Bleu</option>
               <option value="#ff9db3">Rose</option>
               <option value="#9be0a2">Vert</option>
@@ -300,7 +296,7 @@
           </div>
           <div class="outfit-card">
             <label>Bas</label>
-            <select id="bottomSelect" onchange="updateOutfit()">
+            <select id="bottomSelect" onchange="saveGame()">
               <option value="#8b6cff">Violet</option>
               <option value="#5f7cff">Bleu nuit</option>
               <option value="#343434">Noir</option>
@@ -309,7 +305,7 @@
           </div>
           <div class="outfit-card">
             <label>Chapeau</label>
-            <select id="hatSelect" onchange="updateOutfit()">
+            <select id="hatSelect" onchange="saveGame()">
               <option value="#f6b0a6">Rose</option>
               <option value="#9ac8ff">Bleu</option>
               <option value="#e5c67a">Beige</option>
@@ -318,7 +314,7 @@
           </div>
           <div class="outfit-card">
             <label>Accessoire</label>
-            <select id="accSelect" onchange="updateOutfit()">
+            <select id="accSelect" onchange="saveGame()">
               <option value="✨">Étoile</option>
               <option value="🕶️">Lunettes</option>
               <option value="🌸">Fleur</option>
@@ -334,21 +330,13 @@
   <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
   <script src="https://unpkg.com/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
   <script>
-    let stars = 24;
-    let selectedPaletteId = null;
-    let bubbleHits = 0;
-    let memoryPairs = 0;
-    let firstCard = null;
-    let lockBoard = false;
-    let placedItems = [];
-    let placedCounter = 0;
+    let stars=24,selectedPaletteId=null,bubbleHits=0,memoryPairs=0,firstCard=null,lockBoard=false,placedItems=[],placedCounter=0;
+    let scene,camera3d,renderer,controls,raycaster,pointer,floorMesh;
+    const placedMeshes={};
+    const sceneEl=document.getElementById('scene3d');
 
-    let scene, camera3d, renderer, controls, raycaster, pointer, floorMesh;
-    const placedMeshes = {};
-    const sceneEl = document.getElementById('scene3d');
-
-    function svgData(svg){ return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg); }
-    const itemImages = {
+    function svgData(svg){return 'data:image/svg+xml;utf8,'+encodeURIComponent(svg)}
+    const itemImages={
       flowers:svgData('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"><ellipse cx="40" cy="64" rx="24" ry="8" fill="#6fb56f"/><circle cx="20" cy="34" r="8" fill="#ff94b6"/><circle cx="36" cy="28" r="8" fill="#ffd86b"/><circle cx="52" cy="34" r="8" fill="#c3a1ff"/><circle cx="64" cy="26" r="8" fill="#ff94b6"/><rect x="18" y="40" width="3" height="18" rx="2" fill="#58a560"/><rect x="34" y="34" width="3" height="24" rx="2" fill="#58a560"/><rect x="50" y="40" width="3" height="18" rx="2" fill="#58a560"/><rect x="62" y="32" width="3" height="26" rx="2" fill="#58a560"/></svg>'),
       lamp:svgData('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"><ellipse cx="40" cy="70" rx="18" ry="5" fill="#d7cabf"/><rect x="37" y="28" width="6" height="36" rx="3" fill="#7a675d"/><path d="M24 18h32l-6 14H30z" fill="#ffd86b"/><rect x="31" y="64" width="18" height="4" rx="2" fill="#7a675d"/></svg>'),
       shelf:svgData('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"><rect x="12" y="48" width="56" height="8" rx="4" fill="#b27a51"/><rect x="18" y="30" width="10" height="18" rx="2" fill="#f4dbc2"/><rect x="31" y="26" width="10" height="22" rx="2" fill="#bfdcff"/><rect x="44" y="30" width="10" height="18" rx="2" fill="#ffc3d6"/><circle cx="62" cy="39" r="8" fill="#8fd6a0"/></svg>'),
@@ -360,24 +348,23 @@
       frame:svgData('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 60"><rect x="8" y="8" width="64" height="44" rx="6" fill="#b77c52"/><rect x="16" y="16" width="48" height="28" rx="3" fill="#dbf0ff"/><path d="M18 40l12-10 10 8 12-12 10 14z" fill="#97d39e"/><circle cx="55" cy="22" r="5" fill="#ffd86b"/></svg>'),
       basket:svgData('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 70"><path d="M18 28h44l-6 24H24z" fill="#c58a55"/><path d="M28 28c0-10 6-16 12-16s12 6 12 16" fill="none" stroke="#9a6439" stroke-width="4" stroke-linecap="round"/><path d="M26 36h28M24 44h32" stroke="#a56d42" stroke-width="3" stroke-linecap="round"/></svg>')
     };
-
-    const shopItems = [
-      { id:'flowers', name:'Fleurs', desc:'Déco fleurie.', cost:10, owned:false },
-      { id:'lamp', name:'Lampe', desc:'Lumière cosy.', cost:18, owned:false },
-      { id:'shelf', name:'Étagère', desc:'Livres et objets.', cost:22, owned:false },
-      { id:'rug', name:'Tapis', desc:'Tapis cocoon.', cost:14, owned:false },
-      { id:'chair', name:'Chaise', desc:'Chaise simple.', cost:9, owned:false },
-      { id:'bed', name:'Lit', desc:'Grand lit.', cost:28, owned:false },
-      { id:'mirror', name:'Miroir', desc:'Miroir déco.', cost:16, owned:false },
-      { id:'plant', name:'Plante', desc:'Plante intérieure.', cost:13, owned:false },
-      { id:'frame', name:'Cadre', desc:'Cadre mural.', cost:12, owned:false },
-      { id:'basket', name:'Panier', desc:'Rangement.', cost:8, owned:false }
+    const shopItems=[
+      {id:'flowers',name:'Fleurs',desc:'Déco fleurie.',cost:10,owned:false},
+      {id:'lamp',name:'Lampe',desc:'Lumière cosy.',cost:18,owned:false},
+      {id:'shelf',name:'Étagère',desc:'Livres et objets.',cost:22,owned:false},
+      {id:'rug',name:'Tapis',desc:'Tapis cocoon.',cost:14,owned:false},
+      {id:'chair',name:'Chaise',desc:'Chaise simple.',cost:9,owned:false},
+      {id:'bed',name:'Lit',desc:'Grand lit.',cost:28,owned:false},
+      {id:'mirror',name:'Miroir',desc:'Miroir déco.',cost:16,owned:false},
+      {id:'plant',name:'Plante',desc:'Plante intérieure.',cost:13,owned:false},
+      {id:'frame',name:'Cadre',desc:'Cadre mural.',cost:12,owned:false},
+      {id:'basket',name:'Panier',desc:'Rangement.',cost:8,owned:false}
     ];
 
     function saveGame(){
-      localStorage.setItem('maison_v8_save', JSON.stringify({
+      localStorage.setItem('maison_v7_3d_save', JSON.stringify({
         stars,
-        shopItems: shopItems.map(i => ({ id:i.id, owned:i.owned })),
+        shopItems: shopItems.map(i=>({id:i.id, owned:i.owned})),
         placedItems,
         outfit:{
           skin: skinSelect.value,
@@ -388,16 +375,15 @@
         }
       }));
     }
-
     function loadGame(){
-      const raw = localStorage.getItem('maison_v8_save') || localStorage.getItem('maison_v7_save');
+      const raw = localStorage.getItem('maison_v7_3d_save') || localStorage.getItem('maison_v7_save');
       if(!raw) return false;
       try{
         const data = JSON.parse(raw);
         if(typeof data.stars === 'number') stars = data.stars;
         if(Array.isArray(data.shopItems)){
-          data.shopItems.forEach(saved => {
-            const item = shopItems.find(i => i.id === saved.id);
+          data.shopItems.forEach(saved=>{
+            const item = shopItems.find(i=>i.id===saved.id);
             if(item) item.owned = !!saved.owned;
           });
         }
@@ -419,12 +405,7 @@
       init3D();
       initAfterEnter();
     }
-
-    function loadSaveAndEnter(){
-      loadGame();
-      enterHouse();
-    }
-
+    function loadSaveAndEnter(){ loadGame(); enterHouse(); }
     function initAfterEnter(){
       updateStars();
       renderLetters();
@@ -439,35 +420,32 @@
       updatePlacedCount();
       openLevel(1, document.querySelector('.level-btn'));
     }
-
     function updateStars(){ starsCount.textContent = stars; }
     function updatePlacedCount(){ placedCount.textContent = placedItems.length; }
     function setFeedback(id,msg,ok=true){
-      const el = document.getElementById(id);
+      const el=document.getElementById(id);
       if(!el) return;
-      el.textContent = msg;
-      el.className = 'feedback ' + (ok ? 'ok' : 'bad');
+      el.textContent=msg;
+      el.className='feedback '+(ok?'ok':'bad');
     }
-    function gainStars(amount,message,targetId){
+    function gainStars(amount,msg,targetId){
       stars += amount;
       updateStars();
-      setFeedback(targetId,message,true);
+      setFeedback(targetId,msg,true);
       renderShop();
       saveGame();
     }
-
     function openTab(id,btn){
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
-      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
       document.getElementById(id).classList.add('active');
     }
-
     function openLevel(level,btn){
-      document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.level-btn').forEach(b=>b.classList.remove('active'));
       if(btn) btn.classList.add('active');
       for(let i=1;i<=8;i++) document.getElementById('level'+i+'Game').classList.add('hidden');
-      const names = {
+      const names={
         1:'Niveau 1 — Anagramme zen',
         2:'Niveau 2 — Bubble zen',
         3:'Niveau 3 — Mémoire douce',
@@ -483,21 +461,20 @@
     }
     function toggleMinigame(){ minigameBox.classList.toggle('hidden'); }
 
-    function renderLetters(){ lettersBox.innerHTML = ['L','O','N','A','S'].map(l=>`<div class="letter">${l}</div>`).join(''); }
+    function renderLetters(){ lettersBox.innerHTML=['L','O','N','A','S'].map(l=>`<div class="letter">${l}</div>`).join(''); }
     function checkAnagram(){
       const value = anagramInput.value.trim().toUpperCase();
       if(!value){ setFeedback('anagramFeedback','Écris un mot avant de valider.',false); return; }
-      if(value === 'SALON'){
-        gainStars(5,'Niveau terminé : +5 étoiles ⭐','anagramFeedback');
-        anagramInput.value = '';
-      } else setFeedback('anagramFeedback','Pas encore. Essaie une autre combinaison.',false);
+      if(value === 'SALON'){ gainStars(5,'Niveau terminé : +5 étoiles ⭐','anagramFeedback'); anagramInput.value=''; }
+      else setFeedback('anagramFeedback','Pas encore. Essaie une autre combinaison.',false);
     }
 
     function renderBubbleGame(){
       tapBoard.innerHTML='';
       ['•','✦','◆','●','✿','◉','✧','⬤','✺'].forEach(icon=>{
         const btn=document.createElement('button');
-        btn.className='bubble'; btn.textContent=icon;
+        btn.className='bubble';
+        btn.textContent=icon;
         btn.onclick=()=>popBubble(btn);
         tapBoard.appendChild(btn);
       });
@@ -505,16 +482,16 @@
     function popBubble(btn){
       if(btn.disabled) return;
       btn.disabled=true; btn.style.opacity='.35';
-      bubbleHits += 1; bubbleCount.textContent = bubbleHits;
-      if(bubbleHits >= 6){
+      bubbleHits += 1; bubbleCount.textContent=bubbleHits;
+      if(bubbleHits>=6){
         gainStars(4,'Niveau terminé : +4 étoiles ⭐','bubbleFeedback');
-        bubbleHits = 0;
+        bubbleHits=0;
         setTimeout(()=>{ bubbleCount.textContent='0'; renderBubbleGame(); },900);
       }
     }
 
-    const memoryIcons = ['A','A','B','B','C','C','D','D'];
-    function shuffle(array){ return array.map(v=>({v,s:Math.random()})).sort((a,b)=>a.s-b.s).map(x=>x.v); }
+    const memoryIcons=['A','A','B','B','C','C','D','D'];
+    function shuffle(arr){ return arr.map(v=>({v,s:Math.random()})).sort((a,b)=>a.s-b.s).map(x=>x.v); }
     function renderMemory(){
       memoryGrid.innerHTML=''; memoryPairs=0; firstCard=null; lockBoard=false;
       document.getElementById('memoryPairs').textContent='0';
@@ -527,45 +504,41 @@
       });
     }
     function flipCard(card){
-      if(lockBoard || card.classList.contains('matched') || card===firstCard) return;
+      if(lockBoard||card.classList.contains('matched')||card===firstCard) return;
       card.classList.add('revealed');
-      if(!firstCard){ firstCard = card; return; }
-      if(firstCard.dataset.icon === card.dataset.icon){
+      if(!firstCard){ firstCard=card; return; }
+      if(firstCard.dataset.icon===card.dataset.icon){
         firstCard.classList.remove('revealed'); card.classList.remove('revealed');
         firstCard.classList.add('matched'); card.classList.add('matched');
-        firstCard = null; memoryPairs += 1; document.getElementById('memoryPairs').textContent = memoryPairs;
-        if(memoryPairs === 4){
+        firstCard=null; memoryPairs += 1;
+        document.getElementById('memoryPairs').textContent=memoryPairs;
+        if(memoryPairs===4){
           gainStars(6,'Niveau terminé : +6 étoiles ⭐','memoryFeedback');
           setTimeout(renderMemory,1100);
         }
       }else{
-        lockBoard = true; const previous = firstCard;
+        lockBoard=true; const previous=firstCard;
         setTimeout(()=>{ previous.classList.remove('revealed'); card.classList.remove('revealed'); firstCard=null; lockBoard=false; },700);
       }
     }
 
     let swipeActive=false,startX=0,knobStart=5;
-    swipeKnob.addEventListener('pointerdown', e=>{
-      swipeActive=true; startX=e.clientX; knobStart=parseFloat(swipeKnob.style.left||'5'); swipeKnob.setPointerCapture(e.pointerId);
-    });
-    swipeKnob.addEventListener('pointermove', e=>{
+    swipeKnob.addEventListener('pointerdown',e=>{ swipeActive=true; startX=e.clientX; knobStart=parseFloat(swipeKnob.style.left||'5'); swipeKnob.setPointerCapture(e.pointerId); });
+    swipeKnob.addEventListener('pointermove',e=>{
       if(!swipeActive) return;
-      const max = swipeTrack.clientWidth - swipeKnob.clientWidth - 5;
-      let next = knobStart + (e.clientX - startX);
+      const max=swipeTrack.clientWidth-swipeKnob.clientWidth-5;
+      let next=knobStart+(e.clientX-startX);
       if(next<5) next=5;
       if(next>max) next=max;
-      swipeKnob.style.left = next + 'px';
-      if(next >= max - 2){ swipeActive=false; gainStars(5,'Niveau terminé : +5 étoiles ⭐','swipeFeedback'); setTimeout(()=>swipeKnob.style.left='5px',700); }
+      swipeKnob.style.left=next+'px';
+      if(next>=max-2){ swipeActive=false; gainStars(5,'Niveau terminé : +5 étoiles ⭐','swipeFeedback'); setTimeout(()=>swipeKnob.style.left='5px',700); }
     });
-    swipeKnob.addEventListener('pointerup', ()=>{
-      if(!swipeActive) return;
-      swipeActive=false; swipeKnob.style.left='5px';
-    });
+    swipeKnob.addEventListener('pointerup',()=>{ if(!swipeActive) return; swipeActive=false; swipeKnob.style.left='5px'; });
 
-    let sequencePattern = [], sequenceInput = [];
+    let sequencePattern=[], sequenceInput=[];
     function initSequenceGame(){
       sequenceBoard.innerHTML='';
-      const colors = ['#ffd36f','#ff9db3','#9be0a2','#8ec5ff'];
+      const colors=['#ffd36f','#ff9db3','#9be0a2','#8ec5ff'];
       colors.forEach((c,i)=>{
         const btn=document.createElement('button');
         btn.className='bubble'; btn.style.background=c; btn.textContent='';
@@ -575,36 +548,36 @@
       newSequenceRound();
     }
     function newSequenceRound(){
-      sequencePattern = [Math.floor(Math.random()*4), Math.floor(Math.random()*4), Math.floor(Math.random()*4)];
-      sequenceInput = [];
-      setFeedback('sequenceFeedback','Séquence : ' + sequencePattern.map(n=>n+1).join(' - '), true);
+      sequencePattern=[Math.floor(Math.random()*4),Math.floor(Math.random()*4),Math.floor(Math.random()*4)];
+      sequenceInput=[];
+      setFeedback('sequenceFeedback','Séquence : '+sequencePattern.map(n=>n+1).join(' - '), true);
     }
     function pressSequence(i){
       sequenceInput.push(i);
-      const idx = sequenceInput.length - 1;
-      if(sequenceInput[idx] !== sequencePattern[idx]){
+      const idx=sequenceInput.length-1;
+      if(sequenceInput[idx]!==sequencePattern[idx]){
         setFeedback('sequenceFeedback','Mauvaise séquence. Recommence.', false);
         newSequenceRound();
         return;
       }
-      if(sequenceInput.length === sequencePattern.length){
+      if(sequenceInput.length===sequencePattern.length){
         gainStars(5,'Niveau terminé : +5 étoiles ⭐','sequenceFeedback');
         newSequenceRound();
       }
     }
 
-    let cleanCount = 0;
+    let cleanCount=0;
     function tapClean(){
       cleanCount += 1;
-      document.getElementById('cleanCount').textContent = cleanCount;
-      if(cleanCount >= 15){
+      document.getElementById('cleanCount').textContent=cleanCount;
+      if(cleanCount>=15){
         gainStars(4,'Niveau terminé : +4 étoiles ⭐','cleanFeedback');
-        cleanCount = 0;
-        document.getElementById('cleanCount').textContent = '0';
+        cleanCount=0;
+        document.getElementById('cleanCount').textContent='0';
       }
     }
 
-    let holdTimer = null, holdPct = 0;
+    let holdTimer=null, holdPct=0;
     function initHoldGame(){
       holdBtn.addEventListener('pointerdown', startHold);
       holdBtn.addEventListener('pointerup', stopHold);
@@ -613,43 +586,41 @@
     }
     function startHold(){
       clearInterval(holdTimer);
-      holdPct = 0;
-      holdProgress.textContent = '0';
-      holdTimer = setInterval(()=>{
+      holdPct=0; holdProgress.textContent='0';
+      holdTimer=setInterval(()=>{
         holdPct += 4;
-        holdProgress.textContent = holdPct;
-        if(holdPct >= 100){
+        holdProgress.textContent=holdPct;
+        if(holdPct>=100){
           clearInterval(holdTimer);
           gainStars(5,'Niveau terminé : +5 étoiles ⭐','holdFeedback');
-          holdPct = 0;
-          holdProgress.textContent = '0';
+          holdPct=0; holdProgress.textContent='0';
         }
       },120);
     }
     function stopHold(){
-      if(holdPct < 100){
+      if(holdPct<100){
         clearInterval(holdTimer);
-        holdPct = 0;
-        holdProgress.textContent = '0';
+        holdPct=0;
+        holdProgress.textContent='0';
       }
     }
 
-    let starFound = 0;
+    let starFound=0;
     function initStarGame(){
       starBoard.innerHTML='';
       starFound=0;
       for(let i=0;i<9;i++){
         const btn=document.createElement('button');
         btn.className='bubble';
-        const isStar = i < 5;
-        btn.textContent = isStar ? '✦' : '•';
-        btn.style.opacity = '0.18';
+        const isStar=i<5;
+        btn.textContent=isStar?'✦':'•';
+        btn.style.opacity='0.18';
         btn.onclick=()=>{
           if(isStar && !btn.disabled){
             btn.disabled=true;
             btn.style.opacity='1';
             starFound += 1;
-            if(starFound >= 5){
+            if(starFound>=5){
               gainStars(6,'Niveau terminé : +6 étoiles ⭐','starFeedback');
               initStarGame();
             }
@@ -663,85 +634,75 @@
     }
 
     function imageTag(itemId, cls='shop-preview'){ return `<img class="${cls}" src="${itemImages[itemId]}" alt="">`; }
-
     function renderShop(){
       shopList.innerHTML='';
       shopItems.forEach(item=>{
         const article=document.createElement('div');
         article.className='shop-item';
-        article.innerHTML = `
-          <div class="shop-icon">${imageTag(item.id)}</div>
-          <h4>${item.name}</h4>
-          <p>${item.desc}</p>
-          <div class="shop-actions">
-            <button class="shop-action buy" ${item.owned?'disabled':''} data-id="${item.id}">${item.owned?'Acheté':'Acheter ⭐ '+item.cost}</button>
-            ${item.owned?'<span class="owned-badge">✔ Possédé</span>':''}
-          </div>`;
-        const b = article.querySelector('[data-id]');
-        b.addEventListener('click', ()=>buyDecoration(item.id));
+        article.innerHTML=`<div class="shop-icon">${imageTag(item.id)}</div><h4>${item.name}</h4><p>${item.desc}</p><div class="shop-actions"><button class="shop-action buy" ${item.owned?'disabled':''} data-id="${item.id}">${item.owned?'Acheté':'Acheter ⭐ '+item.cost}</button>${item.owned?'<span class="owned-badge">✔ Possédé</span>':''}</div>`;
+        article.querySelector('[data-id]').addEventListener('click',()=>buyDecoration(item.id));
         shopList.appendChild(article);
       });
     }
-
     function buyDecoration(id){
-      const item = shopItems.find(x=>x.id===id);
+      const item=shopItems.find(x=>x.id===id);
       if(!item) return;
-      if(item.owned){ setFeedback('shopFeedback','Cet objet est déjà acheté.',false); return; }
-      if(stars < item.cost){ setFeedback('shopFeedback','Tu n’as pas assez d’étoiles.',false); return; }
-      stars -= item.cost; item.owned=true; updateStars(); renderShop(); renderPalette();
+      if(item.owned){ setFeedback('shopFeedback','Cet objet est déjà acheté.', false); return; }
+      if(stars<item.cost){ setFeedback('shopFeedback','Tu n’as pas assez d’étoiles.', false); return; }
+      stars -= item.cost;
+      item.owned=true;
+      updateStars();
+      renderShop();
+      renderPalette();
       setFeedback('shopFeedback', `${item.name} acheté. Va dans Placer pour le poser.`, true);
       saveGame();
     }
-
     function renderPalette(){
       paletteList.innerHTML='';
-      const owned = shopItems.filter(i=>i.owned);
+      const owned=shopItems.filter(i=>i.owned);
       if(!owned.length){
-        paletteList.innerHTML = '<div class="hint-bar">Achète d’abord un objet dans Boutique.</div>';
+        paletteList.innerHTML='<div class="hint-bar">Achète d’abord un objet dans Boutique.</div>';
         placementStatus.textContent='Aucun';
         return;
       }
       owned.forEach(item=>{
         const btn=document.createElement('button');
         btn.className='palette-btn'+(selectedPaletteId===item.id?' active':'');
-        btn.innerHTML = `${imageTag(item.id,'palette-thumb')}<div style="margin-top:4px">${item.name}</div><div class="tiny">Poser</div>`;
+        btn.innerHTML=`${imageTag(item.id,'palette-thumb')}<div style="margin-top:4px">${item.name}</div><div class="tiny">Poser</div>`;
         btn.onclick=()=>{ selectedPaletteId=item.id; renderPalette(); saveGame(); };
         paletteList.appendChild(btn);
       });
-      placementStatus.textContent = selectedPaletteId ? (shopItems.find(i=>i.id===selectedPaletteId)?.name || 'Aucun') : 'Aucun';
+      placementStatus.textContent=selectedPaletteId?(shopItems.find(i=>i.id===selectedPaletteId)?.name||'Aucun'):'Aucun';
     }
 
     function makeTexture(itemId){
-      const img = new Image();
-      img.src = itemImages[itemId];
-      const tex = new THREE.Texture(img);
-      img.onload = () => { tex.needsUpdate = true; };
+      const img=new Image();
+      img.src=itemImages[itemId];
+      const tex=new THREE.Texture(img);
+      img.onload=()=>{ tex.needsUpdate=true; };
       return tex;
     }
-
     function createItemMesh(item){
-      const tex = makeTexture(item.itemId);
-      const geo = new THREE.PlaneGeometry(1.2,1.2);
-      const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true });
-      const mesh = new THREE.Mesh(geo, mat);
-      mesh.position.set(item.x, 0.7, item.z);
-      mesh.userData.id = item.placedId;
+      const tex=makeTexture(item.itemId);
+      const geo=new THREE.PlaneGeometry(1.2,1.2);
+      const mat=new THREE.MeshBasicMaterial({map:tex, transparent:true});
+      const mesh=new THREE.Mesh(geo,mat);
+      mesh.position.set(item.x,0.7,item.z);
+      mesh.userData.id=item.placedId;
       scene.add(mesh);
-      placedMeshes[item.placedId] = mesh;
+      placedMeshes[item.placedId]=mesh;
     }
-
     function renderPlacedMeshes(){
-      Object.values(placedMeshes).forEach(m => scene.remove(m));
+      Object.values(placedMeshes).forEach(m=>scene.remove(m));
       for(const k in placedMeshes) delete placedMeshes[k];
       placedItems.forEach(createItemMesh);
       updatePlacedCount();
     }
-
     function addPlaced3D(x,z){
       if(!selectedPaletteId){ setFeedback('shopFeedback','Choisis un meuble dans Placer.', false); return; }
-      const item = shopItems.find(i=>i.id===selectedPaletteId && i.owned);
+      const item=shopItems.find(i=>i.id===selectedPaletteId && i.owned);
       if(!item) return;
-      const placed = { placedId:'p'+(++placedCounter)+'_'+Date.now(), itemId:item.id, name:item.name, x, z };
+      const placed={ placedId:'p'+(++placedCounter)+'_'+Date.now(), itemId:item.id, name:item.name, x, z };
       placedItems.push(placed);
       createItemMesh(placed);
       updatePlacedCount();
@@ -750,128 +711,94 @@
     }
 
     function init3D(){
-      scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xfdf4ec);
-      camera3d = new THREE.PerspectiveCamera(55, sceneEl.clientWidth / sceneEl.clientHeight, 0.1, 100);
-      camera3d.position.set(0, 6, 8);
+      scene=new THREE.Scene();
+      scene.background=new THREE.Color(0xfdf4ec);
+      camera3d=new THREE.PerspectiveCamera(55, sceneEl.clientWidth/sceneEl.clientHeight, 0.1, 100);
+      camera3d.position.set(0,6,8);
 
-      renderer = new THREE.WebGLRenderer({ antialias:true });
+      renderer=new THREE.WebGLRenderer({antialias:true});
       renderer.setSize(sceneEl.clientWidth, sceneEl.clientHeight);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-      sceneEl.innerHTML = '';
+      sceneEl.innerHTML='';
       sceneEl.appendChild(renderer.domElement);
 
-      controls = new THREE.OrbitControls(camera3d, renderer.domElement);
-      controls.enablePan = false;
-      controls.minDistance = 5;
-      controls.maxDistance = 12;
-      controls.maxPolarAngle = Math.PI / 2.1;
+      controls=new THREE.OrbitControls(camera3d, renderer.domElement);
+      controls.enablePan=false;
+      controls.minDistance=5;
+      controls.maxDistance=12;
+      controls.maxPolarAngle=Math.PI/2.1;
       controls.target.set(0,1,0);
       controls.update();
 
-      raycaster = new THREE.Raycaster();
-      pointer = new THREE.Vector2();
+      raycaster=new THREE.Raycaster();
+      pointer=new THREE.Vector2();
 
-      const hemi = new THREE.HemisphereLight(0xffffff, 0xd9b28a, 1.15);
+      const hemi=new THREE.HemisphereLight(0xffffff,0xd9b28a,1.15);
       scene.add(hemi);
-      const dir = new THREE.DirectionalLight(0xffffff, 1.1);
+      const dir=new THREE.DirectionalLight(0xffffff,1.1);
       dir.position.set(4,8,6);
       scene.add(dir);
 
-      floorMesh = new THREE.Mesh(
-        new THREE.PlaneGeometry(12,12),
-        new THREE.MeshStandardMaterial({ color:0xd2a174 })
-      );
-      floorMesh.rotation.x = -Math.PI/2;
+      floorMesh=new THREE.Mesh(new THREE.PlaneGeometry(12,12), new THREE.MeshStandardMaterial({color:0xd2a174}));
+      floorMesh.rotation.x=-Math.PI/2;
       scene.add(floorMesh);
 
-      const wallMat = new THREE.MeshStandardMaterial({ color:0xfff2e8 });
-      const backWall = new THREE.Mesh(new THREE.PlaneGeometry(12,6), wallMat);
+      const wallMat=new THREE.MeshStandardMaterial({color:0xfff2e8});
+      const backWall=new THREE.Mesh(new THREE.PlaneGeometry(12,6), wallMat);
       backWall.position.set(0,3,-6);
       scene.add(backWall);
 
-      const leftWall = new THREE.Mesh(new THREE.PlaneGeometry(12,6), wallMat);
-      leftWall.position.set(-6,3,0);
-      leftWall.rotation.y = Math.PI/2;
+      const leftWall=new THREE.Mesh(new THREE.PlaneGeometry(12,6), wallMat);
+      leftWall.position.set(-6,3,0); leftWall.rotation.y=Math.PI/2;
       scene.add(leftWall);
 
-      const rightWall = new THREE.Mesh(new THREE.PlaneGeometry(12,6), wallMat);
-      rightWall.position.set(6,3,0);
-      rightWall.rotation.y = -Math.PI/2;
+      const rightWall=new THREE.Mesh(new THREE.PlaneGeometry(12,6), wallMat);
+      rightWall.position.set(6,3,0); rightWall.rotation.y=-Math.PI/2;
       scene.add(rightWall);
 
-      const rug = new THREE.Mesh(
-        new THREE.PlaneGeometry(3.5,2),
-        new THREE.MeshStandardMaterial({ color:0xf1b394 })
-      );
-      rug.rotation.x = -Math.PI/2;
-      rug.position.set(0,0.01,0.5);
+      const rug=new THREE.Mesh(new THREE.PlaneGeometry(3.5,2), new THREE.MeshStandardMaterial({color:0xf1b394}));
+      rug.rotation.x=-Math.PI/2; rug.position.set(0,0.01,0.5);
       scene.add(rug);
 
-      const sofa = new THREE.Mesh(
-        new THREE.BoxGeometry(3,1.1,1.2),
-        new THREE.MeshStandardMaterial({ color:0xefb39d })
-      );
-      sofa.position.set(0,0.55,2.8);
-      scene.add(sofa);
+      const sofa=new THREE.Mesh(new THREE.BoxGeometry(3,1.1,1.2), new THREE.MeshStandardMaterial({color:0xefb39d}));
+      sofa.position.set(0,0.55,2.8); scene.add(sofa);
 
-      const table = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.8,0.8,0.2,24),
-        new THREE.MeshStandardMaterial({ color:0xe9d3b8 })
-      );
-      table.position.set(0,0.6,0.8);
-      scene.add(table);
+      const table=new THREE.Mesh(new THREE.CylinderGeometry(0.8,0.8,0.2,24), new THREE.MeshStandardMaterial({color:0xe9d3b8}));
+      table.position.set(0,0.6,0.8); scene.add(table);
 
-      const plant = new THREE.Mesh(
-        new THREE.SphereGeometry(0.55,18,18),
-        new THREE.MeshStandardMaterial({ color:0x6eb679 })
-      );
-      plant.position.set(-3.7,1.2,2.6);
-      scene.add(plant);
+      const plant=new THREE.Mesh(new THREE.SphereGeometry(0.55,18,18), new THREE.MeshStandardMaterial({color:0x6eb679}));
+      plant.position.set(-3.7,1.2,2.6); scene.add(plant);
 
-      const pot = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.35,0.45,0.55,16),
-        new THREE.MeshStandardMaterial({ color:0xba7c56 })
-      );
-      pot.position.set(-3.7,0.3,2.6);
-      scene.add(pot);
+      const pot=new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.45,0.55,16), new THREE.MeshStandardMaterial({color:0xba7c56}));
+      pot.position.set(-3.7,0.3,2.6); scene.add(pot);
 
-      const frame = new THREE.Mesh(
-        new THREE.PlaneGeometry(1.8,1.2),
-        new THREE.MeshStandardMaterial({ color:0xffffff })
-      );
-      frame.position.set(0,3,-5.95);
-      scene.add(frame);
+      const frame=new THREE.Mesh(new THREE.PlaneGeometry(1.8,1.2), new THREE.MeshStandardMaterial({color:0xffffff}));
+      frame.position.set(0,3,-5.95); scene.add(frame);
 
       sceneEl.addEventListener('click', onSceneClick);
       window.addEventListener('resize', onResize);
 
       function animate(){
         requestAnimationFrame(animate);
-        renderer.render(scene, camera3d);
+        renderer.render(scene,camera3d);
       }
       animate();
     }
-
     function onSceneClick(e){
       if(!selectedPaletteId || !floorMesh) return;
-      const rect = sceneEl.getBoundingClientRect();
-      pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-      raycaster.setFromCamera(pointer, camera3d);
-      const hits = raycaster.intersectObject(floorMesh);
+      const rect=sceneEl.getBoundingClientRect();
+      pointer.x=((e.clientX-rect.left)/rect.width)*2-1;
+      pointer.y=-((e.clientY-rect.top)/rect.height)*2+1;
+      raycaster.setFromCamera(pointer,camera3d);
+      const hits=raycaster.intersectObject(floorMesh);
       if(hits.length){
-        const p = hits[0].point;
-        addPlaced3D(
-          Math.max(-5, Math.min(5, p.x)),
-          Math.max(-5, Math.min(5, p.z))
-        );
+        const p=hits[0].point;
+        addPlaced3D(Math.max(-5,Math.min(5,p.x)), Math.max(-5,Math.min(5,p.z)));
       }
     }
-
     function onResize(){
       if(!renderer || !camera3d) return;
-      camera3d.aspect = sceneEl.clientWidth / sceneEl.clientHeight;
+      camera3d.aspect=sceneEl.clientWidth/sceneEl.clientHeight;
       camera3d.updateProjectionMatrix();
       renderer.setSize(sceneEl.clientWidth, sceneEl.clientHeight);
     }
