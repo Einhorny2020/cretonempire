@@ -3,478 +3,800 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Étoiles & Maison 3D — V4</title>
+  <title>Étoiles & Maison — V5 intérieur libre</title>
   <style>
-    :root {
-      --bg: #fff8f2;
-      --card: rgba(255,255,255,0.92);
-      --text: #312727;
-      --muted: #7b6b6a;
-      --primary: #ff946f;
-      --primary-strong: #ff6f47;
-      --accent: #ffd86b;
-      --shadow: 0 14px 34px rgba(82, 50, 45, 0.14);
-      --radius: 22px;
+    :root{
+      --bg:#fff8f2;
+      --card:rgba(255,255,255,.94);
+      --text:#2f2524;
+      --muted:#7f6d6a;
+      --primary:#ff946f;
+      --primary-strong:#ff6f47;
+      --accent:#ffd86b;
+      --ok:#2f9150;
+      --bad:#d25757;
+      --shadow:0 14px 34px rgba(82,50,45,.14);
+      --radius:22px;
+      --ui-h:116px;
     }
-    * { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; }
-    body {
-      min-height: 100vh;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text);
-      background: radial-gradient(circle at top, #fffdf9 0%, #fff7ef 35%, #fdf2fb 100%);
-      overflow-x: hidden;
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;height:100%}
+    body{
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--text);
+      background:radial-gradient(circle at top,#fffdf9 0%,#fff7ef 35%,#fdf2fb 100%);
+      overflow:hidden;
     }
-    button, input { font: inherit; }
-    .app { max-width: 620px; margin: 0 auto; padding: 14px 14px 120px; }
-    .topbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
-    .brand { display:flex; align-items:center; gap:12px; }
-    .logo {
-      width:54px; height:54px; border-radius:18px; display:grid; place-items:center; font-size:28px;
-      background:linear-gradient(135deg, var(--primary), var(--accent)); box-shadow:var(--shadow);
+    button,input,select{font:inherit}
+    .hidden{display:none!important}
+
+    .screen{
+      width:100%;
+      min-height:100dvh;
     }
-    .brand h1 { margin:0; font-size:1.08rem; line-height:1.1; }
-    .brand p { margin:4px 0 0; color:var(--muted); font-size:.84rem; }
-    .stars-badge {
-      display:flex; align-items:center; gap:8px; padding:10px 14px; border-radius:999px;
-      background:rgba(255,255,255,.95); box-shadow:var(--shadow); font-weight:800; white-space:nowrap;
+
+    .menu{
+      padding:20px 16px 32px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      text-align:center;
+      gap:14px;
+      min-height:100dvh;
     }
-    .hero, .card, .profile-card, .daily-card {
-      background: var(--card); backdrop-filter: blur(10px); border-radius:24px; box-shadow:var(--shadow);
+    .menu-card{
+      width:min(100%,540px);
+      background:var(--card);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      padding:22px 18px;
     }
-    .hero {
-      padding:18px; margin-bottom:16px; position:relative; overflow:hidden;
-      background:linear-gradient(145deg, rgba(255,255,255,.92), rgba(255,237,227,.92));
+    .logo{
+      width:72px;height:72px;border-radius:22px;margin:0 auto 14px;
+      display:grid;place-items:center;font-size:36px;
+      background:linear-gradient(135deg,var(--primary),var(--accent));
+      box-shadow:var(--shadow);
     }
-    .hero::after {
-      content:""; position:absolute; right:-32px; top:-32px; width:140px; height:140px; border-radius:50%;
-      background:radial-gradient(circle, rgba(255,255,255,.85) 0%, rgba(255,255,255,0) 72%);
+    h1,h2,h3,h4,p{margin:0}
+    .menu h1{font-size:1.7rem;line-height:1.04;margin-bottom:8px}
+    .menu p{color:var(--muted);line-height:1.45}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 12px;border-radius:999px;
+      background:#fff2e9;color:var(--primary-strong);
+      font-weight:800;font-size:.8rem;margin-bottom:12px;
     }
-    .pill {
-      display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,.78); color:var(--primary-strong);
-      padding:8px 12px; border-radius:999px; font-size:.78rem; font-weight:800; margin-bottom:12px;
+    .menu-actions{
+      display:grid;grid-template-columns:1fr;gap:10px;margin-top:16px;
     }
-    .hero h2 { margin:0 0 10px; font-size:1.6rem; line-height:1.05; }
-    .hero p { margin:0; color:var(--muted); line-height:1.48; }
-    .hero-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:16px; }
-    .btn-primary, .btn-secondary, .mini-btn, .shop-action {
-      border:0; border-radius:16px; padding:13px 14px; font-weight:800; cursor:pointer;
-      transition:transform .18s ease, opacity .18s ease;
+    .btn{
+      border:0;border-radius:18px;padding:14px 16px;font-weight:800;cursor:pointer;
+      transition:transform .18s ease,opacity .18s ease;
     }
-    .btn-primary:active, .btn-secondary:active, .mini-btn:active, .shop-action:active { transform:scale(.98); }
-    .btn-primary { color:#fff; background:linear-gradient(135deg, var(--primary), var(--primary-strong)); box-shadow:var(--shadow); }
-    .btn-secondary { color:var(--text); background:#fff; box-shadow:var(--shadow); }
-    .mini-btn { background:#fff4ec; color:var(--text); }
-    .section-title { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:16px 2px 10px; }
-    .section-title h3 { margin:0; font-size:1rem; }
-    .section-title span { color:var(--muted); font-size:.82rem; text-align:right; }
-    .daily-card {
-      padding:14px; margin-bottom:14px; display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center;
+    .btn:active{transform:scale(.98)}
+    .btn-primary{color:#fff;background:linear-gradient(135deg,var(--primary),var(--primary-strong));box-shadow:var(--shadow)}
+    .btn-secondary{background:#fff;color:var(--text);box-shadow:var(--shadow)}
+
+    /* GAME */
+    #gameScreen{
+      display:grid;
+      grid-template-rows:auto 1fr auto;
+      height:100dvh;
+      overflow:hidden;
     }
-    .daily-card h4 { margin:0 0 4px; font-size:.96rem; }
-    .daily-card p, .small { margin:0; color:var(--muted); font-size:.86rem; line-height:1.45; }
-    .reward-chip {
-      background:#fff4c8; color:#8c6a00; border-radius:999px; padding:8px 12px; font-weight:800; font-size:.82rem;
+    .topbar{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      padding:10px 12px;
+      background:rgba(255,255,255,.9);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid rgba(0,0,0,.05);
+      z-index:40;
     }
-    .inside-layout { display:grid; gap:12px; }
-    .inside-stage, .level-game-card, .shop-panel { padding:14px; }
-    .inside-shell { display:grid; grid-template-columns:1fr 110px; gap:10px; align-items:start; }
-    .inside-room {
-      min-height:380px; border-radius:24px; position:relative; overflow:hidden;
-      background:linear-gradient(180deg, #fffaf6 0%, #fff2ea 100%);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.7);
+    .brand{
+      display:flex;align-items:center;gap:10px;min-width:0;
     }
-    .wall-top { position:absolute; inset:0 0 90px 0; background:linear-gradient(180deg, #fff8f2, #ffeede); }
-    .floor { position:absolute; left:0; right:0; bottom:0; height:95px; background:linear-gradient(180deg, #d9b28a, #b98559); }
-    .window-room {
-      position:absolute; top:34px; left:24px; width:88px; height:112px; border-radius:18px;
-      background:linear-gradient(180deg, #d9f1ff, #eefaff); border:8px solid #f3d9c8;
+    .brand-badge{
+      width:44px;height:44px;border-radius:16px;display:grid;place-items:center;font-size:24px;
+      background:linear-gradient(135deg,var(--primary),var(--accent));
     }
-    .window-room::before, .window-room::after { content:""; position:absolute; background:rgba(255,255,255,.65); }
-    .window-room::before { width:6px; height:100%; left:50%; top:0; transform:translateX(-50%); }
-    .window-room::after { height:6px; width:100%; left:0; top:50%; transform:translateY(-50%); }
-    .room-title {
-      position:absolute; left:16px; bottom:106px; padding:8px 12px; border-radius:999px;
-      background:rgba(255,255,255,.88); font-size:.82rem; font-weight:800; color:var(--primary-strong);
+    .brand-text h2{font-size:1rem;line-height:1.1}
+    .brand-text p{font-size:.78rem;color:var(--muted)}
+    .stats{
+      display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;
     }
-    .decor { position:absolute; transition:all .25s ease; }
-    .sofa {
-      left:130px; bottom:70px; width:120px; height:56px; background:#efb39d;
-      border-radius:20px 20px 14px 14px; box-shadow:0 10px 20px rgba(0,0,0,.08);
+    .stat-pill{
+      background:#fff;border-radius:999px;padding:9px 12px;font-weight:800;font-size:.84rem;
+      box-shadow:var(--shadow);
+      white-space:nowrap;
     }
-    .sofa::before, .sofa::after {
-      content:""; position:absolute; bottom:42px; width:46px; height:28px; background:#f3c0ad; border-radius:16px 16px 8px 8px;
+
+    .game-wrap{
+      position:relative;
+      overflow:hidden;
+      background:linear-gradient(180deg,#fff9f4,#fff0e6);
     }
-    .sofa::before { left:8px; }
-    .sofa::after { right:8px; }
-    .table-room {
-      left:144px; bottom:36px; width:92px; height:20px; background:#e9d3b8; border-radius:999px;
+    #camera{
+      position:absolute;inset:0;overflow:hidden;
+      touch-action:none;
     }
-    .table-room::before {
-      content:""; position:absolute; left:50%; top:16px; transform:translateX(-50%); width:10px; height:28px;
-      background:#b98b63; border-radius:999px;
+    #world{
+      position:absolute;
+      width:2200px;
+      height:1600px;
+      transform-origin:0 0;
+      background:
+        linear-gradient(180deg,#fff8f2 0 72%, #ca9a6b 72% 100%);
     }
-    .plant-room {
-      right:24px; bottom:80px; width:36px; height:46px; background:#d39b72; border-radius:0 0 16px 16px;
+
+    .wall-art{
+      position:absolute;background:#fff;border-radius:22px;box-shadow:var(--shadow);
     }
-    .plant-room::before {
-      content:""; position:absolute; left:-10px; top:-34px; width:56px; height:44px; background:#79c687; border-radius:50% 50% 44% 44%;
+    .window-room{
+      position:absolute;left:120px;top:120px;width:160px;height:180px;border-radius:24px;
+      background:linear-gradient(180deg,#d9f1ff,#eefaff);
+      border:12px solid #f3d9c8;
+      box-shadow:var(--shadow);
     }
-    .lamp-room {
-      right:72px; bottom:80px; width:8px; height:88px; background:#8e6a56; border-radius:999px;
+    .window-room::before,.window-room::after{
+      content:"";position:absolute;background:rgba(255,255,255,.65);
     }
-    .lamp-room::before {
-      content:""; position:absolute; left:-12px; top:-18px; width:32px; height:22px; background:#ffe5a0; border-radius:16px 16px 8px 8px;
-      box-shadow:0 0 20px rgba(255,216,107,.35);
+    .window-room::before{width:8px;height:100%;left:50%;top:0;transform:translateX(-50%)}
+    .window-room::after{height:8px;width:100%;left:0;top:50%;transform:translateY(-50%)}
+
+    .floor-rug-base{
+      position:absolute;left:680px;top:1080px;width:420px;height:150px;border-radius:999px;
+      background:linear-gradient(135deg,#f6d0bb,#efb393);
+      opacity:.55;
     }
-    .flowers-room {
-      left:110px; bottom:94px; width:120px; height:36px; pointer-events:none;
+    .label-room{
+      position:absolute;left:28px;top:28px;padding:10px 14px;border-radius:999px;background:#fff;
+      color:var(--primary-strong);font-weight:800;box-shadow:var(--shadow);
     }
-    .flowers-room::before {
-      content:"🌷 🌸 🌷 🌸"; position:absolute; inset:0; font-size:24px; letter-spacing:2px;
+
+    .placed{
+      position:absolute;
+      user-select:none;
+      -webkit-user-select:none;
+      touch-action:none;
+      cursor:grab;
+      transform:translate(-50%,-50%);
+      display:grid;place-items:center;
+      text-align:center;
+      line-height:1;
     }
-    .shelf-room {
-      right:26px; top:54px; width:68px; height:10px; background:#c79a72; border-radius:999px;
+    .placed.selected{
+      outline:3px solid var(--primary-strong);
+      outline-offset:4px;
+      border-radius:18px;
     }
-    .shelf-room::before {
-      content:"🕯️  📚  🪴"; position:absolute; left:-6px; bottom:8px; font-size:20px;
+    .item-emoji{font-size:44px}
+    .item-label{
+      margin-top:2px;
+      font-size:.6rem;
+      font-weight:800;
+      background:rgba(255,255,255,.82);
+      padding:3px 6px;
+      border-radius:999px;
     }
-    .rug-room {
-      left:118px; bottom:14px; width:145px; height:48px; background:linear-gradient(135deg, #f6d0bb, #efb393);
-      border-radius:999px; opacity:.95;
+
+    #player{
+      position:absolute;
+      width:72px;height:96px;
+      transform:translate(-50%,-50%);
+      z-index:20;
+      pointer-events:none;
     }
-    .hidden-decor { display:none; }
-    .level-panel { display:grid; gap:8px; }
-    .level-btn {
-      border:0; border-radius:18px; padding:12px 8px; background:rgba(255,255,255,.9); box-shadow:var(--shadow);
-      font-weight:800; color:var(--text); cursor:pointer;
+    .player-shadow{
+      position:absolute;left:50%;bottom:4px;transform:translateX(-50%);
+      width:44px;height:14px;border-radius:50%;background:rgba(0,0,0,.12);
     }
-    .level-btn.active {
-      background:linear-gradient(135deg, #ffe7db, #fff4e5); color:var(--primary-strong); box-shadow:inset 0 0 0 1px #ffd2bf, var(--shadow);
+    .player-body{
+      position:absolute;left:50%;bottom:12px;transform:translateX(-50%);
+      width:44px;height:58px;border-radius:18px 18px 14px 14px;
+      background:var(--outfit-top,#8ec5ff);
+      border:3px solid rgba(0,0,0,.05);
     }
-    .level-btn small { display:block; margin-top:4px; color:var(--muted); font-size:.72rem; font-weight:700; }
-    .progress-chip {
-      display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:#fff2e9;
-      color:var(--primary-strong); font-size:.8rem; font-weight:800; margin-bottom:10px;
+    .player-bottom{
+      position:absolute;left:50%;bottom:2px;transform:translateX(-50%);
+      width:38px;height:22px;border-radius:10px;background:var(--outfit-bottom,#8b6cff);
     }
-    .house-meta { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px; }
-    .stat { background:rgba(255,255,255,.68); border-radius:16px; padding:12px; text-align:center; }
-    .stat strong { display:block; font-size:1rem; margin-bottom:4px; }
-    .stat span { color:var(--muted); font-size:.78rem; }
-    .game-zone { margin-top:12px; padding-top:12px; }
-    .letters { display:flex; gap:8px; flex-wrap:wrap; margin:12px 0; }
-    .letter {
-      width:42px; height:42px; display:grid; place-items:center; border-radius:14px; background:#fff5ee;
-      box-shadow:inset 0 0 0 1px #f2dfd2; font-weight:800;
+    .player-head{
+      position:absolute;left:50%;top:4px;transform:translateX(-50%);
+      width:42px;height:42px;border-radius:50%;background:var(--skin,#ffd4b8);
+      box-shadow:0 4px 0 rgba(0,0,0,.04) inset;
     }
-    .answer-row { display:flex; gap:10px; }
-    .answer-row input, .profile-card input {
-      flex:1; min-width:0; border:0; background:#fff4ec; border-radius:14px; padding:13px 14px; color:var(--text); outline:none;
+    .player-hat{
+      position:absolute;left:50%;top:-2px;transform:translateX(-50%);
+      width:48px;height:16px;border-radius:16px 16px 8px 8px;background:var(--hat,#f6b0a6);
     }
-    .feedback { min-height:20px; margin-top:10px; font-size:.88rem; font-weight:800; }
-    .feedback.ok { color:#2f9150; }
-    .feedback.bad { color:#d25757; }
-    .tap-board { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:12px; }
-    .bubble {
-      aspect-ratio:1; border-radius:18px; border:0; background:linear-gradient(135deg, #f7e9ff, #fff1e8);
-      box-shadow:inset 0 0 0 1px rgba(255,255,255,.7), var(--shadow); font-size:1.3rem; font-weight:800;
+    .player-accessory{
+      position:absolute;left:50%;top:22px;transform:translateX(-50%);
+      font-size:14px;line-height:1;
     }
-    .memory-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:12px; }
-    .memory-card {
-      aspect-ratio:1; border:0; border-radius:16px; background:linear-gradient(135deg, #fff1e7, #fff8f0);
-      box-shadow:inset 0 0 0 1px #f1ddd1; font-size:1.2rem; font-weight:800; color:transparent;
+
+    .right-panel{
+      position:absolute;
+      right:10px;top:10px;
+      width:124px;
+      display:grid;gap:8px;
+      z-index:35;
     }
-    .memory-card.revealed, .memory-card.matched { color:var(--text); background:linear-gradient(135deg, #eefdeb, #fff6e9); }
-    .hidden { display:none !important; }
-    .swipe-track {
-      margin-top:12px; height:52px; border-radius:999px; background:linear-gradient(135deg, #fff3eb, #fff9f3); position:relative;
-      box-shadow:inset 0 0 0 1px #f2dfd4; overflow:hidden;
+    .panel-card{
+      background:rgba(255,255,255,.94);
+      backdrop-filter:blur(10px);
+      border-radius:18px;
+      box-shadow:var(--shadow);
+      padding:10px;
     }
-    .swipe-knob {
-      position:absolute; left:6px; top:6px; width:40px; height:40px; border-radius:50%;
-      background:linear-gradient(135deg, var(--primary), var(--primary-strong)); box-shadow:var(--shadow); touch-action:none;
+    .panel-card h4{
+      font-size:.82rem;margin-bottom:8px;
     }
-    .swipe-label {
-      position:absolute; inset:0; display:grid; place-items:center; font-size:.86rem; font-weight:800; color:var(--muted); pointer-events:none;
+    .level-btn{
+      width:100%;border:0;border-radius:14px;padding:10px 8px;margin-bottom:6px;
+      background:#fff4ec;color:var(--text);font-weight:800;cursor:pointer;
     }
-    .shop-list { display:grid; gap:10px; }
-    .shop-item {
-      display:grid; grid-template-columns:54px 1fr; gap:10px; align-items:center; background:#fff8f2; border-radius:18px; padding:10px;
+    .level-btn.active{background:linear-gradient(135deg,#ffe7db,#fff4e5);color:var(--primary-strong)}
+    .level-btn:last-child{margin-bottom:0}
+
+    .minigame{
+      position:absolute;
+      left:12px;right:146px;top:10px;
+      background:rgba(255,255,255,.95);
+      backdrop-filter:blur(12px);
+      border-radius:20px;
+      box-shadow:var(--shadow);
+      padding:12px;
+      z-index:34;
+      max-height:44%;
+      overflow:auto;
     }
-    .shop-icon {
-      width:54px; height:54px; display:grid; place-items:center; border-radius:16px; background:linear-gradient(135deg, #fff0e5, #ffe1cf); font-size:1.4rem;
+    .mini-head{
+      display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;
     }
-    .shop-item h4 { margin:0 0 4px; font-size:.95rem; }
-    .shop-item p { margin:0; color:var(--muted); font-size:.82rem; line-height:1.35; }
-    .shop-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
-    .shop-action.buy { background:#fff7d9; color:#886500; }
-    .shop-action.place { background:#eaf9ee; color:#2f9150; }
-    .shop-action:disabled { opacity:.45; cursor:not-allowed; }
-    .owned-badge {
-      display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:#eef9f1; color:#2f9150;
-      font-size:.76rem; font-weight:800;
+    .mini-head h4{font-size:.95rem}
+    .feedback{font-size:.84rem;font-weight:800;min-height:20px;margin-top:8px}
+    .ok{color:var(--ok)} .bad{color:var(--bad)}
+
+    .letters{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+    .letter{
+      width:42px;height:42px;border-radius:14px;display:grid;place-items:center;
+      background:#fff5ee;box-shadow:inset 0 0 0 1px #f2dfd2;font-weight:800;
     }
-    .profile-card {
-      display:grid; grid-template-columns:72px 1fr; gap:14px; align-items:center; padding:14px;
+    .answer-row{display:flex;gap:8px}
+    .answer-row input{
+      flex:1;min-width:0;border:0;background:#fff4ec;border-radius:14px;padding:13px 14px;outline:none;color:var(--text);
     }
-    .avatar {
-      width:72px; height:72px; border-radius:22px; display:grid; place-items:center; font-size:1.8rem;
-      background:linear-gradient(135deg, #ffe4b9, #ffd0c5); box-shadow:var(--shadow);
+
+    .tap-board{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+    .bubble{
+      aspect-ratio:1;border-radius:18px;border:0;background:linear-gradient(135deg,#f7e9ff,#fff1e8);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.7), var(--shadow);font-size:1.2rem;font-weight:800;
     }
-    .bottom-nav {
-      position:fixed; left:50%; transform:translateX(-50%); bottom:12px; width:calc(100% - 24px); max-width:596px;
-      display:grid; grid-template-columns:repeat(4,1fr); gap:8px; padding:10px; background:rgba(255,255,255,.94); backdrop-filter:blur(12px);
-      border-radius:22px; box-shadow:0 14px 30px rgba(63, 42, 38, .16);
+
+    .memory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+    .memory-card{
+      aspect-ratio:1;border:0;border-radius:16px;background:linear-gradient(135deg,#fff1e7,#fff8f0);
+      box-shadow:inset 0 0 0 1px #f1ddd1;font-size:1.2rem;font-weight:800;color:transparent;
     }
-    .nav-item {
-      border:0; background:transparent; color:var(--muted); border-radius:16px; padding:10px 8px; font-size:.77rem; font-weight:800;
-      display:grid; place-items:center; gap:4px;
+    .memory-card.revealed,.memory-card.matched{color:var(--text);background:linear-gradient(135deg,#eefdeb,#fff6e9)}
+
+    .swipe-track{
+      margin-top:10px;height:52px;border-radius:999px;background:linear-gradient(135deg,#fff3eb,#fff9f3);
+      position:relative;box-shadow:inset 0 0 0 1px #f2dfd4;overflow:hidden;
     }
-    .nav-item strong { font-size:1.04rem; }
-    .nav-item.active { color:var(--primary-strong); background:#fff1e8; }
-    @media (min-width: 900px) {
-      .app { max-width:1100px; }
-      .inside-layout { grid-template-columns:1.1fr .9fr; }
-      .inside-shell { grid-template-columns:1fr 128px; }
-      .bottom-nav { max-width:1076px; }
+    .swipe-knob{
+      position:absolute;left:6px;top:6px;width:40px;height:40px;border-radius:50%;
+      background:linear-gradient(135deg,var(--primary),var(--primary-strong));box-shadow:var(--shadow);touch-action:none;
+    }
+    .swipe-label{
+      position:absolute;inset:0;display:grid;place-items:center;font-size:.86rem;font-weight:800;color:var(--muted);pointer-events:none;
+    }
+
+    .bottom-ui{
+      padding:10px 10px 12px;
+      background:rgba(255,255,255,.94);
+      backdrop-filter:blur(10px);
+      border-top:1px solid rgba(0,0,0,.06);
+      z-index:40;
+    }
+    .tabs{
+      display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;
+    }
+    .tab-btn{
+      border:0;border-radius:16px;padding:10px 8px;font-weight:800;background:#fff4ec;color:var(--text);
+    }
+    .tab-btn.active{background:linear-gradient(135deg,#ffe7db,#fff4e5);color:var(--primary-strong)}
+    .panel{
+      display:none;
+    }
+    .panel.active{display:block}
+
+    .shop-strip{
+      display:flex;gap:8px;overflow:auto;padding-bottom:4px;
+    }
+    .shop-item{
+      min-width:168px;background:#fff8f2;border-radius:18px;padding:10px;box-shadow:var(--shadow);
+    }
+    .shop-icon{
+      width:48px;height:48px;display:grid;place-items:center;border-radius:14px;
+      background:linear-gradient(135deg,#fff0e5,#ffe1cf);font-size:1.3rem;margin-bottom:6px;
+    }
+    .shop-item h4{font-size:.88rem;margin-bottom:4px}
+    .shop-item p{font-size:.76rem;color:var(--muted);line-height:1.35;margin-bottom:8px}
+    .shop-actions{display:flex;gap:6px;flex-wrap:wrap}
+    .shop-action{
+      padding:9px 10px;border-radius:12px;font-size:.76rem;
+    }
+    .buy{background:#fff7d9;color:#886500}
+    .place{background:#eaf9ee;color:#2f9150}
+    .owned-badge{
+      display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#eef9f1;color:#2f9150;
+      font-size:.72rem;font-weight:800;
+    }
+
+    .palette-strip{
+      display:flex;gap:8px;overflow:auto;padding-bottom:4px;
+    }
+    .palette-btn{
+      min-width:92px;border:0;border-radius:16px;background:#fff8f2;box-shadow:var(--shadow);
+      padding:10px 8px;font-weight:800;
+    }
+    .palette-btn.active{
+      background:linear-gradient(135deg,#ffe7db,#fff4e5);color:var(--primary-strong);
+    }
+    .palette-btn div:first-child{font-size:1.5rem;margin-bottom:4px}
+    .tiny{font-size:.7rem;color:var(--muted)}
+
+    .outfit-grid{
+      display:grid;grid-template-columns:repeat(2,1fr);gap:8px;
+    }
+    .outfit-card{
+      background:#fff8f2;border-radius:16px;padding:10px;box-shadow:var(--shadow);
+    }
+    .outfit-card label{
+      display:block;font-size:.78rem;font-weight:800;margin-bottom:6px;
+    }
+    .outfit-card select{
+      width:100%;border:0;background:#fff;border-radius:12px;padding:10px;outline:none;
+    }
+
+    .move-grid{
+      width:170px;
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      grid-template-rows:repeat(3,54px);
+      gap:6px;
+      margin:0 auto;
+    }
+    .move-btn{
+      border:0;border-radius:14px;background:#fff8f2;box-shadow:var(--shadow);font-size:1.2rem;font-weight:900;
+    }
+    .move-btn.empty{opacity:0;pointer-events:none}
+    .move-help{font-size:.76rem;color:var(--muted);text-align:center;margin-top:8px}
+
+    .hint-bar{
+      margin-top:8px;padding:10px 12px;border-radius:14px;background:#fff4ec;color:var(--text);font-size:.78rem;font-weight:800;
+    }
+
+    @media (min-width:900px){
+      .menu-actions{grid-template-columns:1fr 1fr}
+      .right-panel{width:138px}
+      .minigame{right:160px}
+      .bottom-ui{padding-left:14px;padding-right:14px}
+      .shop-item{min-width:210px}
+      .palette-btn{min-width:108px}
+      .outfit-grid{grid-template-columns:repeat(4,1fr)}
     }
   </style>
 </head>
 <body>
-  <main class="app">
+  <section id="menuScreen" class="screen menu">
+    <div class="menu-card">
+      <div class="logo">🏡</div>
+      <div class="pill">✨ V5+ • entrer dans la maison • se déplacer • poser librement</div>
+      <h1>Maison sandbox avec déco libre</h1>
+      <p>
+        Tu peux maintenant entrer dans la maison, te déplacer dedans, acheter des décorations et des meubles,
+        choisir un objet, puis le poser où tu veux. Tu peux aussi composer ta tenue.
+      </p>
+      <div class="menu-actions">
+        <button class="btn btn-primary" onclick="enterHouse()">Entrer dans la maison</button>
+        <button class="btn btn-secondary" onclick="loadSaveAndEnter()">Reprendre la partie</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="gameScreen" class="screen hidden">
     <header class="topbar">
       <div class="brand">
-        <div class="logo">🏡</div>
-        <div>
-          <h1>Étoiles & Maison 3D</h1>
-          <p>V4 — achats corrigés + pose de décorations</p>
+        <div class="brand-badge">🏠</div>
+        <div class="brand-text">
+          <h2>Maison intérieure</h2>
+          <p>Déplace-toi et pose tes objets où tu veux</p>
         </div>
       </div>
-      <div class="stars-badge"><span>⭐</span><span id="starsCount">24</span></div>
+      <div class="stats">
+        <div class="stat-pill">⭐ <span id="starsCount">24</span></div>
+        <div class="stat-pill">🪑 <span id="placedCount">0</span></div>
+      </div>
     </header>
 
-    <section class="hero">
-      <div class="pill">✨ V4 • boutique fonctionnelle + poser les décorations</div>
-      <h2>Achète une déco puis pose-la vraiment dans la maison</h2>
-      <p>
-        J’ai corrigé le problème d’achat. Maintenant, quand tu achètes une décoration, elle passe en “possédée”, puis tu peux appuyer sur “Poser” pour l’afficher dans la pièce.
-      </p>
-      <div class="hero-actions">
-        <button class="btn-primary" onclick="scrollToSection('insideSection')">Voir la maison</button>
-        <button class="btn-secondary" onclick="scrollToSection('shopSection')">Voir la boutique</button>
-      </div>
-    </section>
+    <div class="game-wrap">
+      <div id="camera">
+        <div id="world">
+          <div class="label-room">Salon détente</div>
+          <div class="window-room"></div>
+          <div class="floor-rug-base"></div>
 
-    <section class="daily-card">
-      <div>
-        <h4>Défi du jour</h4>
-        <p>Termine 3 niveaux pour acheter plus vite tes décorations.</p>
-      </div>
-      <div class="reward-chip">⭐ +10</div>
-    </section>
+          <div class="wall-art" style="left:520px; top:160px; width:150px; height:100px; display:grid; place-items:center; font-size:42px;">🖼️</div>
+          <div class="wall-art" style="left:840px; top:120px; width:190px; height:130px; display:grid; place-items:center; font-size:54px;">🌿</div>
+          <div class="wall-art" style="left:1240px; top:180px; width:170px; height:110px; display:grid; place-items:center; font-size:44px;">☀️</div>
 
-    <div class="section-title" id="insideSection">
-      <h3>Dans la maison</h3>
-      <span>Niveaux à droite + déco visible dans la pièce</span>
-    </div>
+          <div id="placedLayer"></div>
 
-    <section class="inside-layout">
-      <article class="card inside-stage">
-        <div class="inside-shell">
-          <div class="inside-room" id="insideRoom">
-            <div class="wall-top"></div>
-            <div class="floor"></div>
-            <div class="window-room"></div>
-            <div class="room-title">Salon détente</div>
-
-            <div class="decor sofa" id="decor-sofa"></div>
-            <div class="decor table-room" id="decor-table"></div>
-            <div class="decor plant-room" id="decor-plant-base"></div>
-
-            <div class="decor lamp-room hidden-decor" id="decor-lamp"></div>
-            <div class="decor flowers-room hidden-decor" id="decor-flowers"></div>
-            <div class="decor shelf-room hidden-decor" id="decor-shelf"></div>
-            <div class="decor rug-room hidden-decor" id="decor-rug"></div>
-          </div>
-
-          <div class="level-panel" id="levelsSection">
-            <button class="level-btn active" onclick="openLevel(1, this)">Niveau 1<small>Anagramme</small></button>
-            <button class="level-btn" onclick="openLevel(2, this)">Niveau 2<small>Bubble zen</small></button>
-            <button class="level-btn" onclick="openLevel(3, this)">Niveau 3<small>Mémoire</small></button>
-            <button class="level-btn" onclick="openLevel(4, this)">Niveau 4<small>Glisser relax</small></button>
+          <div id="player">
+            <div class="player-head"></div>
+            <div class="player-hat"></div>
+            <div class="player-accessory">✨</div>
+            <div class="player-body"></div>
+            <div class="player-bottom"></div>
+            <div class="player-shadow"></div>
           </div>
         </div>
-        <div class="house-meta">
-          <div class="stat"><strong id="roomCount">3</strong><span>Pièces</span></div>
-          <div class="stat"><strong id="placedCount">0</strong><span>Décos posées</span></div>
-          <div class="stat"><strong id="starsStat">24</strong><span>Étoiles</span></div>
-        </div>
-      </article>
+      </div>
 
-      <article class="card level-game-card">
-        <div class="progress-chip">🎮 <span id="currentLevelLabel">Niveau 1 — Anagramme</span></div>
+      <div class="right-panel">
+        <div class="panel-card">
+          <h4>Niveaux</h4>
+          <button class="level-btn active" onclick="openLevel(1, this)">Niveau 1</button>
+          <button class="level-btn" onclick="openLevel(2, this)">Niveau 2</button>
+          <button class="level-btn" onclick="openLevel(3, this)">Niveau 3</button>
+          <button class="level-btn" onclick="openLevel(4, this)">Niveau 4</button>
+        </div>
+        <div class="panel-card">
+          <h4>Mode</h4>
+          <div class="tiny" id="placementStatus">Aucun objet sélectionné</div>
+        </div>
+      </div>
+
+      <div class="minigame" id="minigameBox">
+        <div class="mini-head">
+          <h4 id="currentLevelLabel">Niveau 1 — Anagramme</h4>
+          <button class="btn btn-secondary" style="padding:8px 10px;border-radius:12px" onclick="toggleMinigame()">Fermer</button>
+        </div>
 
         <div id="level1Game">
-          <h4>Anagramme zen</h4>
-          <p class="small">Trouve le mot. Quand tu réussis, tu gagnes des étoiles.</p>
-          <div class="game-zone">
-            <div class="small">Indice : pièce douce pour se détendre</div>
-            <div class="letters" id="lettersBox"></div>
-            <div class="answer-row">
-              <input id="anagramInput" type="text" placeholder="Ta réponse" maxlength="5" />
-              <button class="btn-primary" onclick="checkAnagram()">Valider</button>
-            </div>
-            <div id="anagramFeedback" class="feedback"></div>
+          <p class="tiny">Trouve le mot. Tu gagnes 5 étoiles.</p>
+          <div class="letters" id="lettersBox"></div>
+          <div class="answer-row">
+            <input id="anagramInput" type="text" maxlength="5" placeholder="Ta réponse">
+            <button class="btn btn-primary" style="padding:12px 14px" onclick="checkAnagram()">Valider</button>
           </div>
+          <div id="anagramFeedback" class="feedback"></div>
         </div>
 
         <div id="level2Game" class="hidden">
-          <h4>Bubble zen</h4>
-          <p class="small">Éclate 6 bulles pour finir le niveau.</p>
-          <div class="game-zone">
-            <div class="small">Bulles éclatées : <span id="bubbleCount">0</span> / 6</div>
-            <div class="tap-board" id="tapBoard"></div>
-            <div id="bubbleFeedback" class="feedback"></div>
-          </div>
+          <p class="tiny">Éclate 6 bulles pour gagner 4 étoiles.</p>
+          <div class="tiny">Bulles éclatées : <span id="bubbleCount">0</span> / 6</div>
+          <div class="tap-board" id="tapBoard"></div>
+          <div id="bubbleFeedback" class="feedback"></div>
         </div>
 
         <div id="level3Game" class="hidden">
-          <h4>Mémoire douce</h4>
-          <p class="small">Retourne les cartes pour retrouver toutes les paires.</p>
-          <div class="game-zone">
-            <div class="small">Paires trouvées : <span id="memoryPairs">0</span> / 4</div>
-            <div class="memory-grid" id="memoryGrid"></div>
-            <div id="memoryFeedback" class="feedback"></div>
-          </div>
+          <p class="tiny">Trouve les 4 paires pour gagner 6 étoiles.</p>
+          <div class="tiny">Paires : <span id="memoryPairs">0</span> / 4</div>
+          <div class="memory-grid" id="memoryGrid"></div>
+          <div id="memoryFeedback" class="feedback"></div>
         </div>
 
         <div id="level4Game" class="hidden">
-          <h4>Glisser relax</h4>
-          <p class="small">Fais glisser le bouton jusqu’au bout pour terminer le niveau.</p>
-          <div class="game-zone">
-            <div class="swipe-track" id="swipeTrack">
-              <div class="swipe-label">Glisse jusqu’à la fin</div>
-              <div class="swipe-knob" id="swipeKnob"></div>
-            </div>
-            <div id="swipeFeedback" class="feedback"></div>
+          <p class="tiny">Glisse jusqu’au bout pour gagner 5 étoiles.</p>
+          <div class="swipe-track" id="swipeTrack">
+            <div class="swipe-label">Glisse jusqu’à la fin</div>
+            <div class="swipe-knob" id="swipeKnob"></div>
+          </div>
+          <div id="swipeFeedback" class="feedback"></div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="bottom-ui">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="openTab('shopTab', this)">Boutique</button>
+        <button class="tab-btn" onclick="openTab('buildTab', this)">Placer</button>
+        <button class="tab-btn" onclick="openTab('outfitTab', this)">Tenue</button>
+        <button class="tab-btn" onclick="openTab('moveTab', this)">Déplacement</button>
+      </div>
+
+      <div id="shopTab" class="panel active">
+        <div class="shop-strip" id="shopList"></div>
+        <div id="shopFeedback" class="feedback"></div>
+      </div>
+
+      <div id="buildTab" class="panel">
+        <div class="palette-strip" id="paletteList"></div>
+        <div class="hint-bar">
+          Sélectionne un objet possédé, puis touche l’endroit de la maison où tu veux le poser.
+        </div>
+      </div>
+
+      <div id="outfitTab" class="panel">
+        <div class="outfit-grid">
+          <div class="outfit-card">
+            <label>Peau</label>
+            <select id="skinSelect" onchange="updateOutfit()">
+              <option value="#ffd4b8">Clair</option>
+              <option value="#f1b996">Doré</option>
+              <option value="#c98763">Mat</option>
+              <option value="#8b5b42">Foncé</option>
+            </select>
+          </div>
+          <div class="outfit-card">
+            <label>Haut</label>
+            <select id="topSelect" onchange="updateOutfit()">
+              <option value="#8ec5ff">Bleu</option>
+              <option value="#ff9db3">Rose</option>
+              <option value="#9be0a2">Vert</option>
+              <option value="#ffd36f">Jaune</option>
+              <option value="#b8a0ff">Violet</option>
+            </select>
+          </div>
+          <div class="outfit-card">
+            <label>Bas</label>
+            <select id="bottomSelect" onchange="updateOutfit()">
+              <option value="#8b6cff">Violet</option>
+              <option value="#5f7cff">Bleu nuit</option>
+              <option value="#343434">Noir</option>
+              <option value="#c97f5d">Marron</option>
+            </select>
+          </div>
+          <div class="outfit-card">
+            <label>Chapeau</label>
+            <select id="hatSelect" onchange="updateOutfit()">
+              <option value="#f6b0a6">Rose</option>
+              <option value="#9ac8ff">Bleu</option>
+              <option value="#e5c67a">Beige</option>
+              <option value="#7fd1a2">Vert</option>
+            </select>
+          </div>
+          <div class="outfit-card">
+            <label>Accessoire</label>
+            <select id="accSelect" onchange="updateOutfit()">
+              <option value="✨">Étoile</option>
+              <option value="🕶️">Lunettes</option>
+              <option value="🌸">Fleur</option>
+              <option value="💎">Bijou</option>
+              <option value="🎀">Nœud</option>
+            </select>
           </div>
         </div>
-      </article>
-    </section>
-
-    <div class="section-title" id="shopSection">
-      <h3>Boutique déco</h3>
-      <span>Acheter puis poser dans la maison</span>
-    </div>
-
-    <section class="card shop-panel">
-      <div class="shop-list" id="shopList"></div>
-      <div id="shopFeedback" class="feedback"></div>
-    </section>
-
-    <div class="section-title">
-      <h3>Ton profil</h3>
-      <span>Choisis ton pseudo</span>
-    </div>
-
-    <section class="card profile-card">
-      <div class="avatar">✨</div>
-      <div>
-        <h4 id="pseudoDisplay">Pseudo : DreamPlayer</h4>
-        <p>Personnalise ton identité dans le jeu.</p>
-        <input id="pseudoInput" type="text" placeholder="Entre ton pseudo" maxlength="18" />
       </div>
-    </section>
-  </main>
 
-  <nav class="bottom-nav">
-    <button class="nav-item active" onclick="scrollToSection('insideSection')"><strong>🏠</strong>Maison</button>
-    <button class="nav-item" onclick="scrollToSection('levelsSection')"><strong>🎮</strong>Niveaux</button>
-    <button class="nav-item" onclick="scrollToSection('shopSection')"><strong>🪴</strong>Boutique</button>
-    <button class="nav-item" onclick="window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })"><strong>👤</strong>Profil</button>
-  </nav>
+      <div id="moveTab" class="panel">
+        <div class="move-grid">
+          <button class="move-btn empty"></button>
+          <button class="move-btn" onpointerdown="startMove('up')" onpointerup="stopMove()" onpointerleave="stopMove()">▲</button>
+          <button class="move-btn empty"></button>
+          <button class="move-btn" onpointerdown="startMove('left')" onpointerup="stopMove()" onpointerleave="stopMove()">◀</button>
+          <button class="move-btn" onpointerdown="startMove('down')" onpointerup="stopMove()" onpointerleave="stopMove()">▼</button>
+          <button class="move-btn" onpointerdown="startMove('right')" onpointerup="stopMove()" onpointerleave="stopMove()">▶</button>
+          <button class="move-btn empty"></button>
+          <button class="move-btn" onclick="centerOnPlayer()">◎</button>
+          <button class="move-btn empty"></button>
+        </div>
+        <div class="move-help">Tu peux aussi utiliser le clavier : ZQSD, WASD ou flèches.</div>
+      </div>
+    </footer>
+  </section>
 
   <script>
     let stars = 24;
+    let selectedPaletteId = null;
     let bubbleHits = 0;
     let memoryPairs = 0;
-    const anagramSolution = 'SALON';
+    let firstCard = null;
+    let lockBoard = false;
+    let currentMove = null;
+
+    const world = document.getElementById('world');
+    const camera = document.getElementById('camera');
+    const placedLayer = document.getElementById('placedLayer');
+    const player = document.getElementById('player');
+
+    const worldSize = { w: 2200, h: 1600 };
+    const playerState = { x: 860, y: 1020, speed: 6 };
+
     const shuffledLetters = ['L', 'O', 'N', 'A', 'S'];
+    const anagramSolution = 'SALON';
 
     const shopItems = [
-      { id: 'flowers', icon: '🌷', name: 'Fleurs pastel', desc: 'Ajoute des fleurs devant le canapé.', cost: 10, decorId: 'decor-flowers', owned: false, placed: false },
-      { id: 'lamp', icon: '💡', name: 'Lampadaire doux', desc: 'Une lumière cosy dans le salon.', cost: 18, decorId: 'decor-lamp', owned: false, placed: false },
-      { id: 'shelf', icon: '🪵', name: 'Étagère déco', desc: 'Une étagère avec livres et objets.', cost: 22, decorId: 'decor-shelf', owned: false, placed: false },
-      { id: 'rug', icon: '🧶', name: 'Tapis cocoon', desc: 'Un grand tapis sous la table.', cost: 14, decorId: 'decor-rug', owned: false, placed: false }
+      { id:'flowers', icon:'🌷', name:'Fleurs pastel', desc:'Petites fleurs décoratives.', cost:10, owned:false },
+      { id:'lamp', icon:'💡', name:'Lampadaire', desc:'Lumière chaude pour le salon.', cost:18, owned:false },
+      { id:'shelf', icon:'🪵', name:'Étagère', desc:'Petits objets et livres.', cost:22, owned:false },
+      { id:'rug', icon:'🧶', name:'Tapis', desc:'Tapis cocoon au sol.', cost:14, owned:false },
+
+      { id:'chair', icon:'🪑', name:'Chaise', desc:'Chaise simple.', cost:9, owned:false },
+      { id:'bed', icon:'🛏️', name:'Lit', desc:'Grand lit douillet.', cost:28, owned:false },
+      { id:'mirror', icon:'🪞', name:'Miroir', desc:'Miroir déco.', cost:16, owned:false },
+      { id:'plant', icon:'🪴', name:'Grande plante', desc:'Plante intérieure.', cost:13, owned:false },
+      { id:'frame', icon:'🖼️', name:'Cadre photo', desc:'Cadre mural.', cost:12, owned:false },
+      { id:'basket', icon:'🧺', name:'Panier', desc:'Panier de rangement.', cost:8, owned:false },
+      { id:'teddy', icon:'🧸', name:'Peluche', desc:'Déco douce.', cost:11, owned:false },
+      { id:'clock', icon:'🕰️', name:'Horloge', desc:'Horloge chic.', cost:17, owned:false },
+      { id:'desk', icon:'🪟', name:'Fenêtre déco', desc:'Ouverture supplémentaire.', cost:21, owned:false },
+      { id:'candle', icon:'🕯️', name:'Bougie', desc:'Ambiance relax.', cost:7, owned:false }
     ];
 
-    function updateStars() {
+    let placedItems = [];
+    let placedCounter = 0;
+
+    function saveGame(){
+      const data = {
+        stars,
+        shopItems,
+        placedItems,
+        outfit:{
+          skin: document.getElementById('skinSelect').value,
+          top: document.getElementById('topSelect').value,
+          bottom: document.getElementById('bottomSelect').value,
+          hat: document.getElementById('hatSelect').value,
+          acc: document.getElementById('accSelect').value
+        },
+        playerState
+      };
+      localStorage.setItem('maison_v5_save', JSON.stringify(data));
+    }
+
+    function loadGame(){
+      const raw = localStorage.getItem('maison_v5_save');
+      if(!raw) return false;
+      try{
+        const data = JSON.parse(raw);
+        if(typeof data.stars === 'number') stars = data.stars;
+        if(Array.isArray(data.shopItems)){
+          data.shopItems.forEach(saved=>{
+            const item = shopItems.find(i=>i.id===saved.id);
+            if(item) item.owned = !!saved.owned;
+          });
+        }
+        if(data.playerState){
+          playerState.x = data.playerState.x || playerState.x;
+          playerState.y = data.playerState.y || playerState.y;
+        }
+        if(data.outfit){
+          if(data.outfit.skin) document.getElementById('skinSelect').value = data.outfit.skin;
+          if(data.outfit.top) document.getElementById('topSelect').value = data.outfit.top;
+          if(data.outfit.bottom) document.getElementById('bottomSelect').value = data.outfit.bottom;
+          if(data.outfit.hat) document.getElementById('hatSelect').value = data.outfit.hat;
+          if(data.outfit.acc) document.getElementById('accSelect').value = data.outfit.acc;
+        }
+        placedItems = Array.isArray(data.placedItems) ? data.placedItems : [];
+        return true;
+      }catch(e){
+        return false;
+      }
+    }
+
+    function enterHouse(){
+      document.getElementById('menuScreen').classList.add('hidden');
+      document.getElementById('gameScreen').classList.remove('hidden');
+      initAfterEnter();
+    }
+
+    function loadSaveAndEnter(){
+      loadGame();
+      enterHouse();
+    }
+
+    function initAfterEnter(){
+      updateStars();
+      renderLetters();
+      renderBubbleGame();
+      renderMemory();
+      renderShop();
+      renderPalette();
+      renderPlacedItems();
+      updatePlacedCount();
+      updateOutfit();
+      updatePlayer();
+      centerOnPlayer();
+      openLevel(1, document.querySelector('.level-btn'));
+    }
+
+    function updateStars(){
       document.getElementById('starsCount').textContent = stars;
-      document.getElementById('starsStat').textContent = stars;
     }
 
-    function updatePlacedCount() {
-      const placed = shopItems.filter(item => item.placed).length;
-      document.getElementById('placedCount').textContent = placed;
+    function updatePlacedCount(){
+      document.getElementById('placedCount').textContent = placedItems.length;
     }
 
-    function setFeedback(targetId, message, ok = true) {
-      const target = document.getElementById(targetId);
-      if (!target) return;
-      target.textContent = message;
-      target.className = ok ? 'feedback ok' : 'feedback bad';
+    function setFeedback(id, msg, ok=true){
+      const el = document.getElementById(id);
+      if(!el) return;
+      el.textContent = msg;
+      el.className = 'feedback ' + (ok ? 'ok' : 'bad');
     }
 
-    function gainStars(amount, message, targetId) {
+    function gainStars(amount, message, targetId){
       stars += amount;
       updateStars();
       setFeedback(targetId, message, true);
       renderShop();
+      saveGame();
     }
 
-    function renderLetters() {
-      const box = document.getElementById('lettersBox');
-      box.innerHTML = shuffledLetters.map(l => `<div class="letter">${l}</div>`).join('');
+    function openTab(id, btn){
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
     }
 
-    function checkAnagram() {
+    function openLevel(level, btn){
+      document.querySelectorAll('.level-btn').forEach(b=>b.classList.remove('active'));
+      if(btn) btn.classList.add('active');
+      ['level1Game','level2Game','level3Game','level4Game'].forEach(id=>{
+        document.getElementById(id).classList.add('hidden');
+      });
+      const labels = {
+        1:'Niveau 1 — Anagramme',
+        2:'Niveau 2 — Bubble zen',
+        3:'Niveau 3 — Mémoire',
+        4:'Niveau 4 — Glisser relax'
+      };
+      document.getElementById('currentLevelLabel').textContent = labels[level];
+      document.getElementById('level' + level + 'Game').classList.remove('hidden');
+      document.getElementById('minigameBox').classList.remove('hidden');
+    }
+
+    function toggleMinigame(){
+      document.getElementById('minigameBox').classList.toggle('hidden');
+    }
+
+    function renderLetters(){
+      document.getElementById('lettersBox').innerHTML = shuffledLetters.map(l => `<div class="letter">${l}</div>`).join('');
+    }
+
+    function checkAnagram(){
       const input = document.getElementById('anagramInput');
       const value = input.value.trim().toUpperCase();
-      if (!value) {
-        setFeedback('anagramFeedback', 'Écris un mot avant de valider.', false);
+      if(!value){
+        setFeedback('anagramFeedback','Écris un mot avant de valider.', false);
         return;
       }
-      if (value === anagramSolution) {
-        gainStars(5, 'Niveau terminé : +5 étoiles ⭐', 'anagramFeedback');
+      if(value === anagramSolution){
+        gainStars(5,'Niveau terminé : +5 étoiles ⭐','anagramFeedback');
         input.value = '';
-      } else {
-        setFeedback('anagramFeedback', 'Pas encore. Essaie une autre combinaison.', false);
+      }else{
+        setFeedback('anagramFeedback','Pas encore. Essaie une autre combinaison.', false);
       }
     }
 
-    function renderBubbleGame() {
+    function renderBubbleGame(){
       const board = document.getElementById('tapBoard');
       board.innerHTML = '';
       const icons = ['🫧','✨','🌸','💧','☁️','🌷','⭐','🕯️','🍃'];
-      icons.forEach((icon) => {
+      icons.forEach(icon=>{
         const btn = document.createElement('button');
         btn.className = 'bubble';
         btn.textContent = icon;
-        btn.addEventListener('click', () => popBubble(btn));
+        btn.onclick = () => popBubble(btn);
         board.appendChild(btn);
       });
     }
 
-    function popBubble(btn) {
-      if (btn.disabled) return;
+    function popBubble(btn){
+      if(btn.disabled) return;
       btn.disabled = true;
       btn.style.opacity = '.35';
       bubbleHits += 1;
       document.getElementById('bubbleCount').textContent = bubbleHits;
-      if (bubbleHits >= 6) {
-        gainStars(4, 'Niveau terminé : +4 étoiles ⭐', 'bubbleFeedback');
+      if(bubbleHits >= 6){
+        gainStars(4,'Niveau terminé : +4 étoiles ⭐','bubbleFeedback');
         bubbleHits = 0;
-        setTimeout(() => {
+        setTimeout(()=>{
           document.getElementById('bubbleCount').textContent = '0';
           renderBubbleGame();
         }, 900);
@@ -482,42 +804,40 @@
     }
 
     const memoryIcons = ['🌷','🌷','🪴','🪴','🛋️','🛋️','💡','💡'];
-    let firstCard = null;
-    let lockBoard = false;
 
-    function shuffle(array) {
+    function shuffle(array){
       return array
         .map(value => ({ value, sort: Math.random() }))
-        .sort((a, b) => a.sort - b.sort)
-        .map(({ value }) => value);
+        .sort((a,b)=>a.sort-b.sort)
+        .map(({value})=>value);
     }
 
-    function renderMemory() {
+    function renderMemory(){
       const grid = document.getElementById('memoryGrid');
       grid.innerHTML = '';
       memoryPairs = 0;
-      document.getElementById('memoryPairs').textContent = '0';
-      document.getElementById('memoryFeedback').textContent = '';
       firstCard = null;
       lockBoard = false;
-      shuffle(memoryIcons).forEach((icon) => {
+      document.getElementById('memoryPairs').textContent = '0';
+      document.getElementById('memoryFeedback').textContent = '';
+      shuffle(memoryIcons).forEach(icon=>{
         const btn = document.createElement('button');
         btn.className = 'memory-card';
         btn.dataset.icon = icon;
         btn.textContent = icon;
-        btn.addEventListener('click', () => flipCard(btn));
+        btn.onclick = () => flipCard(btn);
         grid.appendChild(btn);
       });
     }
 
-    function flipCard(card) {
-      if (lockBoard || card.classList.contains('matched') || card === firstCard) return;
+    function flipCard(card){
+      if(lockBoard || card.classList.contains('matched') || card === firstCard) return;
       card.classList.add('revealed');
-      if (!firstCard) {
+      if(!firstCard){
         firstCard = card;
         return;
       }
-      if (firstCard.dataset.icon === card.dataset.icon) {
+      if(firstCard.dataset.icon === card.dataset.icon){
         firstCard.classList.remove('revealed');
         card.classList.remove('revealed');
         firstCard.classList.add('matched');
@@ -525,14 +845,14 @@
         firstCard = null;
         memoryPairs += 1;
         document.getElementById('memoryPairs').textContent = memoryPairs;
-        if (memoryPairs === 4) {
-          gainStars(6, 'Niveau terminé : +6 étoiles ⭐', 'memoryFeedback');
+        if(memoryPairs === 4){
+          gainStars(6,'Niveau terminé : +6 étoiles ⭐','memoryFeedback');
           setTimeout(renderMemory, 1100);
         }
-      } else {
+      }else{
         lockBoard = true;
         const previous = firstCard;
-        setTimeout(() => {
+        setTimeout(()=>{
           previous.classList.remove('revealed');
           card.classList.remove('revealed');
           firstCard = null;
@@ -541,100 +861,77 @@
       }
     }
 
-    function openLevel(level, btn) {
-      document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active');
-      ['level1Game','level2Game','level3Game','level4Game'].forEach(id => {
-        document.getElementById(id).classList.add('hidden');
-      });
-      const labels = {
-        1: 'Niveau 1 — Anagramme',
-        2: 'Niveau 2 — Bubble zen',
-        3: 'Niveau 3 — Mémoire',
-        4: 'Niveau 4 — Glisser relax'
-      };
-      document.getElementById('currentLevelLabel').textContent = labels[level];
-      document.getElementById('level' + level + 'Game').classList.remove('hidden');
-    }
-
     const swipeKnob = document.getElementById('swipeKnob');
     const swipeTrack = document.getElementById('swipeTrack');
     let swipeActive = false;
     let startX = 0;
     let knobStart = 6;
 
-    function resetSwipe() {
+    function resetSwipe(){
       swipeKnob.style.left = '6px';
       swipeActive = false;
     }
-
-    function completeSwipe() {
-      gainStars(5, 'Niveau terminé : +5 étoiles ⭐', 'swipeFeedback');
+    function completeSwipe(){
+      gainStars(5,'Niveau terminé : +5 étoiles ⭐','swipeFeedback');
       setTimeout(resetSwipe, 700);
     }
 
-    swipeKnob.addEventListener('pointerdown', (e) => {
+    swipeKnob.addEventListener('pointerdown', (e)=>{
       swipeActive = true;
       startX = e.clientX;
       knobStart = parseFloat(swipeKnob.style.left || '6');
       swipeKnob.setPointerCapture(e.pointerId);
     });
-
-    swipeKnob.addEventListener('pointermove', (e) => {
-      if (!swipeActive) return;
+    swipeKnob.addEventListener('pointermove', (e)=>{
+      if(!swipeActive) return;
       const max = swipeTrack.clientWidth - swipeKnob.clientWidth - 6;
       let next = knobStart + (e.clientX - startX);
-      if (next < 6) next = 6;
-      if (next > max) next = max;
+      if(next < 6) next = 6;
+      if(next > max) next = max;
       swipeKnob.style.left = next + 'px';
-      if (next >= max - 2) {
+      if(next >= max - 2){
         swipeActive = false;
         completeSwipe();
       }
     });
-
-    swipeKnob.addEventListener('pointerup', () => {
-      if (!swipeActive) return;
+    swipeKnob.addEventListener('pointerup', ()=>{
+      if(!swipeActive) return;
       swipeActive = false;
-      if (parseFloat(swipeKnob.style.left || '6') < swipeTrack.clientWidth - swipeKnob.clientWidth - 20) {
+      const max = swipeTrack.clientWidth - swipeKnob.clientWidth - 20;
+      if(parseFloat(swipeKnob.style.left || '6') < max){
         resetSwipe();
       }
     });
 
-    function renderShop() {
+    function renderShop(){
       const container = document.getElementById('shopList');
       container.innerHTML = '';
-      shopItems.forEach(item => {
-        const article = document.createElement('article');
+      shopItems.forEach(item=>{
+        const article = document.createElement('div');
         article.className = 'shop-item';
         article.innerHTML = `
           <div class="shop-icon">${item.icon}</div>
-          <div>
-            <h4>${item.name}</h4>
-            <p>${item.desc}</p>
-            <div class="shop-actions">
-              <button class="shop-action buy" ${item.owned ? 'disabled' : ''} onclick="buyDecoration('${item.id}')">
-                ${item.owned ? 'Acheté' : 'Acheter ⭐ ' + item.cost}
-              </button>
-              <button class="shop-action place" ${item.owned ? '' : 'disabled'} onclick="togglePlaceDecoration('${item.id}')">
-                ${item.placed ? 'Retirer' : 'Poser'}
-              </button>
-              ${item.owned ? '<span class="owned-badge">✔ Possédée</span>' : ''}
-            </div>
+          <h4>${item.name}</h4>
+          <p>${item.desc}</p>
+          <div class="shop-actions">
+            <button class="shop-action buy" ${item.owned ? 'disabled' : ''} onclick="buyDecoration('${item.id}')">
+              ${item.owned ? 'Acheté' : 'Acheter ⭐ ' + item.cost}
+            </button>
+            ${item.owned ? '<span class="owned-badge">✔ Possédé</span>' : ''}
           </div>
         `;
         container.appendChild(article);
       });
     }
 
-    function buyDecoration(id) {
-      const item = shopItems.find(obj => obj.id === id);
-      if (!item) return;
-      if (item.owned) {
-        setFeedback('shopFeedback', 'Cette décoration est déjà achetée.', false);
+    function buyDecoration(id){
+      const item = shopItems.find(obj=>obj.id === id);
+      if(!item) return;
+      if(item.owned){
+        setFeedback('shopFeedback', 'Cet objet est déjà acheté.', false);
         return;
       }
-      if (stars < item.cost) {
+      if(stars < item.cost){
         setFeedback('shopFeedback', 'Tu n’as pas assez d’étoiles.', false);
         return;
       }
@@ -642,43 +939,233 @@
       item.owned = true;
       updateStars();
       renderShop();
-      setFeedback('shopFeedback', `Achat réussi : ${item.name}. Tu peux maintenant appuyer sur Poser.`, true);
+      renderPalette();
+      setFeedback('shopFeedback', `${item.name} acheté. Va dans l’onglet Placer pour le poser dans la maison.`, true);
+      saveGame();
     }
 
-    function togglePlaceDecoration(id) {
-      const item = shopItems.find(obj => obj.id === id);
-      if (!item) return;
-      if (!item.owned) {
-        setFeedback('shopFeedback', 'Tu dois d’abord acheter cette décoration.', false);
+    function renderPalette(){
+      const container = document.getElementById('paletteList');
+      container.innerHTML = '';
+      const owned = shopItems.filter(item=>item.owned);
+      if(owned.length === 0){
+        container.innerHTML = '<div class="hint-bar">Achète d’abord un objet dans la boutique.</div>';
+        document.getElementById('placementStatus').textContent = 'Aucun objet sélectionné';
         return;
       }
-      item.placed = !item.placed;
-      const decor = document.getElementById(item.decorId);
-      if (decor) {
-        decor.classList.toggle('hidden-decor', !item.placed);
+      owned.forEach(item=>{
+        const btn = document.createElement('button');
+        btn.className = 'palette-btn' + (selectedPaletteId === item.id ? ' active' : '');
+        btn.innerHTML = `<div>${item.icon}</div><div>${item.name}</div><div class="tiny">Poser librement</div>`;
+        btn.onclick = ()=>selectPaletteItem(item.id);
+        container.appendChild(btn);
+      });
+      if(selectedPaletteId){
+        const current = shopItems.find(i=>i.id === selectedPaletteId);
+        document.getElementById('placementStatus').textContent = current ? 'Objet choisi : ' + current.name : 'Aucun objet sélectionné';
+      }else{
+        document.getElementById('placementStatus').textContent = 'Aucun objet sélectionné';
       }
+    }
+
+    function selectPaletteItem(id){
+      selectedPaletteId = id;
+      renderPalette();
+      saveGame();
+    }
+
+    function placeSelectedItem(worldX, worldY){
+      if(!selectedPaletteId){
+        setFeedback('shopFeedback', 'Sélectionne un objet dans l’onglet Placer.', false);
+        return;
+      }
+      const item = shopItems.find(i=>i.id === selectedPaletteId && i.owned);
+      if(!item) return;
+
+      const placed = {
+        placedId: 'p' + (++placedCounter) + '_' + Date.now(),
+        itemId: item.id,
+        icon: item.icon,
+        name: item.name,
+        x: Math.max(60, Math.min(worldSize.w - 60, worldX)),
+        y: Math.max(60, Math.min(worldSize.h - 60, worldY))
+      };
+      placedItems.push(placed);
+      renderPlacedItems();
       updatePlacedCount();
-      renderShop();
-      setFeedback('shopFeedback', item.placed ? `${item.name} a été posée dans la maison.` : `${item.name} a été retirée de la maison.`, true);
+      saveGame();
+      setFeedback('shopFeedback', `${item.name} posé dans la maison.`, true);
     }
 
-    function scrollToSection(id) {
-      const el = document.getElementById(id);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    function renderPlacedItems(){
+      placedLayer.innerHTML = '';
+      placedItems.forEach(obj=>{
+        const el = document.createElement('div');
+        el.className = 'placed';
+        el.style.left = obj.x + 'px';
+        el.style.top = obj.y + 'px';
+        el.dataset.id = obj.placedId;
+        el.innerHTML = `<div class="item-emoji">${obj.icon}</div><div class="item-label">${obj.name}</div>`;
+        enableDragPlaced(el, obj);
+        el.addEventListener('dblclick', ()=>{
+          removePlacedItem(obj.placedId);
+        });
+        placedLayer.appendChild(el);
+      });
+      updatePlacedCount();
     }
 
-    document.getElementById('pseudoInput').addEventListener('input', function(e) {
-      const value = e.target.value.trim();
-      document.getElementById('pseudoDisplay').textContent = 'Pseudo : ' + (value || 'DreamPlayer');
+    function removePlacedItem(id){
+      placedItems = placedItems.filter(i=>i.placedId !== id);
+      renderPlacedItems();
+      saveGame();
+    }
+
+    function enableDragPlaced(el, obj){
+      let dragging = false;
+      let moved = false;
+      let startPointerWorldX = 0;
+      let startPointerWorldY = 0;
+      let startObjX = 0;
+      let startObjY = 0;
+
+      el.addEventListener('pointerdown', (e)=>{
+        dragging = true;
+        moved = false;
+        el.setPointerCapture(e.pointerId);
+        const p = screenToWorld(e.clientX, e.clientY);
+        startPointerWorldX = p.x;
+        startPointerWorldY = p.y;
+        startObjX = obj.x;
+        startObjY = obj.y;
+        document.querySelectorAll('.placed').forEach(n=>n.classList.remove('selected'));
+        el.classList.add('selected');
+      });
+
+      el.addEventListener('pointermove', (e)=>{
+        if(!dragging) return;
+        const p = screenToWorld(e.clientX, e.clientY);
+        const dx = p.x - startPointerWorldX;
+        const dy = p.y - startPointerWorldY;
+        if(Math.abs(dx) > 2 || Math.abs(dy) > 2) moved = true;
+        obj.x = clamp(startObjX + dx, 60, worldSize.w - 60);
+        obj.y = clamp(startObjY + dy, 60, worldSize.h - 60);
+        el.style.left = obj.x + 'px';
+        el.style.top = obj.y + 'px';
+      });
+
+      const stop = ()=>{
+        if(dragging){
+          dragging = false;
+          saveGame();
+        }
+      };
+      el.addEventListener('pointerup', stop);
+      el.addEventListener('pointercancel', stop);
+
+      el.addEventListener('click', (e)=>{
+        if(moved) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      });
+    }
+
+    function clamp(v, min, max){
+      return Math.max(min, Math.min(max, v));
+    }
+
+    function screenToWorld(clientX, clientY){
+      const rect = camera.getBoundingClientRect();
+      const camX = getCameraX();
+      const camY = getCameraY();
+      return {
+        x: camX + (clientX - rect.left),
+        y: camY + (clientY - rect.top)
+      };
+    }
+
+    function getCameraX(){
+      const transform = world.style.transform || 'translate(0px, 0px)';
+      const match = transform.match(/translate\(([-0-9.]+)px,\s*([-0-9.]+)px\)/);
+      return match ? -parseFloat(match[1]) : 0;
+    }
+
+    function getCameraY(){
+      const transform = world.style.transform || 'translate(0px, 0px)';
+      const match = transform.match(/translate\(([-0-9.]+)px,\s*([-0-9.]+)px\)/);
+      return match ? -parseFloat(match[2]) : 0;
+    }
+
+    camera.addEventListener('click', (e)=>{
+      if(e.target.closest('.placed')) return;
+      const p = screenToWorld(e.clientX, e.clientY);
+      placeSelectedItem(p.x, p.y);
     });
 
-    renderLetters();
-    renderBubbleGame();
-    renderMemory();
-    updateStars();
-    updatePlacedCount();
-    renderShop();
-    openLevel(1, document.querySelector('.level-btn'));
+    function updateOutfit(){
+      const skin = document.getElementById('skinSelect').value;
+      const top = document.getElementById('topSelect').value;
+      const bottom = document.getElementById('bottomSelect').value;
+      const hat = document.getElementById('hatSelect').value;
+      const acc = document.getElementById('accSelect').value;
+
+      player.style.setProperty('--skin', skin);
+      player.style.setProperty('--outfit-top', top);
+      player.style.setProperty('--outfit-bottom', bottom);
+      player.style.setProperty('--hat', hat);
+      player.querySelector('.player-accessory').textContent = acc;
+      saveGame();
+    }
+
+    function updatePlayer(){
+      player.style.left = playerState.x + 'px';
+      player.style.top = playerState.y + 'px';
+    }
+
+    function centerOnPlayer(){
+      const camW = camera.clientWidth;
+      const camH = camera.clientHeight;
+      const camX = clamp(playerState.x - camW / 2, 0, worldSize.w - camW);
+      const camY = clamp(playerState.y - camH / 2, 0, worldSize.h - camH);
+      world.style.transform = `translate(${-camX}px, ${-camY}px)`;
+    }
+
+    function movePlayer(dx, dy){
+      playerState.x = clamp(playerState.x + dx, 50, worldSize.w - 50);
+      playerState.y = clamp(playerState.y + dy, 50, worldSize.h - 50);
+      updatePlayer();
+      centerOnPlayer();
+      saveGame();
+    }
+
+    function startMove(dir){
+      currentMove = dir;
+    }
+    function stopMove(){
+      currentMove = null;
+    }
+
+    window.addEventListener('keydown', (e)=>{
+      const key = e.key.toLowerCase();
+      if(['arrowup','z','w'].includes(key)) currentMove = 'up';
+      if(['arrowdown','s'].includes(key)) currentMove = 'down';
+      if(['arrowleft','q','a'].includes(key)) currentMove = 'left';
+      if(['arrowright','d'].includes(key)) currentMove = 'right';
+    });
+    window.addEventListener('keyup', (e)=>{
+      const key = e.key.toLowerCase();
+      if(['arrowup','z','w','arrowdown','s','arrowleft','q','a','arrowright','d'].includes(key)) currentMove = null;
+    });
+
+    function gameLoop(){
+      if(currentMove === 'up') movePlayer(0, -playerState.speed);
+      if(currentMove === 'down') movePlayer(0, playerState.speed);
+      if(currentMove === 'left') movePlayer(-playerState.speed, 0);
+      if(currentMove === 'right') movePlayer(playerState.speed, 0);
+      requestAnimationFrame(gameLoop);
+    }
+    requestAnimationFrame(gameLoop);
   </script>
 </body>
 </html>
